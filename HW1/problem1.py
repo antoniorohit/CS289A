@@ -15,22 +15,20 @@ from skimage.io._plugins.qt_plugin import ImageLabel
 
 DEBUG = False
 ############# FILE STUFF ############# 
-
 testFileMNIST = "./digit-dataset/test.mat"
 trainFileMNIST = "./digit-dataset/train.mat"
 
-trainMat = sp.io.loadmat(trainFileMNIST)
-testMat = sp.io.loadmat(testFileMNIST)
+trainMatrix = sp.io.loadmat(trainFileMNIST)                 # Dictionary
+testMatrix = sp.io.loadmat(testFileMNIST)                   # Dictionary
 
 if DEBUG:
     print 50*'-'
-    print trainMat, testMat
+    print trainMatrix, testMatrix
 
 ############# GET DATA ############# 
-
-imageData = np.array(trainMat['train_images'])
+imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
-imageLabels = np.array(trainMat['train_labels'])
+imageLabels = np.array(trainMatrix['train_labels'])
 
 imageComplete = zip(imageData, imageLabels)
 
@@ -69,29 +67,35 @@ shuffledData = []
 shuffledLabels = []
 
 for elem in imageComplete:
-    shuffledData.append((elem[0]).flatten())
+    shuffledData.append((elem[0]).flatten())                # Use a simple array of pixels as the feature
     shuffledLabels.append((elem[1][0]))
 
 # NOTE: Set aside 50,000-60,000 to validate
 
 ############# TRAIN SVM ############# 
-C = 1.0
-
-if DEBUG:
+C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]                    # array of values for parameter C
+training_Size = [100, 200, 500, 1000, 2000, 5000, 10000]
+for C_Value in C:
     print 50*'-'
-    print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
-
-clf = svm.SVC(kernel='linear', C=C)
-clf.fit(shuffledData[:200], np.array(shuffledLabels[:200]))
-
-predicted = clf.predict(shuffledData[50000:])
-actual = shuffledLabels[50000:]
-sum = 0.0
-for elem1, elem2 in zip(predicted, actual):
-    if elem1 == elem2:
-        sum+=1
-
-print "Accuracy: ", 100.0*sum/len(predicted), "%"
+    print "C Value:", C_Value
+    print 50*'-'
+    for elem in training_Size:
+        if DEBUG:
+            print 50*'-'
+            print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
+        
+        clf = svm.SVC(kernel='linear', C=C_Value)
+        clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
+        
+        predicted_Digits = clf.predict(shuffledData[50000:])
+        actual_Digits = shuffledLabels[50000:]
+        accuracy = 0.0
+        for elem1, elem2 in zip(predicted_Digits, actual_Digits):
+            if elem1 == elem2:
+                accuracy+=1
+        
+        print "Training Size:", elem 
+        print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
 
 ############# PLOT RESULTS ############# 
 

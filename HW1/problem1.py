@@ -4,6 +4,23 @@
 # and 10,000. Make sure you set aside 10,000 other training points as a validation set.
 # You should expect accuracies between 70% and 90% at this stage
 
+def computeCV_Score(clf, data, labels, folds):
+    i = 0
+    j = 0
+    accuracy = 0.0
+    scores = []
+    for i in range(folds):
+        clf.fit(data[i], labels[i])
+        for j in range(folds):
+            if(j!=i):
+                predicted_Digits = clf.predict(data[j])
+                for elem1, elem2 in zip(predicted_Digits, labels[j]):
+                    if elem1 == elem2:
+                        accuracy+=1                
+        scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
+    return scores
+
+
 ############# IMPORTS ############# 
 
 import scipy as sp
@@ -14,8 +31,9 @@ import random
 from skimage.io._plugins.qt_plugin import ImageLabel
 from sklearn.metrics import confusion_matrix
 import pylab as plt
+from sklearn import cross_validation
 
-DEBUG = False
+DEBUG = True
 ############# FILE STUFF ############# 
 testFileMNIST = "./digit-dataset/test.mat"
 trainFileMNIST = "./digit-dataset/train.mat"
@@ -75,40 +93,69 @@ for elem in imageComplete:
 # NOTE: Set aside 50,000-60,000 to validate
 
 ############# TRAIN SVM ############# 
-C = [1] #[0.001, 0.01, 0.1, 1, 10, 100, 1000]                    # array of values for parameter C
-training_Size = [100, 200, 500, 1000, 2000, 5000, 10000]
-for C_Value in C:
-    print 50*'-'
-    print "C Value:", C_Value
-    print 50*'-'
-    for elem in training_Size:
-        if DEBUG:
-            print 50*'-'
-            print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
-        
-        clf = svm.SVC(kernel='linear', C=C_Value)
-        clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
-        
-        predicted_Digits = clf.predict(shuffledData[50000:])
-        actual_Digits = shuffledLabels[50000:]
-        accuracy = 0.0
-        for elem1, elem2 in zip(predicted_Digits, actual_Digits):
-            if elem1 == elem2:
-                accuracy+=1
-        
-        print "Training Size:", elem 
-        print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
-        cm = confusion_matrix(actual_Digits, predicted_Digits)
-        
-        # Show confusion matrix in a separate window
-        plt.matshow(cm)
-        plt.title('Confusion matrix')
-        plt.colorbar()
-        plt.ylabel('True Digit')
-        plt.xlabel('Predicted Digit')
-        plt.savefig("./Results/" + str(elem)+"_CM.png")
+C = [0.000001, 0.001, 1, 1000, 1000000]                    # array of values for parameter C
+training_Size = [100, 200, 500, 1000, 2000]#, 5000, 10000]
+for elem in training_Size:
+    if DEBUG:
+        print 50*'-'
+        print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
+    
+    clf = svm.SVC(kernel='linear', C=C[3])
+    clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
+    
+    predicted_Digits = clf.predict(shuffledData[50000:])
+    actual_Digits = shuffledLabels[50000:]
+    accuracy = 0.0
+    for elem1, elem2 in zip(predicted_Digits, actual_Digits):
+        if elem1 == elem2:
+            accuracy+=1
+    
+    print "Training Size:", elem 
+    print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
+    cm = confusion_matrix(actual_Digits, predicted_Digits)
 ############# PLOT RESULTS ############# 
+    
+    # Show confusion matrix in a separate window
+    plt.matshow(cm)
+    plt.title('Confusion matrix')
+    plt.colorbar()
+    plt.ylabel('True Digit')
+    plt.xlabel('Predicted Digit')
+    plt.savefig("./Results/" + str(elem)+"_CM.png")
+####################################### 
+
+#########################################################
+# CROSS VALIDATION 
+#########################################################
+
+############# USING BUILT IN FUNCTION ############# 
+# for C_Value in C:
+#     clf = svm.SVC(kernel='linear', C=C_Value)
+#     scores = cross_validation.cross_val_score(clf, shuffledData[:10000], shuffledLabels[:10000], cv=10)
+#     print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+
+############# DATA PARTIONING ############# 
+crossValidation_Data= []
+crossValidation_Labels = []
+k = 10 
+lengthData = 10000
+stepLength = lengthData/k
+for index in range(0,k):
+    crossValidation_Data.append(shuffledData[index:lengthData:stepLength])
+    crossValidation_Labels.append(shuffledLabels[index:lengthData:stepLength])
+
+if DEBUG:
+    print "Lengths of CV Data and Labels: ", len(crossValidation_Data), len(crossValidation_Labels)
+
+for C_Value in C:
+    clf = svm.SVC(kernel='linear', C=C_Value)
+    scores = computeCV_Score(clf, shuffledData[:10000], shuffledLabels[:10000], 10)
+    print scores
+    print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+
+############# CROSS-VALIDATION ############# 
 
 
 print 50*'-'
 print "End of File"
+print 50*'-'

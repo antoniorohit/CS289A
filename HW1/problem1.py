@@ -12,6 +12,8 @@ from sklearn import svm
 from scipy import io
 import random
 from skimage.io._plugins.qt_plugin import ImageLabel
+from sklearn.metrics import confusion_matrix
+import pylab as plt
 
 DEBUG = False
 ############# FILE STUFF ############# 
@@ -73,7 +75,7 @@ for elem in imageComplete:
 # NOTE: Set aside 50,000-60,000 to validate
 
 ############# TRAIN SVM ############# 
-C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]                    # array of values for parameter C
+C = [1] #[0.001, 0.01, 0.1, 1, 10, 100, 1000]                    # array of values for parameter C
 training_Size = [100, 200, 500, 1000, 2000, 5000, 10000]
 for C_Value in C:
     print 50*'-'
@@ -96,9 +98,17 @@ for C_Value in C:
         
         print "Training Size:", elem 
         print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
-
+        cm = confusion_matrix(actual_Digits, predicted_Digits)
+        
+        # Show confusion matrix in a separate window
+        plt.matshow(cm)
+        plt.title('Confusion matrix')
+        plt.colorbar()
+        plt.ylabel('True Digit')
+        plt.xlabel('Predicted Digit')
+        plt.savefig("./Results/" + str(elem)+"_CM.png")
 ############# PLOT RESULTS ############# 
 
-    
+
 print 50*'-'
 print "End of File"

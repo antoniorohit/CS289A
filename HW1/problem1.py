@@ -46,7 +46,7 @@ from sklearn.metrics import confusion_matrix
 import pylab as plt
 from sklearn import cross_validation
 
-DEBUG = True
+DEBUG = False
 ############# FILE STUFF ############# 
 testFileMNIST = "./digit-dataset/test.mat"
 trainFileMNIST = "./digit-dataset/train.mat"
@@ -106,7 +106,11 @@ for elem in imageComplete:
 # NOTE: Set aside 50,000-60,000 to validate
 
 ############# TRAIN SVM ############# 
-C = [0.000001, 0.001, 1, 1000, 1000000]                    # array of values for parameter C
+print 50*'-'
+print "SVM TRAINING"
+print 50*'-'
+
+C = [0.000000001, 0.000001, 0.001, 1, 1000]                    # array of values for parameter C
 training_Size = [100, 200, 500, 1000]#, 2000, 5000, 10000]
 for elem in training_Size:
     if DEBUG:
@@ -125,9 +129,10 @@ for elem in training_Size:
     
     print "Training Size:", elem 
     print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
+    print 50*'-'
+
     cm = confusion_matrix(actual_Digits, predicted_Digits)
-############# PLOT RESULTS ############# 
-    
+############# PLOT RESULTS #############     
     # Show confusion matrix in a separate window
     plt.matshow(cm)
     plt.title('Confusion matrix')
@@ -135,17 +140,15 @@ for elem in training_Size:
     plt.ylabel('True Digit')
     plt.xlabel('Predicted Digit')
     plt.savefig("./Results/" + str(elem)+"_CM.png")
+
 ####################################### 
 
 #########################################################
 # CROSS VALIDATION 
 #########################################################
-
-############# USING BUILT IN FUNCTION ############# 
-# for C_Value in C:
-#     clf = svm.SVC(kernel='linear', C=C_Value)
-#     scores = cross_validation.cross_val_score(clf, shuffledData[:10000], shuffledLabels[:10000], cv=10)
-#     print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+print 50*'-'
+print "CROSS VALIDATION"
+print 50*'-'
 
 ############# DATA PARTIONING ############# 
 crossValidation_Data= []
@@ -158,19 +161,22 @@ for index in range(0,k):
     crossValidation_Labels.append(shuffledLabels[index:lengthData:stepLength])
 
 if DEBUG:
-    print 50*'-'
     print "Lengths of CV Data and Labels: ", np.array(crossValidation_Data).shape, np.array(crossValidation_Labels).shape
     print 50*'-'
 
+############# CROSS-VALIDATION ############# 
 for C_Value in C:
     clf = svm.SVC(kernel='linear', C=C_Value)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    print 50*'-'
-    print scores
     print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (np.array(scores).mean(), np.array(scores).std() / 2)
     print 50*'-'
 
-############# CROSS-VALIDATION ############# 
+############# USING BUILT IN FUNCTION ############# 
+for C_Value in C:
+    clf = svm.SVC(kernel='linear', C=C_Value)
+    scores = cross_validation.cross_val_score(clf, shuffledData[:10000], shuffledLabels[:10000], cv=10)
+    print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+    print 50*'-'
 
 
 print 50*'-'

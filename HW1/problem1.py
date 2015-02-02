@@ -4,20 +4,33 @@
 # and 10,000. Make sure you set aside 10,000 other training points as a validation set.
 # You should expect accuracies between 70% and 90% at this stage
 
+# Function to calculate cross validation scores 
+# Input: SVC object, data, labels, num folds
+# Output: Array of scores averaged for each fold
 def computeCV_Score(clf, data, labels, folds):
     i = 0
     j = 0
     accuracy = 0.0
     scores = []
+    clf_local = clf
+    # For each fold trained on...
     for i in range(folds):
-        clf.fit(data[i], labels[i])
+        # Initialize variables
+        clf_local = clf
+        j = 0
+        accuracy = 0
+
+        clf_local.fit(data[i], labels[i])
+        # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
-                predicted_Digits = clf.predict(data[j])
-                for elem1, elem2 in zip(predicted_Digits, labels[j]):
+                predicted_Digits = clf_local.predict(data[j])
+                for (elem1, elem2) in zip(predicted_Digits, labels[j]):
                     if elem1 == elem2:
                         accuracy+=1                
+            j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
+        i+=1
     return scores
 
 
@@ -94,7 +107,7 @@ for elem in imageComplete:
 
 ############# TRAIN SVM ############# 
 C = [0.000001, 0.001, 1, 1000, 1000000]                    # array of values for parameter C
-training_Size = [100, 200, 500, 1000, 2000]#, 5000, 10000]
+training_Size = [100, 200, 500, 1000]#, 2000, 5000, 10000]
 for elem in training_Size:
     if DEBUG:
         print 50*'-'
@@ -139,19 +152,23 @@ crossValidation_Data= []
 crossValidation_Labels = []
 k = 10 
 lengthData = 10000
-stepLength = lengthData/k
+stepLength = k
 for index in range(0,k):
     crossValidation_Data.append(shuffledData[index:lengthData:stepLength])
     crossValidation_Labels.append(shuffledLabels[index:lengthData:stepLength])
 
 if DEBUG:
-    print "Lengths of CV Data and Labels: ", len(crossValidation_Data), len(crossValidation_Labels)
+    print 50*'-'
+    print "Lengths of CV Data and Labels: ", np.array(crossValidation_Data).shape, np.array(crossValidation_Labels).shape
+    print 50*'-'
 
 for C_Value in C:
     clf = svm.SVC(kernel='linear', C=C_Value)
-    scores = computeCV_Score(clf, shuffledData[:10000], shuffledLabels[:10000], 10)
+    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+    print 50*'-'
     print scores
-    print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+    print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (np.array(scores).mean(), np.array(scores).std() / 2)
+    print 50*'-'
 
 ############# CROSS-VALIDATION ############# 
 

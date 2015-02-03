@@ -26,12 +26,12 @@ def computeCV_Score(clf, data, labels, folds):
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
-                predicted_Digits = clf_local.predict(data[j])
-                for (elem1, elem2) in zip(predicted_Digits, labels[j]):
+                predicted_Class = clf_local.predict(data[j])
+                for (elem1, elem2) in zip(predicted_Class, labels[j]):
                     if elem1 == elem2:
                         accuracy+=1                
             j+=1
-        scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
+        scores.append(100.0*accuracy/((folds-1)*len(predicted_Class)))
         i+=1
     return np.array(scores)
 ###################################
@@ -48,7 +48,7 @@ from sklearn.metrics import confusion_matrix
 import pylab as plt
 from sklearn import cross_validation
 
-DEBUG = True
+DEBUG = False
 ############# FILE STUFF ############# 
 File_Spam = "./spam-dataset/spam_data.mat"
 
@@ -65,12 +65,22 @@ trainingLabels = np.array(trainMatrix['training_labels'][0])
 testData= np.array(trainMatrix['test_data'][0])
 trainingComplete = zip(trainingData, trainingLabels)
 
+############# SHUFFLE DATA ############# 
+random.shuffle(trainingComplete)
+shuffledData = []
+shuffledLabels = []
+for elem in trainingComplete:
+    shuffledData.append((elem[0]))                # Use a simple array of pixels as the feature
+    shuffledLabels.append((elem[1]))
+
+trainingData = np.array(shuffledData)
+trainingLabels = np.array(shuffledLabels)
 if DEBUG:
     print 50*'-'
     print ("Shapes of data and labels: ", trainingData.shape, 
                                     trainingLabels.shape, len(trainingComplete))
         
-C = [ 0.1, 1, 5, 10, 50]                    # array of values for parameter C
+C = [ 0.1, 1, 5, 10, 50, 100]                    # array of values for parameter C
 
 #########################################################
 # CROSS VALIDATION 
@@ -98,7 +108,7 @@ scoreBuffer = []
 for C_Value in C:
     clf = svm.SVC(kernel='linear', C=C_Value)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    scoreBuffer.append((scores).mean)
+    scoreBuffer.append((scores).mean())
     if DEBUG:
         print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
@@ -108,44 +118,9 @@ maxScore_Index = scoreBuffer.index(maxScore)
 print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", maxScore
 print 50*'-'
 
-############# TRAIN SVM ############# 
+# FOR KAGGLE
+np.savetxt("./Results/Spam.csv", clf.predict(testData), delimiter=",") 
+
 print 50*'='
-print "SVM TRAINING"
-print 50*'='
-
-if DEBUG:
-    print 50*'-'
-    print "Shuffled Data and Label shape: ", len(trainingData), len(trainingLabels)
-
-clf = svm.SVC(kernel='linear', C=C[2])
-clf.fit(trainingData, np.array(trainingLabels))
-
-predicted_Digits = clf.predict(testData)
-actual_Digits = trainingLabels
-accuracy = 0.0
-for elem1, elem2 in zip(predicted_Digits, actual_Digits):
-    if elem1 == elem2:
-        accuracy+=1
-
-print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
-print 50*'-'
-
-cm = confusion_matrix(actual_Digits, predicted_Digits)
-############# PLOT RESULTS #############     
-# Show confusion matrix in a separate window
-plt.matshow(cm)
-plt.title('Confusion matrix')
-plt.colorbar()
-plt.ylabel('True Digit')
-plt.xlabel('Predicted Digit')
-plt.savefig("./ResultsSpam/" +"_CM.png")
-
-####################################### 
-
-
-
-
-
-print 50*'-'
 print "End of File"
-print 50*'-'
+print 50*'='

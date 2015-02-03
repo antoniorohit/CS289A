@@ -62,6 +62,7 @@ if DEBUG:
     print trainMatrix, testMatrix
 
 ############# GET DATA ############# 
+testData = np.array(testMatrix['test_images'])
 imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
@@ -108,6 +109,13 @@ for elem in imageComplete:
 
 # NOTE: Set aside 50,000-60,000 to validate
 
+# Plot the distribution of digits in Validation Data
+plt.title('Histogram for Validation Data')
+plt.ylabel('Count')
+plt.xlabel('Digit Label')
+plt.hist(shuffledLabels[50000:])
+plt.savefig("./Results/ValidationData_Hist.png")
+
 ############# TRAIN SVM ############# 
 print 50*'='
 print "SVM TRAINING"
@@ -121,7 +129,7 @@ for elem in training_Size:
         print 50*'-'
         print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
     
-    clf = svm.SVC(kernel='linear', C=C[1])
+    clf = svm.SVC(kernel='linear', C=C[4])
     clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
     
     predicted_Digits = clf.predict(shuffledData[50000:])
@@ -139,7 +147,7 @@ for elem in training_Size:
     cm = confusion_matrix(actual_Digits, predicted_Digits)
 ############# PLOT RESULTS #############     
     # Show confusion matrix in a separate window
-    fig = plt.figure(0)
+    fig = plt.figure()
     ax = fig.add_subplot(111)
     cax = ax.matshow(cm)
     plt.title('Confusion matrix')
@@ -147,14 +155,17 @@ for elem in training_Size:
     plt.ylabel('True Digit')
     plt.xlabel('Predicted Digit')
     plt.savefig("./Results/" + str(elem)+"_CM.png")
-    fig.delaxes(fig.axes[1]) 
+
+# Remove color bar
+fig.delaxes(fig.axes[0]) 
 
 # Plot error rate vs training size
-plt.figure(1)
-plt.title('Error Rate Vs Training Size')
-plt.ylabel('Training Size')
-plt.xlabel('Error Rate')
-plt.plot(training_Size, errorRate_array)
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set_title('Error Rate Vs Training Size')
+ax.set_ylabel('Training Size')
+ax.set_xlabel('Error Rate')
+ax.plot(training_Size, errorRate_array)
 plt.savefig("./Results/ErrorRate_TrainingSize.png")
 ####################################### 
 
@@ -185,30 +196,49 @@ scoreBuffer = []
 for C_Value in C:
     clf = svm.SVC(kernel='linear', C=C_Value)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    scoreBuffer.append((scores).mean)
+    scoreBuffer.append((scores).mean())
     if DEBUG:
         print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
 
-maxScore = np.array(scoreBuffer).max()
+maxScore = np.max(np.array(scoreBuffer))
 maxScore_Index = scoreBuffer.index(maxScore)
-print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", maxScore
+
+# Train SVM using best C value
+clf = svm.SVC(kernel='linear', C=C[maxScore_Index])
+clf.fit(shuffledData[:10000], np.array(shuffledLabels[:10000]))
+# Predict digits
+predicted_Digits = clf.predict(shuffledData[50000:])
+actual_Digits = shuffledLabels[50000:]
+# Compute Accuracy
+accuracy = 0.0
+for elem1, elem2 in zip(predicted_Digits, actual_Digits):
+    if elem1 == elem2:
+        accuracy+=1
+
+print "Using Custom CV Function"
+print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", (100.0*accuracy/len(predicted_Digits))
 print 50*'-'
+
+# FOR KAGGLE
+np.savetxt("./Results/Digits.csv", clf.predict(testData), delimiter=",") 
+
 
 ############# USING BUILT IN FUNCTION ############# 
-for C_Value in C:
-    clf = svm.SVC(kernel='linear', C=C_Value)
-    scores = cross_validation.cross_val_score(clf, shuffledData[:10000], shuffledLabels[:10000], cv=10)
-    if DEBUG:
-        print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
-        print 50*'-'
+# for C_Value in C:
+#     clf = svm.SVC(kernel='linear', C=C_Value)
+#     scores = cross_validation.cross_val_score(clf, shuffledData[:10000], shuffledLabels[:10000], cv=10)
+#     if DEBUG:
+#         print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+#         print 50*'-'
+# 
+# maxScore = scoreBuffer.max()
+# maxScore_Index = scoreBuffer.index(maxScore)
+# print "Using BuiltIn CV Function"
+# print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", maxScore
+# print 50*'-'
 
-maxScore = scoreBuffer.max()
-maxScore_Index = scoreBuffer.index(maxScore)
-print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", maxScore
-print 50*'-'
 
-
-print 50*'-'
+print 50*'='
 print "End of File"
-print 50*'-'
+print 50*'='

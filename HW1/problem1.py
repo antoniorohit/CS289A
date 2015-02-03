@@ -4,9 +4,11 @@
 # and 10,000. Make sure you set aside 10,000 other training points as a validation set.
 # You should expect accuracies between 70% and 90% at this stage
 
+###################################
 # Function to calculate cross validation scores 
 # Input: SVC object, data, labels, num folds
 # Output: Array of scores averaged for each fold
+###################################
 def computeCV_Score(clf, data, labels, folds):
     i = 0
     j = 0
@@ -31,8 +33,8 @@ def computeCV_Score(clf, data, labels, folds):
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
         i+=1
-    return scores
-
+    return np.array(scores)
+###################################
 
 ############# IMPORTS ############# 
 
@@ -51,8 +53,9 @@ DEBUG = False
 testFileMNIST = "./digit-dataset/test.mat"
 trainFileMNIST = "./digit-dataset/train.mat"
 
-trainMatrix = sp.io.loadmat(trainFileMNIST)                 # Dictionary
-testMatrix = sp.io.loadmat(testFileMNIST)                   # Dictionary
+
+trainMatrix = io.loadmat(trainFileMNIST)                 # Dictionary
+testMatrix = io.loadmat(testFileMNIST)                   # Dictionary
 
 if DEBUG:
     print 50*'-'
@@ -106,18 +109,19 @@ for elem in imageComplete:
 # NOTE: Set aside 50,000-60,000 to validate
 
 ############# TRAIN SVM ############# 
-print 50*'-'
+print 50*'='
 print "SVM TRAINING"
-print 50*'-'
+print 50*'='
 
-C = [0.000000001, 0.000001, 0.001, 1, 1000]                    # array of values for parameter C
-training_Size = [100, 200, 500, 1000]#, 2000, 5000, 10000]
+errorRate_array = []
+C = [0.0000001, 0.000001, 0.00001, 0.0001, 1]                    # array of values for parameter C
+training_Size = [100, 200, 500, 1000, 2000, 5000, 10000]
 for elem in training_Size:
     if DEBUG:
         print 50*'-'
         print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
     
-    clf = svm.SVC(kernel='linear', C=C[3])
+    clf = svm.SVC(kernel='linear', C=C[1])
     clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
     
     predicted_Digits = clf.predict(shuffledData[50000:])
@@ -127,28 +131,39 @@ for elem in training_Size:
         if elem1 == elem2:
             accuracy+=1
     
+    errorRate_array.append(100-100.0*accuracy/len(predicted_Digits))
     print "Training Size:", elem 
-    print "Accuracy: ", 100.0*accuracy/len(predicted_Digits), "%"
+    print "Error Rate: ", errorRate_array[-1], "%"
     print 50*'-'
 
     cm = confusion_matrix(actual_Digits, predicted_Digits)
 ############# PLOT RESULTS #############     
     # Show confusion matrix in a separate window
-    plt.matshow(cm)
+    fig = plt.figure(0)
+    ax = fig.add_subplot(111)
+    cax = ax.matshow(cm)
     plt.title('Confusion matrix')
-    plt.colorbar()
+    fig.colorbar(cax)
     plt.ylabel('True Digit')
     plt.xlabel('Predicted Digit')
     plt.savefig("./Results/" + str(elem)+"_CM.png")
+    fig.delaxes(fig.axes[1]) 
 
+# Plot error rate vs training size
+plt.figure(1)
+plt.title('Error Rate Vs Training Size')
+plt.ylabel('Training Size')
+plt.xlabel('Error Rate')
+plt.plot(training_Size, errorRate_array)
+plt.savefig("./Results/ErrorRate_TrainingSize.png")
 ####################################### 
 
 #########################################################
 # CROSS VALIDATION 
 #########################################################
-print 50*'-'
+print 50*'='
 print "CROSS VALIDATION"
-print 50*'-'
+print 50*'='
 
 ############# DATA PARTIONING ############# 
 crossValidation_Data= []
@@ -164,19 +179,34 @@ if DEBUG:
     print "Lengths of CV Data and Labels: ", np.array(crossValidation_Data).shape, np.array(crossValidation_Labels).shape
     print 50*'-'
 
+scoreBuffer = []
+
 ############# CROSS-VALIDATION ############# 
 for C_Value in C:
     clf = svm.SVC(kernel='linear', C=C_Value)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (np.array(scores).mean(), np.array(scores).std() / 2)
-    print 50*'-'
+    scoreBuffer.append((scores).mean)
+    if DEBUG:
+        print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50*'-'
+
+maxScore = np.array(scoreBuffer).max()
+maxScore_Index = scoreBuffer.index(maxScore)
+print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", maxScore
+print 50*'-'
 
 ############# USING BUILT IN FUNCTION ############# 
 for C_Value in C:
     clf = svm.SVC(kernel='linear', C=C_Value)
     scores = cross_validation.cross_val_score(clf, shuffledData[:10000], shuffledLabels[:10000], cv=10)
-    print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
-    print 50*'-'
+    if DEBUG:
+        print "C Value:", C_Value, "Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() / 2)
+        print 50*'-'
+
+maxScore = scoreBuffer.max()
+maxScore_Index = scoreBuffer.index(maxScore)
+print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", maxScore
+print 50*'-'
 
 
 print 50*'-'

@@ -63,6 +63,10 @@ if DEBUG:
 
 ############# GET DATA ############# 
 testData = np.array(testMatrix['test_images'])
+testData = np.rollaxis(testData, 2, 0)                # move the index axis to be the first 
+testData_flat = []
+for elem in testData:
+    testData_flat.append(elem.flatten())
 imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
@@ -221,8 +225,11 @@ print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", (100.0*accurac
 print 50*'-'
 
 # FOR KAGGLE
-np.savetxt("./Results/Digits.csv", clf.predict(testData), delimiter=",") 
-
+indices = np.array(range(1,len(testData_flat)+1))
+print indices.shape, clf.predict(testData_flat).shape
+kaggle_format =  np.vstack(((indices), (clf.predict(testData_flat)))).T
+print kaggle_format.shape, kaggle_format
+np.savetxt("./Results/Digits.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
 
 ############# USING BUILT IN FUNCTION ############# 
 # for C_Value in C:

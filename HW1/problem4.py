@@ -120,9 +120,12 @@ print 50*'-'
 
 # FOR KAGGLE
 indices = np.array(range(1,len(testData)+1))
-print indices.shape, clf.predict(testData).shape
 kaggle_format =  np.vstack(((indices), (clf.predict(testData)))).T
-print kaggle_format.shape, kaggle_format
+
+if DEBUG:
+    print kaggle_format.shape, kaggle_format
+    print indices.shape, clf.predict(testData).shape
+
 np.savetxt("./Results/Spam.csv", (kaggle_format), fmt = '%d,%d',  delimiter=",", header='Id,Category', comments='') 
 
 print 50*'='

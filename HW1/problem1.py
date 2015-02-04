@@ -226,9 +226,12 @@ print 50*'-'
 
 # FOR KAGGLE
 indices = np.array(range(1,len(testData_flat)+1))
-print indices.shape, clf.predict(testData_flat).shape
 kaggle_format =  np.vstack(((indices), (clf.predict(testData_flat)))).T
-print kaggle_format.shape, kaggle_format
+
+if DEBUG:
+    print indices.shape, clf.predict(testData_flat).shape
+    print kaggle_format.shape, kaggle_format
+
 np.savetxt("./Results/Digits.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
 
 ############# USING BUILT IN FUNCTION ############# 

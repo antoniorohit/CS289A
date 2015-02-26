@@ -3,6 +3,8 @@
 # choices of the number of training examples should be 100, 200, 500, 1,000, 2,000, 5,000
 # and 10,000. Make sure you set aside 10,000 other training points as a validation set.
 # You should expect accuracies between 70% and 90% at this stage
+from dynd._pydynd import linspace
+
 
 ###################################
 # Function to calculate cross validation scores 
@@ -39,6 +41,7 @@ def computeCV_Score(clf, data, labels, folds):
 ############# IMPORTS ############# 
 
 import scipy as sp
+from scipy import signal
 import numpy as np
 from sklearn import svm
 from scipy import io
@@ -48,6 +51,7 @@ from sklearn.metrics import confusion_matrix
 import pylab as plt
 from sklearn import cross_validation
 
+MALIK = True
 DEBUG = False
 ############# FILE STUFF ############# 
 testFileMNIST = "./digit-dataset/test.mat"
@@ -70,6 +74,18 @@ for elem in testData:
 imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
+
+############# 
+# Ink Normalization
+############# 
+if MALIK == True:
+    i = 0
+    for element in imageData:
+        if np.linalg.norm(imageData[i]) != 0:
+            imageData[i] = (imageData[i]/np.linalg.norm(imageData[i]))
+        i+=1
+else:
+    pass
 
 imageComplete = zip(imageData, imageLabels)
 
@@ -104,13 +120,39 @@ if DEBUG:
         if i > 5000:
             break
 
+############# 
+# ORIENTATION HISTOGRAM
+############# 
 shuffledData = []
 shuffledLabels = []
+bins = np.linspace(-np.pi, np.pi, 12)
 
-for elem in imageComplete:
-    shuffledData.append((elem[0]).flatten())                # Use a simple array of pixels as the feature
-    shuffledLabels.append((elem[1][0]))
-
+if MALIK == True:
+    for elem in imageComplete:
+        gradx, grady = np.gradient(elem[0])
+        mag = np.sqrt(np.square(gradx) + np.square(grady))
+        cell = (1.0)*np.ones((4,4))
+        ori = (np.arctan2(grady, gradx))
+        # Aggregate over a cell 4x4 etc moved by half cell size
+#         ori = signal.convolve2d(ori, cell, 'same')
+#         ori = np.histogram(ori.flatten(), bins)
+        
+#         print ori[0]
+        
+#         ori = ori[0]/np.linalg.norm(ori[0])
+        if np.linalg.norm(mag) != 0:
+            mag = (mag-np.mean(mag))/np.linalg.norm(mag)
+        
+        ori = (ori-np.mean(ori))/np.linalg.norm(ori)
+        
+        shuffledData.append(np.append(mag.flatten(), ori.flatten()))
+        shuffledLabels.append((elem[1][0]))
+    
+else:
+    for elem in imageComplete:
+        shuffledData.append((elem[0]).flatten())                # Use a simple array of pixels as the feature
+        shuffledLabels.append((elem[1][0]))
+    
 # NOTE: Set aside 50,000-60,000 to validate
 
 # Plot the distribution of digits in Validation Data
@@ -126,7 +168,7 @@ print "SVM TRAINING"
 print 50*'='
 
 errorRate_array = []
-C = [0.0000001, 0.000001, 0.00001, 0.0001, 1]                    # array of values for parameter C
+C = [0.75, 1, 1.5, 1.75, 2, 2.25, 2.5]                    # array of values for parameter C
 training_Size = [100, 200, 500, 1000, 2000, 5000, 10000]
 for elem in training_Size:
     if DEBUG:

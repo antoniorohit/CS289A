@@ -129,17 +129,16 @@ bins = np.linspace(-np.pi, np.pi, 12)
 
 if MALIK == True:
     for elem in imageComplete:
-        gradx, grady = np.gradient(elem[0])
+        [gradx, grady] = np.gradient(elem[0])
+
         mag = np.sqrt(np.square(gradx) + np.square(grady))
-        cell = (1.0)*np.ones((4,4))
+        cell = (1.0/16.0)*np.ones((4,4))
         ori = (np.arctan2(grady, gradx))
         # Aggregate over a cell 4x4 etc moved by half cell size
 #         ori = signal.convolve2d(ori, cell, 'same')
-#         ori = np.histogram(ori.flatten(), bins)
+#         ori = np.histogram(ori.flatten(), bins)[0]
+                
         
-#         print ori[0]
-        
-#         ori = ori[0]/np.linalg.norm(ori[0])
         if np.linalg.norm(mag) != 0:
             mag = (mag-np.mean(mag))/np.linalg.norm(mag)
         
@@ -168,14 +167,14 @@ print "SVM TRAINING"
 print 50*'='
 
 errorRate_array = []
-C = [0.75, 1, 1.5, 1.75, 2, 2.25, 2.5]                    # array of values for parameter C
-training_Size = [100, 200, 500, 1000, 2000, 5000, 10000]
+C = np.linspace(1,3,16)                   # array of values for parameter C
+training_Size = [100, 200, 500, 1000, 2000, 5000, 10000, 15000]
 for elem in training_Size:
     if DEBUG:
         print 50*'-'
         print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
     
-    clf = svm.SVC(kernel='linear', C=C[4])
+    clf = svm.SVC(kernel='linear', C=C[8])
     clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
     
     predicted_Digits = clf.predict(shuffledData[50000:])

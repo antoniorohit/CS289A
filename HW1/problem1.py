@@ -4,6 +4,7 @@
 # and 10,000. Make sure you set aside 10,000 other training points as a validation set.
 # You should expect accuracies between 70% and 90% at this stage
 from dynd._pydynd import linspace
+import matplotlib.cm as cm
 
 
 ###################################
@@ -31,7 +32,12 @@ def computeCV_Score(clf, data, labels, folds):
                 predicted_Digits = clf_local.predict(data[j])
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
                     if elem1 == elem2:
-                        accuracy+=1                
+                        accuracy+=1
+                    else:
+                        print data[i].shape
+                        plt.imshow(data[i])
+                        plt.show()
+                
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
         i+=1
@@ -168,13 +174,13 @@ print 50*'='
 
 errorRate_array = []
 C = np.linspace(1,3,16)                   # array of values for parameter C
-training_Size = [100, 200, 500, 1000, 2000, 5000, 10000, 15000]
+training_Size = [100, 200, 500, 1000, 2000,]# 5000, 10000, 15000]
 for elem in training_Size:
     if DEBUG:
         print 50*'-'
         print "Shuffled Data and Label shape: ", len(shuffledData), len(shuffledLabels)
     
-    clf = svm.SVC(kernel='linear', C=C[8])
+    clf = svm.SVC(kernel='linear', C=1.4)
     clf.fit(shuffledData[:elem], np.array(shuffledLabels[:elem]))
     
     predicted_Digits = clf.predict(shuffledData[50000:])

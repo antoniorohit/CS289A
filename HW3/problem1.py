@@ -53,18 +53,19 @@ plt.grid()
 plt.hold('on')
 plt.arrow(np.mean(X1), np.mean(X2), eigenvalues[0]*eigenvectors[0][0], eigenvalues[0]*eigenvectors[1][0], head_width=0.3, head_length=0.5)
 plt.arrow(np.mean(X1), np.mean(X2), eigenvalues[1]*eigenvectors[0][1], eigenvalues[1]*eigenvectors[1][1], head_width=0.3, head_length=0.5)
+plt.title("Part d: Data Points and Arrows for Eigenvectors")
 
 plt.figure()
 
+###################################
+# answer to part e of the question
+###################################
 U = np.mat(eigenvectors)
 
 mu_100 = np.mat(np.ones((2,NUM_SAMPLES)))
 mu_100[0:,]*= mu[0]
 mu_100[1:,]*= mu[1]
 
-###################################
-# answer to part e of the question
-###################################
 [X1_new, X2_new] = np.transpose(U)*(np.mat(X1X2)-mu_100)
 Covariance_new = np.cov(np.vstack((X1_new, X2_new)))
 eigvalue_new, eigvect_new = np.linalg.eig(Covariance_new)
@@ -77,6 +78,6 @@ plt.hold('on')
 
 plt.arrow(np.mean(X1_new), np.mean(X2_new), eigvalue_new[0]*eigvect_new[0][0], eigvalue_new[0]*eigvect_new[1][0], head_width=0.3, head_length=0.5)
 plt.arrow(np.mean(X1_new), np.mean(X2_new), eigvalue_new[1]*eigvect_new[0][1], eigvalue_new[1]*eigvect_new[1][1], head_width=0.3, head_length=0.5)
-
+plt.title("Part e: Rotated Data Points and Arrows for Eigenvectors")
 
 plt.show()

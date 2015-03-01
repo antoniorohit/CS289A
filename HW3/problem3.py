@@ -38,6 +38,8 @@ for constant in np.linspace(0.1, 1000, 20):
 plt.ylim((-50, 50))
 plt.xlim((-50, 50))
 
+plt.xlabel("X1")
+plt.ylabel("Y1")
 plt.title("Part a - Diagonal covariance matrix")
 
 #########################################

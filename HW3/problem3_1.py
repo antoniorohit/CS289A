@@ -35,6 +35,8 @@ plt.clabel(CS, inline=1, fontsize=10)
 plt.title('Solution to part a')
 plt.xlim([-5, 6])
 plt.ylim([-5, 6])
+plt.xlabel("X1")
+plt.ylabel("X2")
 
 #########################################
 # answer to part b of the question
@@ -55,6 +57,8 @@ plt.clabel(CS, inline=1, fontsize=10)
 plt.title('Solution to part b')
 plt.xlim([-8, 6])
 plt.ylim([-2, 6])
+plt.xlabel("X1")
+plt.ylabel("X2")
 
 #########################################
 # answer to part c of the question
@@ -79,6 +83,8 @@ plt.clabel(CS, inline=1, fontsize=10)
 plt.title('Solution to part c')
 plt.xlim([-2, 4])
 plt.ylim([-4, 6])
+plt.xlabel("X1")
+plt.ylabel("X2")
 
 
 #########################################
@@ -104,6 +110,8 @@ plt.clabel(CS, inline=1, fontsize=10)
 plt.title('Solution to part d')
 plt.xlim([-2, 4])
 plt.ylim([-4, 6])
+plt.xlabel("X1")
+plt.ylabel("X2")
 
 #########################################
 # answer to part e of the question
@@ -128,6 +136,8 @@ plt.clabel(CS, inline=1, fontsize=10)
 plt.title('Solution to part e')
 plt.xlim([-4, 4])
 plt.ylim([-6, 4])
+plt.xlabel("X1")
+plt.ylabel("X2")
 
 
 plt.show()

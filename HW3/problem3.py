@@ -56,7 +56,7 @@ for constant in np.linspace(0.1, 1000, 20):
 plt.ylim((-50, 50))
 plt.xlim((-50, 50))
 
-
+plt.show()
 plt.figure()
 
 for constant in np.linspace(0, 200, 10):
@@ -88,4 +88,3 @@ for constant in np.linspace(0, 200, 10):
 
 
 
-plt.show()

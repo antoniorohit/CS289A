@@ -5,7 +5,7 @@
 # You should expect accuracies between 70% and 90% at this stage
 from dynd._pydynd import linspace
 import matplotlib.cm as cm
-from scipy.stats import norm
+from scipy.stats import multivariate_normal as norm
 
 ###################################
 # Function to calculate cross validation scores 
@@ -46,12 +46,10 @@ def computeCV_Score(clf, data, labels, folds):
 
 ############# IMPORTS ############# 
 
-def train_gauss(data, labels):
+def train_gauss(im_data, labels):
     ############# 
     # Fit gaussian to each digit
     ############# 
-    image = np.zeros((28,28))
-    gauss_list = []
     overall_cov = np.zeros((784, 784))
     all_cov = []
     all_prior = []
@@ -62,7 +60,7 @@ def train_gauss(data, labels):
         index  = 0
         for label in labels:
             if(label == i):
-                data_label.append(data[index].flatten())
+                data_label.append(im_data[index].flatten())
             index += 1
         # data label contains all the data of a certain number
         # transpose it so that we can take the average across 
@@ -81,17 +79,18 @@ def train_gauss(data, labels):
     
     
         # prior probability 
-        prior = len(data_label)/60000.0
+        prior = float(len(data_label))/(len(im_data))
         
         # visualize this mean
-    #     for j in range(0, 28):
-    #         image[j] = mu[28*j:28*j+28]
-    
-    #     plt.figure()
-    #     plt.imshow(image)
-    #     plt.figure()
-    #     plt.imshow(cov)
-    #     plt.show()
+#         image = np.zeros((28,28))
+#         for j in range(0, 28):
+#             image[j] = mu[28*j:28*j+28]
+#      
+#         plt.figure()
+#         plt.imshow(image)
+#         plt.figure()
+#         plt.imshow(cov)
+#         plt.show()
             
         print prior, i
         all_cov.append(cov)
@@ -101,26 +100,26 @@ def train_gauss(data, labels):
 
 def gauss_predict(data, all_mu, overall_cov, all_prior):
     labelled_list = []
+    
+    # Create PDFs
+    n = []
+    for label in range(0, 10):
+        mu = all_mu[label]
+        cov = overall_cov
+        n.append(norm(mean=mu, cov=(cov)))
+                
     for elem in data:
         prob_list = []
         for label in range(0, 10):
-            mu = all_mu[label]
-            cov = all_cov[label]
-            n = norm(loc=mu, scale=cov)
-            prob_list.append(np.sum(n.logpdf(elem))*all_prior[label])
+            prob_list.append(np.sum(n[label].logpdf(elem))*all_prior[label])
         labelled_list.append(prob_list.index(max(prob_list)))
+    
     return labelled_list
 
-import scipy as sp
-from scipy import signal
 import numpy as np
-from sklearn import svm
 from scipy import io
 import random
-from skimage.io._plugins.qt_plugin import ImageLabel
-from sklearn.metrics import confusion_matrix
 import pylab as plt
-from sklearn import cross_validation
 
 DEBUG = False
 ############# FILE STUFF ############# 
@@ -166,12 +165,16 @@ for elem in imageComplete:
     
 errorRate_array = []
 C = np.linspace(1,3,16)                   # array of values for parameter C
-training_Size = [100, 200, 500, 1000, 2000,]# 5000, 10000, 15000]
+training_Size = [100, 200, 500, 1000, 2000, 5000, 10000, 15000]
 for elem in training_Size:
     all_mu, all_cov, all_prior = train_gauss(shuffledData[:elem], np.array(shuffledLabels[:elem]))
     overall_cov = np.mean(all_cov)   
+        
+    predicted_Digits = gauss_predict(shuffledData[50000:], all_mu,\
+                                      overall_cov, all_prior)
     
-    predicted_Digits = gauss_predict(shuffledData[50000:], all_mu, overall_cov, all_prior)
+    print predicted_Digits
+    
     actual_Digits = shuffledLabels[50000:]
     accuracy = 0.0
     for elem1, elem2 in zip(predicted_Digits, actual_Digits):

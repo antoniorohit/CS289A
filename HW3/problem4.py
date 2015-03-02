@@ -219,7 +219,7 @@ scoreBuffer = []
 
 ############# Cross Validation ############# 
 small_weight = np.linspace(0.01, 0.1, 5)
-gauss_params = train_gauss(shuffledData[0:60000], shuffledLabels[0:60000])
+gauss_params = train_gauss(shuffledData[0:10000], shuffledLabels[0:10000])
 for weight in small_weight:
     scores = computeCV_Score(gauss_params, np.array(crossValidation_Data), crossValidation_Labels, k, weight)
     scoreBuffer.append((scores).mean())

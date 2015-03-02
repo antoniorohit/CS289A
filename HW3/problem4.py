@@ -12,35 +12,33 @@ from scipy.stats import multivariate_normal as norm
 # Input: SVC object, data, labels, num folds
 # Output: Array of scores averaged for each fold
 ###################################
-def computeCV_Score(clf, data, labels, folds):
+def computeCV_Score(clf_local, data, labels, folds, weight):
     i = 0
     j = 0
     accuracy = 0.0
     scores = []
-    clf_local = clf
+    (all_mu, all_cov, all_prior) = clf_local
     # For each fold trained on...
     for i in range(folds):
         # Initialize variables
-        clf_local = clf
         j = 0
         accuracy = 0
-
-        clf_local.fit(data[i], labels[i])
-        # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
-                predicted_Digits = clf_local.predict(data[j])
+                predicted_Digits = gauss_predict(data[j], all_mu, all_cov, all_prior, False, weight)
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
                     if elem1 == elem2:
                         accuracy+=1
                     else:
-                        print data[i].shape
-                        plt.imshow(data[i])
-                        plt.show()
+                        pass
+#                         print data[i].shape
+#                         plt.imshow(data[i])
+#                         plt.show()
                 
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
         i+=1
+        print weight, scores
     return np.array(scores)
 ###################################
 
@@ -92,20 +90,25 @@ def train_gauss(im_data, labels):
 #         plt.imshow(cov)
 #         plt.show()
             
-        print prior, i
+#         print prior, i
         all_cov.append(cov)
         all_prior.append(prior)
         all_mu.append(mu)
     return all_mu, all_cov, all_prior
 
-def gauss_predict(data, all_mu, overall_cov, all_prior):
+def gauss_predict(data, all_mu, all_cov, all_prior, overall = True, weight = 0.001):
     labelled_list = []
     
     # Create PDFs
     n = []
     for label in range(0, 10):
         mu = all_mu[label]
-        cov = overall_cov
+        if overall == True:
+            cov = np.mean(all_cov)
+        else:
+            # add small value to diag to remove singularity
+            small_value = weight*np.eye(len(all_cov[0]))
+            cov = all_cov[label]+small_value
         n.append(norm(mean=mu, cov=(cov)))
                 
     for elem in data:
@@ -123,7 +126,7 @@ import pylab as plt
 
 DEBUG = False
 ############# FILE STUFF ############# 
-testFileMNIST = "./digit-dataset/test.mat"
+testFileMNIST = "./digit-dataset/kaggle.mat"
 trainFileMNIST = "./digit-dataset/train.mat"
 
 
@@ -165,15 +168,14 @@ for elem in imageComplete:
     
 errorRate_array = []
 C = np.linspace(1,3,16)                   # array of values for parameter C
-training_Size = [100, 200, 500, 1000, 2000, 5000, 10000, 15000]
+training_Size = [100, 200, 500, 1000, 2000, 5000, 10000, 30000, 60000]
 for elem in training_Size:
     all_mu, all_cov, all_prior = train_gauss(shuffledData[:elem], np.array(shuffledLabels[:elem]))
-    overall_cov = np.mean(all_cov)   
         
     predicted_Digits = gauss_predict(shuffledData[50000:], all_mu,\
-                                      overall_cov, all_prior)
+                                      all_cov, all_prior, overall = False)
     
-    print predicted_Digits
+#     print predicted_Digits
     
     actual_Digits = shuffledLabels[50000:]
     accuracy = 0.0
@@ -192,11 +194,60 @@ for elem in training_Size:
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.set_title('Error Rate Vs Training Size')
-ax.set_ylabel('Training Size')
-ax.set_xlabel('Error Rate')
+ax.set_xlabel('Training Size')
+ax.set_ylabel('Error Rate')
 ax.plot(training_Size, errorRate_array)
 plt.savefig("./Results/ErrorRate_TrainingSize.png")
 ####################################### 
         
-        
+#########################################################
+# CROSS VALIDATION 
+#########################################################
+print 50*'='
+print "CROSS VALIDATION"
+print 50*'='
+
+############# DATA PARTIONING ############# 
+crossValidation_Data= []
+crossValidation_Labels = []
+k = 10 
+lengthData = 10000
+stepLength = k
+for index in range(0,k):
+    crossValidation_Data.append(shuffledData[index:lengthData:stepLength])
+    crossValidation_Labels.append(shuffledLabels[index:lengthData:stepLength])
+
+if DEBUG:
+    print "Lengths of CV Data and Labels: ", np.array(crossValidation_Data).shape, np.array(crossValidation_Labels).shape
+    print 50*'-'
+
+scoreBuffer = []
+
+
+############# Cross Validation ############# 
+small_weight = np.linspace(0.01, 0.0001, 10)
+for weight in small_weight:
+    (all_mu, all_cov, all_prior) = train_gauss(shuffledData[:elem], np.array(shuffledLabels[:elem]))
+    class_params = (all_mu, all_cov, all_prior)
+    scores = computeCV_Score(class_params, np.array(crossValidation_Data), crossValidation_Labels, k, weight)
+    scoreBuffer.append((scores).mean())
+    if DEBUG:
+        print "C Value:", weight, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50*'-'
+ 
+maxScore = np.max(np.array(scoreBuffer))
+maxScore_Index = scoreBuffer.index(maxScore)
+ 
+print "Using BuiltIn CV Function"
+print "Best C Value:", small_weight[maxScore_Index], "Accuracy for that C:", maxScore
+print 50*'-'
+
+#########################################################
+# FOR KAGGLE
+#########################################################
+indices = np.array(range(1,len(testData_flat)+1))
+kaggle_format =  np.vstack(((indices), (gauss_predict(testData_flat,all_mu, all_cov, all_prior, False, small_weight[maxScore_Index])))).T
+
+np.savetxt("./Results/Digits.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
+
 print 5*"-The End-"

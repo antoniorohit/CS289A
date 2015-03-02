@@ -16,6 +16,8 @@ matplotlib.rcParams['ytick.direction'] = 'out'
 
 delta = 0.010
 
+print str(True)
+
 #########################################
 # answer to part a of the question
 ###################################

@@ -1,10 +1,4 @@
-# Train a linear SVM using raw pixels as features. Plot the error rate on a validation
-# set versus the number of training examples that you used to train your classier. The
-# choices of the number of training examples should be 100, 200, 500, 1,000, 2,000, 5,000
-# and 10,000. Make sure you set aside 10,000 other training points as a validation set.
-# You should expect accuracies between 70% and 90% at this stage
-from dynd._pydynd import linspace
-import matplotlib.cm as cm
+
 from scipy.stats import multivariate_normal as norm
 
 ###################################
@@ -47,7 +41,6 @@ def train_gauss(im_data, labels):
     ############# 
     # Fit gaussian to each digit
     ############# 
-    overall_cov = np.zeros((784, 784))
     all_cov = []
     all_prior = []
     all_mu = []
@@ -65,10 +58,10 @@ def train_gauss(im_data, labels):
         data_label = np.transpose(np.array(data_label))
         
         # mean mu for label 
-        mu = [np.mean(data_label[j]) for j in range(0, 28*28)]
+        mu = [np.mean(data_label[j]) for j in range(0,len(data_label))]
         
         # sample covariance
-        cov = np.zeros((784, 784))
+        cov = np.zeros((len(data_label), len(data_label)))
         data_label = data_label.T 
         for elem in (data_label):
             cov += np.mat(elem-mu).T*np.mat(elem-mu)
@@ -225,7 +218,7 @@ scoreBuffer = []
 
 
 ############# Cross Validation ############# 
-small_weight = np.linspace(0.1, 0.01, 5)
+small_weight = np.linspace(0.01, 0.1, 5)
 gauss_params = train_gauss(shuffledData[0:60000], shuffledLabels[0:60000])
 for weight in small_weight:
     scores = computeCV_Score(gauss_params, np.array(crossValidation_Data), crossValidation_Labels, k, weight)

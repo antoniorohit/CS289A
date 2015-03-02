@@ -43,12 +43,11 @@ def train_gauss(im_data, labels):
     ############# 
     # Fit gaussian to each digit
     ############# 
-    overall_cov = np.zeros((784, 784))
     all_cov = []
     all_prior = []
     all_mu = []
-    
-    for i in range(0,10):
+        
+    for i in range(0,2):
         data_label = []
         index  = 0
         for label in labels:
@@ -61,7 +60,7 @@ def train_gauss(im_data, labels):
         data_label = np.transpose(np.array(data_label))
         
         # mean mu for label 
-        mu = [np.mean(data_label[j]) for j in range(0, 28*28)]
+        mu = [np.mean(data_label[j]) for j in range(0, len(data_label))]
         
         # sample covariance
         cov = np.zeros((len(data_label), len(data_label)))
@@ -85,19 +84,19 @@ def gauss_predict(data, all_mu, all_cov, all_prior, overall = True, weight = 0.0
     
     # Create PDFs
     n = []
-    for label in range(0, 10):
+    for label in range(0, 2):
         mu = all_mu[label]
         if overall == True:
             cov = np.mean(all_cov)
         else:
             # add small value to diag to remove singularity
             small_value = weight*np.eye(len(all_cov[0]))
-            cov = all_cov[label]+small_value
+            cov = all_cov[label] + small_value
         n.append(norm(mean=mu, cov=(cov)))
                 
     for elem in data:
         prob_list = []
-        for label in range(0, 10):
+        for label in range(0, 2):
             prob_list.append(np.sum(n[label].logpdf(elem))*all_prior[label])
         labelled_list.append(prob_list.index(max(prob_list)))
     
@@ -118,6 +117,16 @@ if DEBUG:
 trainingData = np.array(trainMatrix['training_data'])
 trainingLabels = np.array(trainMatrix['training_labels'][0])
 testData= np.array(trainMatrix['test_data'])
+
+############# 
+# Normalization
+############# 
+i = 0
+for element in trainingData:
+    if np.linalg.norm(trainingData[i]) != 0:
+        trainingData[i] = (trainingData[i]/np.linalg.norm(trainingData[i]))
+    i+=1
+
 trainingComplete = zip(trainingData, trainingLabels)
 
 ############# SHUFFLE DATA ############# 
@@ -159,13 +168,13 @@ if DEBUG:
 scoreBuffer = []
 
 ############# CROSS-VALIDATION ############# 
-gauss_params = train_gauss(shuffledData[0:10000], shuffledLabels[0:10000])
-small_weight = np.linspace(0.1, 0.01, 3)
+gauss_params = train_gauss(shuffledData[0:-1], shuffledLabels[0:-1])
+small_weight = np.linspace(0.001, 0.00001, 5)
 for weight in small_weight:
     scores = computeCV_Score(gauss_params, crossValidation_Data, crossValidation_Labels, k, weight)
     scoreBuffer.append((scores).mean())
     if 1:
-        print "C Value:", weight, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print "Weight:", weight, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
 
 maxScore = np.max(scoreBuffer)

@@ -197,6 +197,9 @@ for overall in [True, False]:
     ax.set_xlabel('Training Size')
     ax.set_ylabel('Error Rate')
     ax.plot(training_Size, errorRate_array)
+    for xy in zip(training_Size, errorRate_array):                                                # <--
+        ax.annotate('%s' % int(xy[1]) + "%", xy=xy, fontsize = 'small') # <--
+    plt.grid()
     plt.savefig("./Results/ErrorRate_TrainingSize_Overall_" + str(overall) + ".png")
     ####################################### 
         

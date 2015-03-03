@@ -25,7 +25,7 @@ X1X2 = np.vstack((X1, X2))
 # np.cov takes: A 1-D or 2-D array containing multiple variables and
 # observations. Each row of `m` represents a variable, and each column
 # a single observation of all those variables.
-Covariance = np.cov(X1X2)
+Covariance = np.around(np.cov(X1X2), 2)
 
 ###################################
 # answer to part b of the question
@@ -40,12 +40,13 @@ eigenvalues, eigenvectors = np.linalg.eig(Covariance)
 # answer to part c of the question
 ###################################
 print "c) Eigenvalues and Eigenvectors of the Sampled Data"
-print "   Eigenvalues:", eigenvalues 
-print "   Eigenvectors:", eigenvectors 
+print "   Eigenvalues:", np.around(eigenvalues, 2) 
+print "   Eigenvectors:", np.around(eigenvectors, 2) 
 
 ###################################
 # answer to part d of the question
 ###################################
+print "d): Data Point Plot for Eigenvectors"
 plt.scatter(X1, X2)
 plt.xlim([-15, 15])
 plt.ylim([-15, 15])
@@ -54,12 +55,16 @@ plt.hold('on')
 plt.arrow(np.mean(X1), np.mean(X2), eigenvalues[0]*eigenvectors[0][0], eigenvalues[0]*eigenvectors[1][0], head_width=0.3, head_length=0.5)
 plt.arrow(np.mean(X1), np.mean(X2), eigenvalues[1]*eigenvectors[0][1], eigenvalues[1]*eigenvectors[1][1], head_width=0.3, head_length=0.5)
 plt.title("Part d: Data Points and Arrows for Eigenvectors")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.savefig("./Results/Q1d_DataPointPlot.png")
 
 plt.figure()
 
 ###################################
 # answer to part e of the question
 ###################################
+print "e): Rotated Data Point Plot for Eigenvectors"
 U = np.mat(eigenvectors)
 
 mu_100 = np.mat(np.ones((2,NUM_SAMPLES)))
@@ -79,5 +84,8 @@ plt.hold('on')
 plt.arrow(np.mean(X1_new), np.mean(X2_new), eigvalue_new[0]*eigvect_new[0][0], eigvalue_new[0]*eigvect_new[1][0], head_width=0.3, head_length=0.5)
 plt.arrow(np.mean(X1_new), np.mean(X2_new), eigvalue_new[1]*eigvect_new[0][1], eigvalue_new[1]*eigvect_new[1][1], head_width=0.3, head_length=0.5)
 plt.title("Part e: Rotated Data Points and Arrows for Eigenvectors")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.savefig("./Results/Q1e_RotatedDataPointPlot.png")
 
 plt.show()

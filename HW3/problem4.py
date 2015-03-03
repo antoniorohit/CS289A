@@ -71,18 +71,25 @@ def train_gauss(im_data, labels):
         # prior probability 
         prior = float(len(data_label))/(len(im_data))
         
-        # visualize this mean
+############# 
+# Part c of question
+############# 
+        # visualize this mean and covariance
 #         image = np.zeros((28,28))
 #         for j in range(0, 28):
 #             image[j] = mu[28*j:28*j+28]
-#      
+#       
 #         plt.figure()
 #         plt.imshow(image)
 #         plt.figure()
 #         plt.imshow(cov)
 #         plt.show()
             
-#         print prior, i
+
+############# 
+# Part bCov_Co of question
+############# 
+        print np.around(prior, 3), i
         all_cov.append(cov)
         all_prior.append(prior)
         all_mu.append(mu)
@@ -159,7 +166,7 @@ for elem in imageComplete:
     shuffledLabels.append((elem[1][0]))
     
 
-training_Size = [100]#, 200, 500, 1000, 2000, 5000, 10000, 30000, 60000]
+training_Size = [100, 200, 500, 1000, 2000, 5000, 10000, 30000, 60000]
 for overall in [True, False]:
     errorRate_array = []
     for elem in training_Size:

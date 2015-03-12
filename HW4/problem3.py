@@ -5,11 +5,13 @@ import pylab as plt
 from enum import Enum
 
 class ProcessingMethod:
+    all = [0, 1, 2]
     normalized = 0
     logarith = 1
     sign = 2
     
 class GradientMethod :
+    all = [0, 1]
     batch = 0
     stochastic = 1
 
@@ -28,7 +30,7 @@ training_data_raw = np.array(trainMatrix['Xtrain'])
 trainingLabels_raw = np.array(trainMatrix['ytrain'])
 testData = np.array(trainMatrix['Xtest'])
 
-for PRE in [0, 1, 2]:
+for PRE in ProcessingMethod.all:
     ############# PRE-PROCESSING ############# 
     if PRE == ProcessingMethod.normalized:
         print 30*'#'
@@ -105,7 +107,8 @@ for PRE in [0, 1, 2]:
     elif GRADIENT == GradientMethod.stochastic:
         ############ STOCHASTIC GRADIENT METHOD ############# 
         for i in range(NUM_ITER):
-            step_size_loc = (step_size)/(i+1.0)
+#             step_size_loc = (step_size)/(i+1.0)
+            step_size_loc = step_size
             loss = reg*np.square(np.linalg.norm(beta)) - y.T*np.log(mu+0.000001) - (1-y).T*np.log(1-mu + 0.000001)
             beta = beta - step_size_loc*np.matrix(2*reg*beta - X[i].T*(y[i]-mu[i]))  
             mu = []
@@ -138,9 +141,13 @@ for PRE in [0, 1, 2]:
     print "Loss Array: ", (loss_array)
     
     plt.figure()
+    plt.xlabel("Iterations")
+    plt.ylabel("Loss")
+    plt.title("Constant Rate Stochastic Gradient and Preprocessing Method " + str(PRE))
     plt.plot(loss_array)
-    plt.savefig('./Results/Training_Loss_Stochastic_Variable_' + str(PRE))
+    plt.savefig('./Results/Training_Loss_Stochastic_Constant_' + str(PRE))
 
+plt.show()
 print 30*'#'
 print "THE END!"
 print 30*'#'

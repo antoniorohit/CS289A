@@ -60,6 +60,7 @@ test_labels = labels[TRAIN_COUNT:]
 beta = TrainLeastSquares(train_data, train_labels)
 
 print "Beta Shape:", beta.shape
+print "Beta 0:", beta[0]
 
 y = np.around(np.matrix(test_data)*beta, 2)
 

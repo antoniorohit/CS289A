@@ -39,6 +39,7 @@ plt.xlim([-5, 6])
 plt.ylim([-5, 6])
 plt.xlabel("X1")
 plt.ylabel("X2")
+plt.savefig("./Results/Q3a.png")
 
 #########################################
 # answer to part b of the question
@@ -61,6 +62,7 @@ plt.xlim([-8, 6])
 plt.ylim([-2, 6])
 plt.xlabel("X1")
 plt.ylabel("X2")
+plt.savefig("./Results/Q3b.png")
 
 #########################################
 # answer to part c of the question
@@ -87,6 +89,7 @@ plt.xlim([-2, 4])
 plt.ylim([-4, 6])
 plt.xlabel("X1")
 plt.ylabel("X2")
+plt.savefig("./Results/Q3c.png")
 
 
 #########################################
@@ -114,6 +117,7 @@ plt.xlim([-2, 4])
 plt.ylim([-4, 6])
 plt.xlabel("X1")
 plt.ylabel("X2")
+plt.savefig("./Results/Q3d.png")
 
 #########################################
 # answer to part e of the question
@@ -140,6 +144,7 @@ plt.xlim([-4, 4])
 plt.ylim([-6, 4])
 plt.xlabel("X1")
 plt.ylabel("X2")
+plt.savefig("./Results/Q3e.png")
 
 
 plt.show()

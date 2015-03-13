@@ -1,0 +1,19 @@
+Antonio Rohit De Lima Fernandes, SID: 25939824
+
+For the solution to problem 1:
+- Run p1.m
+
+For the solution to problem 2:
+- Have a folder named Results in the path
+- Have the 'YearPredictionsMSD.txt' file in the path
+- Run problem2.py using Python
+
+For the solution to problem 3:
+- Have a folder named Results in the path
+- Have the spam.mat' file in the path
+- Run problem3.py using Python
+- Change the variables according to which problem section you want:
+eg1. change GRADIENT = GradientMethod.batch for batch gradient method.
+eg2. uncomment step_size_loc = step_size/(i+1.0) to enable dynamic step sizes (also don't forget to comment out step_size_loc = step_size
+
+

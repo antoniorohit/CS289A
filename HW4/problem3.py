@@ -2,7 +2,6 @@ import numpy as np
 from numpy import random
 from scipy import io
 import pylab as plt
-from enum import Enum
 
 class ProcessingMethod:
     all = [0, 1, 2]

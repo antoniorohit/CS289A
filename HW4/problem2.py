@@ -80,4 +80,4 @@ for elem1, elem2 in zip(y, test_labels):
     
     RSS += (elem1 - elem2)**2
 
-print RSS
+print "RSS:", RSS

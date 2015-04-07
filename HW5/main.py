@@ -34,17 +34,15 @@ def segmentor(data, labels, impurity):
     
     root_1_labels = sum(labels)
     root_0_labels = data_len - root_1_labels
-    print root_0_labels, root_1_labels
     
     for i in range(num_features):
         threshold = np.mean(data,axis=0)[i]
         multi_val_arr = [(x,l) for (x,l) in zip(data, labels) if x[i] < threshold]
-        
+                
         temp_data = [row[0] for row in multi_val_arr]
         temp_labels = [row[1] for row in multi_val_arr]
         
         left_data_len = np.shape(temp_data)[0]
-        
         left_1_labels = sum(temp_labels)
         left_0_labels = left_data_len - left_1_labels
 
@@ -53,9 +51,15 @@ def segmentor(data, labels, impurity):
         
         left_label_hist = (left_0_labels, left_1_labels)      
         right_label_hist = (right_0_labels, right_1_labels)
-        impurity_score = impurity(left_label_hist, right_label_hist)
-
-#         print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels, impurity_score
+        
+        print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
+        
+        # The data on the left and right should be non zero
+        if left_data_len > 0 and left_data_len < data_len:
+            impurity_score = impurity(left_label_hist, right_label_hist)
+        else:
+            print threshold
+            impurity_score = 1
         
         if(impurity_score < min_impurity_score):
             min_impurity_score = impurity_score
@@ -82,6 +86,7 @@ def computeCV_Score(clf, data, labels, folds):
         for j in range(folds):
             if(j!=i):
                 predicted_Class = clf_local.predict(data[j])
+                print np.shape(labels), np.shape(predicted_Class)
                 for (elem1, elem2) in zip(predicted_Class, labels[j]):
                     if elem1 == elem2:
                         accuracy+=1                

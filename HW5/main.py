@@ -7,11 +7,21 @@ import random
 # Entropy impurity
 def impurity(left_label_hist, right_label_hist):
     """Describe"""
-    total = left_label_hist + right_label_hist
+    total_left = sum(left_label_hist)
+    total_right = sum(right_label_hist)
+    
     small_value = 10**-50       # avoid divide by 0
-    P_left = small_value + left_label_hist/float(total)
-    P_right = small_value + right_label_hist/float(total)
-    return -(P_left*np.log2(P_left) + P_right*np.log2(P_right))
+    left_0_label = small_value + left_label_hist[0]/float(total_left)
+    left_1_label = small_value + left_label_hist[1]/float(total_left)
+
+    right_0_label = small_value + right_label_hist[0]/float(total_right)
+    right_1_label = small_value + right_label_hist[1]/float(total_right)
+
+    P_left = left_0_label*np.log2(left_0_label) + left_1_label*np.log2(left_1_label)
+    P_right = right_0_label*np.log2(right_0_label) + right_1_label*np.log2(right_1_label)
+    
+    # Average impurity
+    return -(P_left + P_right)*0.5
 
 def segmentor(data, labels, impurity):
     """Describe"""
@@ -22,13 +32,31 @@ def segmentor(data, labels, impurity):
     min_imp_feature_ind = -1
     min_imp_threshold = -1
     
+    root_1_labels = sum(labels)
+    root_0_labels = data_len - root_1_labels
+    print root_0_labels, root_1_labels
+    
     for i in range(num_features):
         threshold = np.mean(data,axis=0)[i]
-        temp_data = [x for x in data if x[i] < threshold]
-        left_label_hist = np.shape(temp_data)[0]        
-        right_label_hist = data_len - left_label_hist
+        multi_val_arr = [(x,l) for (x,l) in zip(data, labels) if x[i] < threshold]
+        
+        temp_data = [row[0] for row in multi_val_arr]
+        temp_labels = [row[1] for row in multi_val_arr]
+        
+        left_data_len = np.shape(temp_data)[0]
+        
+        left_1_labels = sum(temp_labels)
+        left_0_labels = left_data_len - left_1_labels
+
+        right_1_labels = root_1_labels - left_1_labels
+        right_0_labels = root_0_labels - left_0_labels
+        
+        left_label_hist = (left_0_labels, left_1_labels)      
+        right_label_hist = (right_0_labels, right_1_labels)
         impurity_score = impurity(left_label_hist, right_label_hist)
-        print i, impurity_score, threshold
+
+#         print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels, impurity_score
+        
         if(impurity_score < min_impurity_score):
             min_impurity_score = impurity_score
             min_imp_feature_ind = i

@@ -8,8 +8,9 @@ import random
 def impurity(left_label_hist, right_label_hist):
     """Describe"""
     total = left_label_hist + right_label_hist
-    P_left = left_label_hist/total
-    P_right = right_label_hist/total
+    small_value = 10**-50       # avoid divide by 0
+    P_left = small_value + left_label_hist/float(total)
+    P_right = small_value + right_label_hist/float(total)
     return -(P_left*np.log2(P_left) + P_right*np.log2(P_right))
 
 def segmentor(data, labels, impurity):
@@ -22,10 +23,12 @@ def segmentor(data, labels, impurity):
     min_imp_threshold = -1
     
     for i in range(num_features):
-        threshold = np.mean(data,axis=1)[i]
-        left_label_hist = len([x for x in data if x[i]>threshold])
+        threshold = np.mean(data,axis=0)[i]
+        temp_data = [x for x in data if x[i] < threshold]
+        left_label_hist = np.shape(temp_data)[0]        
         right_label_hist = data_len - left_label_hist
         impurity_score = impurity(left_label_hist, right_label_hist)
+        print i, impurity_score, threshold
         if(impurity_score < min_impurity_score):
             min_impurity_score = impurity_score
             min_imp_feature_ind = i

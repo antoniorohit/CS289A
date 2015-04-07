@@ -52,20 +52,20 @@ def segmentor(data, labels, impurity):
         left_label_hist = (left_0_labels, left_1_labels)      
         right_label_hist = (right_0_labels, right_1_labels)
         
-        print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
+#         print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
         
         # The data on the left and right should be non zero
         if left_data_len > 0 and left_data_len < data_len:
             impurity_score = impurity(left_label_hist, right_label_hist)
         else:
-            print threshold
             impurity_score = 1
         
         if(impurity_score < min_impurity_score):
             min_impurity_score = impurity_score
             min_imp_feature_ind = i
             min_imp_threshold = threshold
-    
+#             print i, threshold, impurity_score
+            
     return (min_imp_feature_ind, min_imp_threshold)
 
 def computeCV_Score(clf, data, labels, folds):

@@ -10,12 +10,17 @@ class DTree(object):
             self.left = left
             self.right = right
             self.split_rule = split_rule
+            self.type = "Node"
             return
+        
+        def __type__(self):
+            return "Node"
     
     class Leaf_Node(object):
         """Definition of a Leaf Node"""
         
         def __init__(self, label):
+            self.type = "Leaf"
             self.label = label         
     
     def __init__(self, depth, impurity, segmentor):
@@ -55,14 +60,15 @@ class DTree(object):
             self.node_list[self.node_index].split_rule = (split_feat, thresh)
             curr_node = self.node_index    
             if (thresh) > 0:
-                print thresh
                 multi_val_arr = [(x,l) for (x,l) in zip(data, labels) if x[split_feat] < thresh]
                 left_data = [row[0] for row in multi_val_arr]
                 left_labels = [row[1] for row in multi_val_arr]
                 if(sum(left_labels) == 0):
                     self.add_LNode(0)
+                    self.node_list[curr_node].left = self.node_index
                 elif(sum(left_labels) == len(left_labels)):          
                     self.add_LNode(1)
+                    self.node_list[curr_node].left = self.node_index
                 else:
                     self.add_Node()
                     self.node_list[curr_node].left = self.node_index
@@ -74,17 +80,31 @@ class DTree(object):
                 right_labels = [row[1] for row in multi_val_arr]
                 if(sum(right_labels) == 0):
                     self.add_LNode(0)
+                    self.node_list[curr_node].right = self.node_index
                 elif(sum(right_labels) == len(right_labels)):          
                     self.add_LNode(1)
+                    self.node_list[curr_node].right = self.node_index
                 else:
                     self.add_Node()
                     self.node_list[curr_node].right = self.node_index
                     print "RIGHT"
                     self.train(right_data, right_labels)
-            
-        
+
         return
     
     def predict(self, test_data):
-        
+        predictedLabels = []
+        loc_node = self.Node()
+        for elem in test_data:
+            loc_node = self.node_list[0]            # ROOT
+            while (loc_node.type != "Leaf"):
+                print loc_node.type, loc_node.split_rule, loc_node.left, loc_node.right
+                split_feat, thresh = loc_node.split_rule
+                if(elem[split_feat] < thresh):
+                    loc_node = self.node_list[loc_node.left]
+                else:
+                    loc_node = self.node_list[loc_node.right]
+                    
+            print loc_node.label
+            predictedLabels.append(loc_node.label)
         return

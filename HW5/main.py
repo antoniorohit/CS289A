@@ -51,12 +51,12 @@ def segmentor(data, labels, impurity):
         
         left_label_hist = (left_0_labels, left_1_labels)      
         right_label_hist = (right_0_labels, right_1_labels)
-        
-#         print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
-        
+                
         # The data on the left and right should be non zero
         if left_data_len > 0 and left_data_len < data_len:
             impurity_score = impurity(left_label_hist, right_label_hist)
+            if(left_0_labels == 0 or left_1_labels == 0 or right_0_labels == 0 or right_1_labels == 0):
+                print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
         else:
             impurity_score = 1
         

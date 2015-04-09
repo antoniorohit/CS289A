@@ -5,8 +5,11 @@ import random
 
 ############# FUNCTIONS ############# 
 # Entropy impurity
-def impurity(left_label_hist, right_label_hist):
+def entropy_impurity(left_label_hist, right_label_hist):
     """Describe"""
+#     left_label_hist = (left_0_labels, left_1_labels)      
+#     right_label_hist = (right_0_labels, right_1_labels)
+
     total_left = sum(left_label_hist)
     total_right = sum(right_label_hist)
     
@@ -22,6 +25,27 @@ def impurity(left_label_hist, right_label_hist):
     
     # Average impurity
     return -(P_left + P_right)*0.5
+
+def gini_impurity(left_label_hist, right_label_hist):
+    """Describe"""
+#     left_label_hist = (left_0_labels, left_1_labels)      
+#     right_label_hist = (right_0_labels, right_1_labels)
+
+    total_left = sum(left_label_hist)
+    total_right = sum(right_label_hist)
+    
+    left_0_label = left_label_hist[0]/float(total_left)
+    left_1_label = left_label_hist[1]/float(total_left)
+
+    right_0_label = right_label_hist[0]/float(total_right)
+    right_1_label = right_label_hist[1]/float(total_right)
+
+    P_left = left_0_label*left_1_label
+    P_right = right_0_label*right_1_label
+    
+    # Average impurity
+    return (P_left + P_right)*0.5
+
 
 def segmentor(data, labels, impurity):
     """Describe"""
@@ -145,7 +169,7 @@ scoreBuffer = []
 ############# CROSS-VALIDATION ############# 
 for depth in depths:
     print "DEPTH:", depth
-    clf = DTree(depth, impurity, segmentor)
+    clf = DTree(depth, gini_impurity, segmentor)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
     scoreBuffer.append((scores).mean())
     if 1:

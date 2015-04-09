@@ -149,14 +149,17 @@ for depth in depths:
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
     scoreBuffer.append((scores).mean())
     if 1:
-        print "Depth:", depth, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
 
 maxScore = np.max(scoreBuffer)
 maxScore_Index = scoreBuffer.index(maxScore)
-print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", maxScore
+print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
 print 50*'-'
 
 ############# FOR KAGGLE ############# 
 indices = np.array(range(1,len(testData)+1))
 kaggle_format =  np.vstack(((indices), (clf.predict(testData)))).T
+np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
+
+print 20*"*", "The End" ,20*"*"

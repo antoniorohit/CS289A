@@ -28,7 +28,7 @@ def segmentor(data, labels, impurity):
     # Assuming that the first element of shape is sample count, 
     # second element is features
     data_len, num_features = np.shape(data)
-    min_impurity_score = 1
+    min_impurity_score = 1.
     min_imp_feature_ind = -1
     min_imp_threshold = -1
     
@@ -55,12 +55,12 @@ def segmentor(data, labels, impurity):
         # The data on the left and right should be non zero
         if left_data_len > 0 and left_data_len < data_len:
             impurity_score = impurity(left_label_hist, right_label_hist)
-            if(left_0_labels == 0 or left_1_labels == 0 or right_0_labels == 0 or right_1_labels == 0):
-                print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
+#             if(left_0_labels == 0 or left_1_labels == 0 or right_0_labels == 0 or right_1_labels == 0):
+#                 print i, left_0_labels, left_1_labels, right_0_labels, right_1_labels
         else:
             impurity_score = 1
         
-        if(impurity_score < min_impurity_score):
+        if(impurity_score <= min_impurity_score):
             min_impurity_score = impurity_score
             min_imp_feature_ind = i
             min_imp_threshold = threshold
@@ -73,20 +73,17 @@ def computeCV_Score(clf, data, labels, folds):
     j = 0
     accuracy = 0.0
     scores = []
-    clf_local = clf
     # For each fold trained on...
     for i in range(folds):
         # Initialize variables
-        clf_local = clf
         j = 0
         accuracy = 0
-
+        clf_local = clf
         clf_local.train(data[i], labels[i])
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
                 predicted_Class = clf_local.predict(data[j])
-                print np.shape(labels), np.shape(predicted_Class)
                 for (elem1, elem2) in zip(predicted_Class, labels[j]):
                     if elem1 == elem2:
                         accuracy+=1                
@@ -97,7 +94,7 @@ def computeCV_Score(clf, data, labels, folds):
 
 ############# CONSTANTS ############# 
 
-depths = [50, 150, 200]
+depths = [1, 5, 25, 50, 100, 150]
 
 
 ############# FILE STUFF ############# 
@@ -147,16 +144,17 @@ scoreBuffer = []
 
 ############# CROSS-VALIDATION ############# 
 for depth in depths:
-    clf = DTree(depths[1], impurity, segmentor)
+    print "DEPTH:", depth
+    clf = DTree(depth, impurity, segmentor)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
     scoreBuffer.append((scores).mean())
-    if 0:
+    if 1:
         print "Depth:", depth, "Accuracy: %0.2f (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
 
 maxScore = np.max(scoreBuffer)
 maxScore_Index = scoreBuffer.index(maxScore)
-print "Best C Value:", depths[maxScore_Index], "Accuracy for that Depth:", maxScore
+print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", maxScore
 print 50*'-'
 
 ############# FOR KAGGLE ############# 

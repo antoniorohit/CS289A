@@ -122,7 +122,7 @@ depths = [1, 5, 25, 50, 100, 150]
 
 
 ############# FILE STUFF ############# 
-File_Spam = "./spam_data.mat"
+File_Spam = "./Data/spam_data.mat"
 
 trainMatrix = io.loadmat(File_Spam)                 # Dictionary
 
@@ -148,7 +148,7 @@ for elem in trainingComplete:
 # CROSS VALIDATION 
 #########################################################
 print 50*'='
-print "CROSS VALIDATION"
+print "CROSS VALIDATION USING CUSTOM FUNCTION"
 print 50*'='
 
 ############# DATA PARTIONING ############# 
@@ -187,6 +187,10 @@ kaggle_format =  np.vstack(((indices), (clf.predict(testData)))).T
 np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
 
 ############# BUILT-IN FUNCTION ############# 
+print 50*'='
+print "CROSS VALIDATION USING SCIKIT LEARN"
+print 50*'='
+
 for depth in depths:
     print "DEPTH:", depth
     clf = tree.DecisionTreeClassifier()

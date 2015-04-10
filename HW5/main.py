@@ -2,6 +2,7 @@ from Decision_Tree import DTree
 import numpy as np
 from scipy import io
 import random
+from sklearn import tree
 
 ############# FUNCTIONS ############# 
 # Entropy impurity
@@ -45,7 +46,6 @@ def gini_impurity(left_label_hist, right_label_hist):
     
     # Average impurity
     return (P_left + P_right)*0.5
-
 
 def segmentor(data, labels, impurity):
     """Describe"""
@@ -103,7 +103,7 @@ def computeCV_Score(clf, data, labels, folds):
         j = 0
         accuracy = 0
         clf_local = clf
-        clf_local.train(data[i], labels[i])
+        clf_local.fit(data[i], labels[i])
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
@@ -185,5 +185,34 @@ print 50*'-'
 indices = np.array(range(1,len(testData)+1))
 kaggle_format =  np.vstack(((indices), (clf.predict(testData)))).T
 np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
+
+############# BUILT-IN FUNCTION ############# 
+for depth in depths:
+    print "DEPTH:", depth
+    clf = tree.DecisionTreeClassifier()
+    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+    scoreBuffer.append((scores).mean())
+    if 1:
+        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50*'-'
+
+maxScore = np.max(scoreBuffer)
+maxScore_Index = scoreBuffer.index(maxScore)
+print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
+print 50*'-'
+
+############# VISUALIZE ############# 
+# from sklearn.externals.six import StringIO
+# with open("iris.dot", 'w') as f:
+#     f = tree.export_graphviz(clf, out_file=f)
+# 
+# import os
+# os.unlink('iris.dot')
+# from sklearn.externals.six import StringIO  
+# import pydot 
+# dot_data = StringIO() 
+# tree.export_graphviz(clf, out_file=dot_data) 
+# graph = pydot.graph_from_dot_data(dot_data.getvalue()) 
+# graph.write_pdf("iris.pdf") 
 
 print 20*"*", "The End" ,20*"*"

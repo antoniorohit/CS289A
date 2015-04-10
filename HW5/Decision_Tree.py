@@ -50,7 +50,7 @@ class DTree(object):
         self.node_index+=1
         return self.node_index
     
-    def train(self, data, labels):
+    def fit(self, data, labels):
 #         print self.depth
         curr_node = self.node_index    
         split_feat, thresh = self.segmentor(data, labels, self.impurity)
@@ -72,7 +72,7 @@ class DTree(object):
                 self.depth += 1
                 self.add_Node()
                 self.node_list[curr_node].left = self.node_index
-                self.train(left_data, left_labels)            
+                self.fit(left_data, left_labels)            
                 # exiting one node
                 self.depth -=1
         
@@ -90,7 +90,7 @@ class DTree(object):
                 self.depth += 1
                 self.add_Node()
                 self.node_list[curr_node].right = self.node_index
-                self.train(right_data, right_labels)
+                self.fit(right_data, right_labels)
                 # exiting one node
                 self.depth -=1
                         

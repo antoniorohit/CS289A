@@ -57,7 +57,6 @@ class DTree(object):
         # While the tree is not at its max depth and the 
         # node is not pure, keep splitting it
         if self.depth < self.max_depth and thresh > 0:
-#             self.size_l += 1
             multi_val_arr = [(x,l) for (x,l) in zip(data, labels) if x[split_feat] < thresh]
             left_data = [row[0] for row in multi_val_arr]
             left_labels = [row[1] for row in multi_val_arr]
@@ -75,7 +74,6 @@ class DTree(object):
                 # exiting one node
                 self.depth -=1
         
-#             self.size_r += 1
             multi_val_arr = [(x,l) for (x,l) in zip(data, labels) if x[split_feat] >= thresh]
             right_data = [row[0] for row in multi_val_arr]
             right_labels = [row[1] for row in multi_val_arr]
@@ -110,16 +108,13 @@ class DTree(object):
         for elem in test_data:
             loc_node = self.node_list[0]            # ROOT
             while (loc_node.type == "Node"):
-#                 print loc_node.left, loc_node.right, loc_node.split_rule
                 split_feat, thresh = loc_node.split_rule
                 if self.VISUALIZE == True:
                     print split_feat, thresh 
                     time.sleep(.1)    # pause 
                 if(elem[split_feat] < thresh):
-#                     print "L"
                     loc_node = self.node_list[loc_node.left]
                 else:
-#                     print "R" 
                     loc_node = self.node_list[loc_node.right]
             predictedLabels.append(loc_node.label)
 

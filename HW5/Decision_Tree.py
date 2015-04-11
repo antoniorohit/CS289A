@@ -32,7 +32,7 @@ class DTree(object):
         self.root = 0
         self.node_list = []
         self.node_index = -1
-        self.VISUALIZE = False      # visualize splits on prediction
+        self.VISUALIZE = True      # visualize splits on prediction
         # ROOT
         self.add_Node()
     
@@ -105,7 +105,7 @@ class DTree(object):
         return
     
     def predict(self, test_data):
-        predictedLabels = []
+        predictedLabels = [0]
         loc_node = self.Node()
         for elem in test_data:
             loc_node = self.node_list[0]            # ROOT
@@ -115,12 +115,13 @@ class DTree(object):
                 if self.VISUALIZE == True:
                     print split_feat, thresh 
                     time.sleep(.1)    # pause 
+                    break
                 if(elem[split_feat] < thresh):
 #                     print "L"
                     loc_node = self.node_list[loc_node.left]
                 else:
 #                     print "R" 
                     loc_node = self.node_list[loc_node.right]
-            predictedLabels.append(loc_node.label)
+#             predictedLabels.append(loc_node.label)
 
         return predictedLabels

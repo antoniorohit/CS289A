@@ -1,7 +1,5 @@
 from Decision_Tree import DTree
 import numpy as np
-from scipy import io
-import random
 from sklearn import tree
 from main import segmentor, entropy_impurity, gini_impurity, load_data
 
@@ -31,14 +29,13 @@ def predict_forest(classifier_list, testDatum):
         
     return label/len(classifier_list)
 
-DEPTH = 5
+DEPTH = 50
 NUM_TREES = 50
 
 ############# FILE STUFF ############# 
 File_Spam = "./Data/spam_data.mat"
 
 trainingData, trainingLabels, testData = load_data(File_Spam)
-
 ############# CREATE FOREST ############# 
 clf = DTree(DEPTH, gini_impurity, segmentor)
 classifier_list = create_forest(clf, trainingData, trainingLabels, NUM_TREES)
@@ -59,6 +56,16 @@ for (elem1, elem2) in zip(predictedClass, trainingLabels):
 print 100.0*accuracy/len(predictedClass)
 print sum(predictedClass), len(predictedClass)
 
-# print predictedClass
+
+############# TESTDATA PREDICT! ############# 
+predictedClass = []
+for elem in testData:
+    predictedClass.append(predict_forest(classifier_list, elem))
+
+############# FOR KAGGLE ############# 
+indices = np.array(range(1,len(testData)+1))
+kaggle_format =  np.vstack(((indices), predictedClass)).T
+np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
+
 
 print 20*"*", "The End" ,20*"*"

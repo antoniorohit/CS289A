@@ -19,14 +19,13 @@ for filename in os.listdir(ham_dir):
         break
     if filename[-3:] == 'txt':
         f = open(ham_dir+filename, 'rb')
-        x = [x for x in f.read().split() if len(x) > 0]
+        x = [x for x in f.read().split() if len(x) < 3]
         ham_bag = np.concatenate((ham_bag, x), 0)
 
 cnt = Counter(ham_bag)
-sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)
-print ""
-print len(cnt)
-print ""
+sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)[:15]
+print 20*"*", "HAM", 20*"*"
+print "Num words, files:", len(cnt), len(os.listdir(ham_dir))
 print sorted_cnt
 
 i = 0
@@ -36,11 +35,14 @@ for filename in os.listdir(spam_dir):
         break
     if filename[-3:] == 'txt':
         f = open(spam_dir+filename, 'rb')
-        x = [x for x in f.read().split() if len(x) > 0]
+        x = [x for x in f.read().split() if len(x) > 3]
         spam_bag = np.concatenate((spam_bag, x), 0)
 
 
 cnt = Counter(spam_bag)
-sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)
-print len(cnt)
+sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)[:15]
+print 20*"*", "SPAM", 20*"*"
+print "Num words, files:", len(cnt), len(os.listdir(spam_dir))
 print sorted_cnt
+
+print 20*"*", "THE END", 20*"*"

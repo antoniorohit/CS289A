@@ -138,7 +138,7 @@ def load_data(File_Spam):
 
 if __name__ == "__main__":
     ############# CONSTANTS ############# 
-    depths = [1, 5, 10, 20, 50, 100]
+    depths = [5, 10, 25, 50]
     
     ############# FILE STUFF ############# 
     File_Spam = "./Data/spam_data.mat"

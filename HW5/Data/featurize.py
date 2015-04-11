@@ -160,6 +160,15 @@ def freq_thanks_feature(text, freq):
 def freq___feature(text, freq):
     return text.count('-')
 
+def freq_sex_feature(text, freq):
+    return text.count('sex')
+
+def freq_at_feature(text, freq):
+    return text.count('@')
+
+def freq_viagra_feature(text, freq):
+    return text.count('viagra')
+
 def freq_numwords_feature(text, freq):
     return len(Counter(text))
 
@@ -209,6 +218,9 @@ def generate_feature_vector(text, freq):
     feature.append(freq_please_feature(text, freq))
     feature.append(freq_thanks_feature(text, freq))
     feature.append(freq___feature(text, freq))
+    feature.append(freq_at_feature(text, freq))
+    feature.append(freq_sex_feature(text, freq))
+    feature.append(freq_viagra_feature(text, freq))
     feature.append(freq_numwords_feature(text, freq))
     # Make sure type is int or float
 

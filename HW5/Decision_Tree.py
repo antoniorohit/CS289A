@@ -1,3 +1,5 @@
+import time
+
 class DTree(object):
     """ Decision Tree Object """
     
@@ -30,6 +32,7 @@ class DTree(object):
         self.root = 0
         self.node_list = []
         self.node_index = -1
+        self.VISUALIZE = False      # visualize splits on prediction
         # ROOT
         self.add_Node()
     
@@ -109,6 +112,9 @@ class DTree(object):
             while (loc_node.type == "Node"):
 #                 print loc_node.left, loc_node.right, loc_node.split_rule
                 split_feat, thresh = loc_node.split_rule
+                if self.VISUALIZE == True:
+                    print split_feat, thresh 
+                    time.sleep(.1)    # pause 
                 if(elem[split_feat] < thresh):
 #                     print "L"
                     loc_node = self.node_list[loc_node.left]

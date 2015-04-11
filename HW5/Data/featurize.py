@@ -210,10 +210,10 @@ def generate_feature_vector(text, freq):
     feature.append(freq_and_feature(text, freq))
 
     # --------- Add your own features here ---------
-    feature.append(freq_should_feature(text, freq))
+#     feature.append(freq_should_feature(text, freq))
 #     feature.append(freq_this_feature(text, freq))
-    feature.append(freq_your_feature(text, freq))
-    feature.append(freq_http_feature(text, freq))
+#     feature.append(freq_your_feature(text, freq))
+#     feature.append(freq_http_feature(text, freq))
     feature.append(freq_pills_feature(text, freq))
     feature.append(freq_please_feature(text, freq))
     feature.append(freq_thanks_feature(text, freq))

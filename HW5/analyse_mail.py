@@ -21,11 +21,7 @@ for filename in os.listdir(ham_dir):
         f = open(ham_dir+filename, 'rb')
         x = [x for x in f.read().split() if len(x) > 0]
         ham_bag = np.concatenate((ham_bag, x), 0)
-#         for line in f:
-#             words = line.split()
-#             for word in words:
-#                 if(len(word)>3):
-#                     print word
+
 cnt = Counter(ham_bag)
 sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)
 print ""
@@ -42,13 +38,9 @@ for filename in os.listdir(spam_dir):
         f = open(spam_dir+filename, 'rb')
         x = [x for x in f.read().split() if len(x) > 0]
         spam_bag = np.concatenate((spam_bag, x), 0)
-#         for line in f:
-#             words = line.split()
-#             for word in words:
-#                 if(len(word)>3):
-#                     print word
+
 
 cnt = Counter(spam_bag)
 sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)
-# print len(cnt)
-# print sorted_cnt
+print len(cnt)
+print sorted_cnt

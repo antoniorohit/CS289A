@@ -116,107 +116,111 @@ def computeCV_Score(clf, data, labels, folds):
         i+=1
     return np.array(scores)
 
-############# CONSTANTS ############# 
+def load_data(File_Spam):
+    trainMatrix = io.loadmat(File_Spam)                 # Dictionary
+    
+    ############# GET DATA ############# 
+    training_data_raw = np.array(trainMatrix['training_data'])
+    training_labels_raw = np.array(trainMatrix['training_labels']).T
+    testData = np.array(trainMatrix['test_data'])
+    
+    trainingComplete = zip(training_data_raw, training_labels_raw)
+    
+    ############# SHUFFLE DATA ############# 
+    random.shuffle(trainingComplete)
+    trainingData = []
+    trainingLabels = []
+    for elem in trainingComplete:
+        trainingData.append(elem[0]) 
+        trainingLabels.append(elem[1][0])
+    
+    return trainingData, trainingLabels, testData
 
-depths = [1, 5, 25, 50, 100, 150]
-
-
-############# FILE STUFF ############# 
-File_Spam = "./Data/spam_data.mat"
-
-trainMatrix = io.loadmat(File_Spam)                 # Dictionary
-
-############# GET DATA ############# 
-training_data_raw = np.array(trainMatrix['training_data'])
-training_labels_raw = np.array(trainMatrix['training_labels']).T
-testData = np.array(trainMatrix['test_data'])
-
-trainingComplete = zip(training_data_raw, training_labels_raw)
-
-############# SHUFFLE DATA ############# 
-random.shuffle(trainingComplete)
-trainingData = []
-trainingLabels = []
-for elem in trainingComplete:
-    trainingData.append(elem[0]) 
-    trainingLabels.append(elem[1][0])
-
-# spam_DTree = DTree(depths[1], impurity, segmentor)
-# spam_DTree.train(trainingData, trainingLabels)
-
-#########################################################
-# CROSS VALIDATION 
-#########################################################
-print 50*'='
-print "CROSS VALIDATION USING CUSTOM FUNCTION"
-print 50*'='
-
-############# DATA PARTIONING ############# 
-crossValidation_Data= []
-crossValidation_Labels = []
-k = 10 
-stepLength = k
-for index in range(0,k):
-    crossValidation_Data.append(trainingData[index:-1:stepLength])
-    crossValidation_Labels.append(trainingLabels[index:-1:stepLength])
-
-if 0:
-    print "Lengths of CV Data and Labels: ", np.array(crossValidation_Data).shape, np.array(crossValidation_Labels).shape
+if __name__ == "__main__":
+    ############# CONSTANTS ############# 
+    depths = [1, 5, 10, 20, 50, 100]
+    
+    ############# FILE STUFF ############# 
+    File_Spam = "./Data/spam_data.mat"
+    
+    trainingData, trainingLabels, testData = load_data(File_Spam)
+    
+    # spam_DTree = DTree(depths[1], impurity, segmentor)
+    # spam_DTree.train(trainingData, trainingLabels)
+    
+    #########################################################
+    # CROSS VALIDATION 
+    #########################################################
+    print 50*'='
+    print "CROSS VALIDATION USING CUSTOM FUNCTION"
+    print 50*'='
+    
+    ############# DATA PARTIONING ############# 
+    crossValidation_Data= []
+    crossValidation_Labels = []
+    k = 10 
+    stepLength = k
+    for index in range(0,k):
+        crossValidation_Data.append(trainingData[index:-1:stepLength])
+        crossValidation_Labels.append(trainingLabels[index:-1:stepLength])
+    
+    if 0:
+        print "Lengths of CV Data and Labels: ", np.array(crossValidation_Data).shape, np.array(crossValidation_Labels).shape
+        print 50*'-'
+    
+    scoreBuffer = []
+    
+    ############# CROSS-VALIDATION ############# 
+    for depth in depths:
+        print "DEPTH:", depth
+        clf = DTree(depth, gini_impurity, segmentor)
+        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+        scoreBuffer.append((scores).mean())
+        if 1:
+            print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+            print 50*'-'
+    
+    maxScore = np.max(scoreBuffer)
+    maxScore_Index = scoreBuffer.index(maxScore)
+    print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
     print 50*'-'
-
-scoreBuffer = []
-
-############# CROSS-VALIDATION ############# 
-for depth in depths:
-    print "DEPTH:", depth
-    clf = DTree(depth, gini_impurity, segmentor)
-    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    scoreBuffer.append((scores).mean())
-    if 1:
-        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-        print 50*'-'
-
-maxScore = np.max(scoreBuffer)
-maxScore_Index = scoreBuffer.index(maxScore)
-print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
-print 50*'-'
-
-############# FOR KAGGLE ############# 
-indices = np.array(range(1,len(testData)+1))
-kaggle_format =  np.vstack(((indices), (clf.predict(testData)))).T
-np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
-
-############# BUILT-IN FUNCTION ############# 
-print 50*'='
-print "CROSS VALIDATION USING SCIKIT LEARN"
-print 50*'='
-
-for depth in depths:
-    print "DEPTH:", depth
-    clf = tree.DecisionTreeClassifier()
-    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    scoreBuffer.append((scores).mean())
-    if 1:
-        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-        print 50*'-'
-
-maxScore = np.max(scoreBuffer)
-maxScore_Index = scoreBuffer.index(maxScore)
-print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
-print 50*'-'
-
-############# VISUALIZE ############# 
-# from sklearn.externals.six import StringIO
-# with open("iris.dot", 'w') as f:
-#     f = tree.export_graphviz(clf, out_file=f)
-# 
-# import os
-# os.unlink('iris.dot')
-# from sklearn.externals.six import StringIO  
-# import pydot 
-# dot_data = StringIO() 
-# tree.export_graphviz(clf, out_file=dot_data) 
-# graph = pydot.graph_from_dot_data(dot_data.getvalue()) 
-# graph.write_pdf("iris.pdf") 
-
-print 20*"*", "The End" ,20*"*"
+    
+    ############# FOR KAGGLE ############# 
+    indices = np.array(range(1,len(testData)+1))
+    kaggle_format =  np.vstack(((indices), (clf.predict(testData)))).T
+    np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
+    
+    ############# BUILT-IN FUNCTION ############# 
+    print 50*'='
+    print "CROSS VALIDATION USING SCIKIT LEARN"
+    print 50*'='
+    
+    for depth in depths:
+        print "DEPTH:", depth
+        clf = tree.DecisionTreeClassifier()
+        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+        scoreBuffer.append((scores).mean())
+        if 1:
+            print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+            print 50*'-'
+    
+    maxScore = np.max(scoreBuffer)
+    maxScore_Index = scoreBuffer.index(maxScore)
+    print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
+    print 50*'-'
+    
+    ############# VISUALIZE ############# 
+    # from sklearn.externals.six import StringIO
+    # with open("iris.dot", 'w') as f:
+    #     f = tree.export_graphviz(clf, out_file=f)
+    # 
+    # import os
+    # os.unlink('iris.dot')
+    # from sklearn.externals.six import StringIO  
+    # import pydot 
+    # dot_data = StringIO() 
+    # tree.export_graphviz(clf, out_file=dot_data) 
+    # graph = pydot.graph_from_dot_data(dot_data.getvalue()) 
+    # graph.write_pdf("iris.pdf") 
+    
+    print 20*"*", "The End" ,20*"*"

@@ -25,8 +25,6 @@ def predict_forest(classifier_list, testDatum):
     label = 0.
     for clf in classifier_list:
         label += int(clf.predict([testDatum,])[0])
-        print "-"
-    print "---"
     return label/len(classifier_list)
 
 def computeCV_Score_Forest(clf, data, labels, folds):
@@ -65,7 +63,7 @@ if __name__ == "__main__":
     print 50*'*'
     DEPTH = 25
     NUM_TREES = 30
-    depths = [10, 5, 10, 25, 50]
+    depths = [1, 5, 10, 25, 50]
     
     ############# FILE STUFF ############# 
     File_Spam = "./Data/spam_data.mat"

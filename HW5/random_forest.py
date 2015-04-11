@@ -1,7 +1,7 @@
 from Decision_Tree import DTree
 import numpy as np
-from sklearn import tree
-from main import segmentor, entropy_impurity, gini_impurity, load_data
+from sklearn import tree, ensemble
+from main import segmentor, entropy_impurity, gini_impurity, load_data, computeCV_Score
 
 def create_forest_data(trainingData, trainingLabels):
     trainingComplete = np.array(zip(trainingData, trainingLabels))
@@ -28,7 +28,7 @@ def predict_forest(classifier_list, testDatum):
         
     return label/len(classifier_list)
 
-def computeCV_Score(clf, data, labels, folds):
+def computeCV_Score_Forest(clf, data, labels, folds):
     i = 0
     j = 0
     accuracy = 0.0
@@ -60,11 +60,11 @@ def computeCV_Score(clf, data, labels, folds):
 
 if __name__ == "__main__":
     print 50*'*'
-    print "DECISION TREES"
+    print "RANDOM FORESTS"
     print 50*'*'
     DEPTH = 25
     NUM_TREES = 25
-    depths = [1, 5, 10,25, 50]
+    depths = [1, 5, 10, 25, 50]
     
     ############# FILE STUFF ############# 
     File_Spam = "./Data/spam_data.mat"
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     for depth in depths:
         print "DEPTH:", depth
         clf = DTree(depth, entropy_impurity, segmentor)
-        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+        scores = computeCV_Score_Forest(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
@@ -106,19 +106,41 @@ if __name__ == "__main__":
     print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
     print 50*'-'
     
+    print "Creating best ever random forest based on Cross Validation!"
     clf_best = DTree(depths[maxScore_Index], entropy_impurity, segmentor)
     best_forest = create_forest(clf_best, trainingData, trainingLabels)
-    
     
     ############# TESTDATA PREDICT! ############# 
     predictedClass = []
     for elem in testData:
         predictedClass.append(predict_forest(best_forest, elem))
+
+    print "Used this to predict classes on Test Data!"
+    print 50*'-'
     
     ############# FOR KAGGLE ############# 
     indices = np.array(range(1,len(testData)+1))
     kaggle_format =  np.vstack(((indices), predictedClass)).T
     np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
+
+    ############# BUILT-IN FUNCTION ############# 
+    scoreBuffer = []
+    print 50*'='
+    print "CROSS VALIDATION USING SCIKIT-LEARN"
+    print 50*'='
     
+    for depth in depths:
+        print "DEPTH:", depth
+        clf = ensemble.RandomForestClassifier(n_estimators=5, criterion='entropy', max_depth=depth)    
+        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+        scoreBuffer.append((scores).mean())
+        if 1:
+            print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+            print 50*'-'
+    
+    maxScore = np.max(scoreBuffer)
+    maxScore_Index = scoreBuffer.index(maxScore)
+    print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore,3)
+    print 50*'-'
     
     print 20*"*", "The End" ,20*"*"

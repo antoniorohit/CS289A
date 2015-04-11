@@ -137,8 +137,12 @@ def load_data(File_Spam):
     return trainingData, trainingLabels, testData
 
 if __name__ == "__main__":
+    print 50*'*'
+    print "DECISION TREES"
+    print 50*'*'
+    
     ############# CONSTANTS ############# 
-    depths = [5, 10, 25, 50]
+    depths = [1, 5, 10, 25, 50]
     
     ############# FILE STUFF ############# 
     File_Spam = "./Data/spam_data.mat"
@@ -173,7 +177,7 @@ if __name__ == "__main__":
     ############# CROSS-VALIDATION ############# 
     for depth in depths:
         print "DEPTH:", depth
-        clf = DTree(depth, gini_impurity, segmentor)
+        clf = DTree(depth, entropy_impurity, segmentor)
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
         if 1:
@@ -191,13 +195,14 @@ if __name__ == "__main__":
     np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt = '%d,%d',   header = 'Id,Category', comments='') 
     
     ############# BUILT-IN FUNCTION ############# 
+    scoreBuffer = []
     print 50*'='
     print "CROSS VALIDATION USING SCIKIT LEARN"
     print 50*'='
     
     for depth in depths:
         print "DEPTH:", depth
-        clf = tree.DecisionTreeClassifier()
+        clf = tree.DecisionTreeClassifier(max_depth=depth, criterion='gini')
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
         if 1:

@@ -1,5 +1,3 @@
-import numpy as np
-
 class DTree(object):
     """ Decision Tree Object """
     
@@ -28,9 +26,7 @@ class DTree(object):
         self.max_depth = depth
         self.impurity = impurity
         self.segmentor = segmentor
-        self.depth = 1
-        self.size_l = 0
-        self.size_r = 0
+        self.depth = 0
         self.root = 0
         self.node_list = []
         self.node_index = -1

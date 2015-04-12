@@ -188,9 +188,8 @@ if __name__ == "__main__":
         clf = DTree(depth, entropy_impurity, segmentor)
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
-        if 1:
-            print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-            print 50*'-'
+        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50*'-'
     
     maxScore = np.max(scoreBuffer)
     maxScore_Index = scoreBuffer.index(maxScore)
@@ -213,9 +212,8 @@ if __name__ == "__main__":
         clf = tree.DecisionTreeClassifier(max_depth=depth, criterion='gini')
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
-        if 1:
-            print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-            print 50*'-'
+        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50*'-'
     
     maxScore = np.max(scoreBuffer)
     maxScore_Index = scoreBuffer.index(maxScore)

@@ -12,7 +12,7 @@ def create_forest_data(trainingData, trainingLabels):
     trainingLabels = trainingComplete_replaced[:,1].tolist()
     return trainingData, trainingLabels
 
-def create_forest(clf, trainingData, trainingLabels, NUM_TREES=50):
+def create_forest(clf, trainingData, trainingLabels, NUM_TREES=25):
     classifier_list = []
     for _ in range(NUM_TREES):
         forestData, forestLabels = create_forest_data(trainingData, trainingLabels)
@@ -27,7 +27,7 @@ def predict_forest(classifier_list, testDatum):
         label += int(clf.predict([testDatum,])[0])
     return label/len(classifier_list)
 
-def computeCV_Score_Forest(clf, data, labels, folds):
+def computeCV_Score_Forest(clf, data, labels, folds, NUM_TREES=25):
     i = 0
     j = 0
     accuracy = 0.0
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     for depth in depths:
         print "DEPTH:", depth
         clf = DTree(depth, entropy_impurity, segmentor)
-        scores = computeCV_Score_Forest(clf, crossValidation_Data, crossValidation_Labels, k)
+        scores = computeCV_Score_Forest(clf, crossValidation_Data, crossValidation_Labels, k, NUM_TREES)
         scoreBuffer.append((scores).mean())
         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
         print 50*'-'
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     
     print "Creating best ever random forest based on Cross Validation!"
     clf_best = DTree(depths[maxScore_Index], entropy_impurity, segmentor)
-    best_forest = create_forest(clf_best, trainingData, trainingLabels)
+    best_forest = create_forest(clf_best, trainingData, trainingLabels, NUM_TREES)
     
     ############# TESTDATA PREDICT! ############# 
     predictedClass = []
@@ -130,9 +130,8 @@ if __name__ == "__main__":
         clf = ensemble.RandomForestClassifier(n_estimators=5, criterion='entropy', max_depth=depth)    
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
-        if 1:
-            print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-            print 50*'-'
+        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50*'-'
     
     maxScore = np.max(scoreBuffer)
     maxScore_Index = scoreBuffer.index(maxScore)

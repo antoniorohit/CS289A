@@ -65,7 +65,7 @@ if __name__ == "__main__":
     print "RANDOM FORESTS"
     print 50*'*'
     DEPTH = 25
-    NUM_TREES = 30
+    NUM_TREES = 50
     depths = [5, 25, 50]
     
     ############# FILE STUFF ############# 

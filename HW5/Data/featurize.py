@@ -172,6 +172,12 @@ def freq_viagra_feature(text, freq):
 def freq_free_feature(text, freq):
     return text.count('free')
 
+def freq_price_feature(text, freq):
+    return text.count('price')
+
+def freq_click_feature(text, freq):
+    return text.count('click')
+
 def freq_numwords_feature(text, freq):
     return len(Counter(text))
 
@@ -225,6 +231,8 @@ def generate_feature_vector(text, freq):
     feature.append(freq_sex_feature(text, freq))
     feature.append(freq_viagra_feature(text, freq))
     feature.append(freq_free_feature(text, freq))
+    feature.append(freq_price_feature(text, freq))
+    feature.append(freq_click_feature(text, freq))
     feature.append(freq_numwords_feature(text, freq))
     # Make sure type is int or float
 

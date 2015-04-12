@@ -23,7 +23,7 @@ for filename in os.listdir(ham_dir):
         ham_bag = np.concatenate((ham_bag, x), 0)
 
 cnt = Counter(ham_bag)
-sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)[10:25]
+sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)[20:30]
 print 20*"*", "HAM", 20*"*"
 print "Num words, files:", len(cnt), len(os.listdir(ham_dir))
 print sorted_cnt
@@ -40,7 +40,7 @@ for filename in os.listdir(spam_dir):
 
 
 cnt = Counter(spam_bag)
-sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)[10:25]
+sorted_cnt = sorted(cnt.items(), key=operator.itemgetter(1), reverse=True)[20:30]
 print 20*"*", "SPAM", 20*"*"
 print "Num words, files:", len(cnt), len(os.listdir(spam_dir))
 print sorted_cnt

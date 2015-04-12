@@ -65,7 +65,7 @@ def segmentor(data, labels, impurity, RNO=None):
         feature_set = range(num_features)
     else:
         rho = int(np.sqrt(num_features))
-        feature_set = random.sample(range(rho), rho)
+        feature_set = random.sample(range(num_features), rho)
     
     for i in feature_set:
         threshold = np.mean(data,axis=0)[i]

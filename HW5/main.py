@@ -47,7 +47,7 @@ def gini_impurity(left_label_hist, right_label_hist):
     # Average impurity
     return (P_left + P_right)*0.5
 
-def segmentor(data, labels, impurity):
+def segmentor(data, labels, impurity, RNO=None):
     """Describe"""
     # Assuming that the first element of shape is sample count, 
     # second element is features
@@ -59,7 +59,15 @@ def segmentor(data, labels, impurity):
     root_1_labels = sum(labels)
     root_0_labels = data_len - root_1_labels
     
-    for i in range(num_features):
+    # Random Node Optimization - choose subset of features to split on 
+    # for random forests
+    if(RNO==None):
+        feature_set = range(num_features)
+    else:
+        rho = int(np.sqrt(num_features))
+        feature_set = random.sample(range(rho), rho)
+    
+    for i in feature_set:
         threshold = np.mean(data,axis=0)[i]
         multi_val_arr = [(x,l) for (x,l) in zip(data, labels) if x[i] < threshold]
                 

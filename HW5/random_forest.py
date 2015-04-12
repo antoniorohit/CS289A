@@ -17,7 +17,7 @@ def create_forest(clf, trainingData, trainingLabels, NUM_TREES=50):
     for _ in range(NUM_TREES):
         forestData, forestLabels = create_forest_data(trainingData, trainingLabels)
         clf_new = clf
-        clf_new.fit(forestData, forestLabels)
+        clf_new.fit(forestData, forestLabels, RNO="sqrt")
         classifier_list.append(clf_new)
     return classifier_list
 
@@ -41,7 +41,7 @@ def computeCV_Score_Forest(clf, data, labels, folds):
         for _ in range(NUM_TREES):
             forestData, forestLabels = create_forest_data(data[i], labels[i])
             clf_new = clf
-            clf_new.fit(forestData, forestLabels)
+            clf_new.fit(forestData, forestLabels, RNO="sqrt")
             classifier_list.append(clf_new)
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):

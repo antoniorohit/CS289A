@@ -49,10 +49,10 @@ class DTree(object):
         self.node_index+=1
         return self.node_index
     
-    def fit(self, data, labels):
+    def fit(self, data, labels, RNO=None):
 #         print self.depth
         curr_node = self.node_index    
-        split_feat, thresh = self.segmentor(data, labels, self.impurity)
+        split_feat, thresh = self.segmentor(data, labels, self.impurity, RNO)
         self.node_list[self.node_index].split_rule = (split_feat, thresh)
         # While the tree is not at its max depth and the 
         # node is not pure, keep splitting it

@@ -4,6 +4,7 @@ from sklearn import tree, ensemble
 from main import segmentor, entropy_impurity, gini_impurity, load_data, computeCV_Score
 
 def create_forest_data(trainingData, trainingLabels):
+    # It works - I checked
     trainingComplete = np.array(zip(trainingData, trainingLabels))
     data_len = len(trainingData)
     indices = np.random.randint(data_len,size=data_len)
@@ -25,7 +26,9 @@ def predict_forest(classifier_list, testDatum):
     label = 0.
     for clf in classifier_list:
         label += int(clf.predict([testDatum,])[0])
-    return label/len(classifier_list)
+    if label > 0 and label < 30:
+        print label, len(classifier_list)
+    return np.round(label/len(classifier_list))
 
 def computeCV_Score_Forest(clf, data, labels, folds, NUM_TREES=25):
     i = 0
@@ -63,7 +66,7 @@ if __name__ == "__main__":
     print 50*'*'
     DEPTH = 25
     NUM_TREES = 30
-    depths = [1, 5, 10, 25, 50]
+    depths = [5, 25, 50]
     
     ############# FILE STUFF ############# 
     File_Spam = "./Data/spam_data.mat"
@@ -91,7 +94,7 @@ if __name__ == "__main__":
 
     for depth in depths:
         print "DEPTH:", depth
-        clf = DTree(depth, entropy_impurity, segmentor)
+        clf = DTree(depth, gini_impurity, segmentor)
         scores = computeCV_Score_Forest(clf, crossValidation_Data, crossValidation_Labels, k, NUM_TREES)
         scoreBuffer.append((scores).mean())
         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
@@ -103,7 +106,7 @@ if __name__ == "__main__":
     print 50*'-'
     
     print "Creating best ever random forest based on Cross Validation!"
-    clf_best = DTree(depths[maxScore_Index], entropy_impurity, segmentor)
+    clf_best = DTree(depths[maxScore_Index], gini_impurity, segmentor)
     best_forest = create_forest(clf_best, trainingData, trainingLabels, NUM_TREES)
     
     ############# TESTDATA PREDICT! ############# 

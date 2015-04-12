@@ -61,9 +61,9 @@ def segmentor(data, labels, impurity, RNO=None):
     
     # Random Node Optimization - choose subset of features to split on 
     # for random forests
-    if(RNO==None):
+    if(RNO == None):            # all features
         feature_set = range(num_features)
-    else:
+    else:                       # sqrt number of features
         rho = int(np.sqrt(num_features))
         feature_set = random.sample(range(num_features), rho)
     

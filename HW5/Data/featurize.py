@@ -104,6 +104,9 @@ def freq_memo_feature(text, freq):
 def freq_planning_feature(text, freq):
     return float(freq['planning'])
 
+def freq_pleased_feature(text, freq):
+    return float(freq['pleased'])
+
 def freq_record_feature(text, freq):
     return float(freq['record'])
 
@@ -133,50 +136,47 @@ def freq_and_feature(text, freq):
     return text.count('&')
 
 # --------- Add your own feature methods ----------
-def example_feature(text, freq):
-    return int('example' in text)
-
 def freq_should_feature(text, freq):
-    return text.count('should')
+    return freq['should']
 
 def freq_this_feature(text, freq):
-    return text.count('this')
+    return freq['this']
 
 def freq_your_feature(text, freq):
-    return text.count('your')
+    return freq['your']
 
 def freq_http_feature(text, freq):
-    return text.count('http')
+    return freq['http']
 
 def freq_pills_feature(text, freq):
-    return text.count('pills')
+    return freq['pills']
 
 def freq_please_feature(text, freq):
-    return text.count('please')
+    return freq['please']
 
 def freq_thanks_feature(text, freq):
-    return text.count('thanks')
+    return freq['thanks']
 
 def freq___feature(text, freq):
     return text.count('-')
 
 def freq_sex_feature(text, freq):
-    return text.count('sex')
+    return freq['sex']
 
 def freq_at_feature(text, freq):
     return text.count('@')
 
 def freq_viagra_feature(text, freq):
-    return text.count('viagra')
+    return text.count('iagra')
 
 def freq_free_feature(text, freq):
-    return text.count('free')
+    return freq['free']
 
 def freq_price_feature(text, freq):
-    return text.count('price')
+    return freq['price']
 
 def freq_click_feature(text, freq):
-    return text.count('click')
+    return freq['click']
 
 def freq_numwords_feature(text, freq):
     return len(Counter(text))
@@ -190,7 +190,7 @@ def generate_feature_vector(text, freq):
     feature.append(freq_bank_feature(text, freq))
     feature.append(freq_money_feature(text, freq))
     feature.append(freq_drug_feature(text, freq))
-#     feature.append(freq_spam_feature(text, freq))
+    feature.append(freq_spam_feature(text, freq))
     feature.append(freq_prescription_feature(text, freq))
     feature.append(freq_creative_feature(text, freq))
     feature.append(freq_height_feature(text, freq))
@@ -207,7 +207,7 @@ def generate_feature_vector(text, freq):
     feature.append(freq_meter_feature(text, freq))
     feature.append(freq_memo_feature(text, freq))
     feature.append(freq_planning_feature(text, freq))
-#     feature.append(freq_pleased_feature(text, freq))
+    feature.append(freq_pleased_feature(text, freq))
     feature.append(freq_record_feature(text, freq))
     feature.append(freq_out_feature(text, freq))
     feature.append(freq_semicolon_feature(text, freq))
@@ -219,10 +219,10 @@ def generate_feature_vector(text, freq):
     feature.append(freq_and_feature(text, freq))
 
     # --------- Add your own features here ---------
-#     feature.append(freq_should_feature(text, freq))
-#     feature.append(freq_this_feature(text, freq))
-#     feature.append(freq_your_feature(text, freq))
-#     feature.append(freq_http_feature(text, freq))
+    feature.append(freq_should_feature(text, freq))
+    feature.append(freq_this_feature(text, freq))
+    feature.append(freq_your_feature(text, freq))
+    feature.append(freq_http_feature(text, freq))
     feature.append(freq_pills_feature(text, freq))
     feature.append(freq_please_feature(text, freq))
     feature.append(freq_thanks_feature(text, freq))

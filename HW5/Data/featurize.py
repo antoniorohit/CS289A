@@ -167,7 +167,11 @@ def freq_at_feature(text, freq):
     return text.count('@')
 
 def freq_viagra_feature(text, freq):
-    return text.count('iagra')
+    regex1 = re.compile('v[iagr]*gra')
+    regex2 = re.compile('V[iagr]*gra')
+    count1 = re.findall(regex1, text)
+    count2 = re.findall(regex2, text)
+    return len(count1)+len(count2)
 
 def freq_free_feature(text, freq):
     return freq['free']
@@ -177,6 +181,9 @@ def freq_price_feature(text, freq):
 
 def freq_click_feature(text, freq):
     return freq['click']
+
+def freq_enron_feature(text, freq):
+    return freq['enron']
 
 def freq_numwords_feature(text, freq):
     return len(Counter(text))
@@ -233,6 +240,7 @@ def generate_feature_vector(text, freq):
     feature.append(freq_free_feature(text, freq))
     feature.append(freq_price_feature(text, freq))
     feature.append(freq_click_feature(text, freq))
+    feature.append(freq_enron_feature(text, freq))
     feature.append(freq_numwords_feature(text, freq))
     # Make sure type is int or float
 

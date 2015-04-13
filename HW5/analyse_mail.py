@@ -23,7 +23,7 @@ for filename in os.listdir(ham_dir):
         break
     if filename[-3:] == 'txt':
         f = open(ham_dir+filename, 'rb')
-        x = [x for x in f.read().split() if len(x) > 3]
+        x = [x for x in f.read().lower().split() if len(x) > 3]
         ham_bag = np.concatenate((ham_bag, x), 0)
 
 cnt = Counter(ham_bag)
@@ -41,7 +41,7 @@ for filename in os.listdir(spam_dir):
         break
     if filename[-3:] == 'txt':
         f = open(spam_dir+filename, 'rb')
-        x = [x for x in f.read().split() if len(x) > 3]
+        x = [x for x in f.read().lower().split() if len(x) > 3]
         spam_bag = np.concatenate((spam_bag, x), 0)
 
 
@@ -60,7 +60,7 @@ for filename in os.listdir(test_dir):
         break
     if filename[-3:] == 'txt':
         f = open(test_dir+filename, 'rb')
-        x = [x for x in f.read().split() if len(x) > 3]
+        x = [x for x in f.read().lower().split() if len(x) > 3]
         test_bag = np.concatenate((test_bag, x), 0)
 
 

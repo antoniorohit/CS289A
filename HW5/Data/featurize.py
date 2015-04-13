@@ -167,11 +167,9 @@ def freq_at_feature(text, freq):
     return text.count('@')
 
 def freq_viagra_feature(text, freq):
-    regex1 = re.compile('v[iagr]*gra')
-    regex2 = re.compile('V[iagr]*gra')
-    count1 = re.findall(regex1, text)
-    count2 = re.findall(regex2, text)
-    return len(count1)+len(count2)
+    regex = re.compile('v[iagr]*gra')
+    count_viagra = re.findall(regex, text)
+    return len(count_viagra)
 
 def freq_free_feature(text, freq):
     return freq['free']
@@ -252,7 +250,7 @@ def generate_design_matrix(filenames):
     design_matrix = []
     for filename in filenames:
         with open(filename) as f:
-            text = f.read() # Read in text from file
+            text = f.read().lower() # Read in text from file, change to all lower case
             text = text.replace('\r\n', ' ') # Remove newline character
             words = re.findall(r'\w+', text)
             word_freq = defaultdict(int) # Frequency of all words

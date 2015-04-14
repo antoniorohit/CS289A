@@ -53,18 +53,17 @@ def write_wave(params, cleaned_signal, output_fname = 'cleaned_audio.wav', outpu
 
 
 def extract_Gender_Label(directory):
-    labels = []
     folder = directory+"/etc/"
     readme =  open(folder+"README").read().strip().lower()
-    if("male" in readme):
-        labels.append(1)
-    elif("female" in readme):
-        labels.append(0)
+    if("female" in readme):
+        label = 0
+    elif("male" in readme):
+        label = 1
     else:
         print "ERROR!!"
         print readme
         exit
-    return labels
+    return label
 
 def extract_Data(data_directory):
     labels = []

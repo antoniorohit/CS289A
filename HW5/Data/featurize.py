@@ -250,10 +250,10 @@ def generate_design_matrix(filenames):
     design_matrix = []
     for filename in filenames:
         with open(filename) as f:
-            text = f.read().lower() # Read in text from file, change to all lower case
-            text = text.replace('\r\n', ' ') # Remove newline character
+            text = f.read().lower()  # Read in text from file, change to all lower case
+            text = text.replace('\r\n', ' ')  # Remove newline character
             words = re.findall(r'\w+', text)
-            word_freq = defaultdict(int) # Frequency of all words
+            word_freq = defaultdict(int)  # Frequency of all words
             for word in words:
                 word_freq[word] += 1
 
@@ -275,7 +275,7 @@ test_filenames = [BASE_DIR + TEST_DIR + str(x) + '.txt' for x in range(NUM_TEST_
 test_design_matrix = generate_design_matrix(test_filenames)
 
 X = spam_design_matrix + ham_design_matrix
-Y = [1]*len(spam_design_matrix) + [0]*len(ham_design_matrix)
+Y = [1] * len(spam_design_matrix) + [0] * len(ham_design_matrix)
 
 file_dict = {}
 file_dict['training_data'] = X

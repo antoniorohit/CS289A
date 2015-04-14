@@ -1,0 +1,4 @@
+.project
+.pydevproject
+*.pyc
+./feature_extraction/*.pyc

@@ -40,11 +40,19 @@ def extractFeatures(input_signal):
     # do not keep first coeff (energy)
     features_list=list()
     for k in range(len(mfcc_list)):
-        features_list += [mfcc_list[k][1:]]
+        features_list += [mfcc_list[k][1:5]]
 #         features_list += [delta_list[k][1:]]
 #         features_list += [ddelta_list[k][1:]]
 #         features_list += [np.hstack((mfcc_list[k][1:], delta_list[k][1:], ddelta_list[k][1:]))]
         
 #     print np.shape(mfcc_list), np.shape(features_list)
-        
+    
+    # dont return nan 
+    # TODO WHY DOES THIS HAPPEN?
+    for row in features_list:
+        for cell in row:
+            if cell!=cell:
+                print cell
+                return []
+    
     return features_list

@@ -32,10 +32,10 @@ def frame_chunks(rawSignal):
         framedRawSignal.append(rawSignal[index:index+chunk_size])
         index += chunk_size             #non-overlapping
     
-    # Zero padding for last sample (unnecessary?)    
-    if index != len(rawSignal):
-        framedRawSignal.append(rawSignal[index:])
-        framedRawSignal[-1] = np.append(framedRawSignal[-1], np.zeros(chunk_size - len(framedRawSignal[-1])))
+    # Zero padding for last sample (unnecessary?)    (remove)
+#     if index != len(rawSignal):
+#         framedRawSignal.append(rawSignal[index:])
+#         framedRawSignal[-1] = np.append(framedRawSignal[-1], np.zeros(chunk_size - len(framedRawSignal[-1])))
 
     return framedRawSignal
 
@@ -76,21 +76,70 @@ def extract_Data(data_directory):
             try:
                 for file_name in os.listdir(directory+folder):
                     if file_name[-3:] == "wav":
-                        features = []
                         label = extract_Gender_Label(directory)
-                        params, rawSignal = get_RawSignal(directory+folder+file_name)
+                        _, rawSignal = get_RawSignal(directory+folder+file_name)
                         framedRawSignal = (frame_chunks(rawSignal))
-                        for chunk in framedRawSignal:                            
-                            data.append(extractFeatures(chunk))
-                            labels.append(label)
+                        for chunk in framedRawSignal:
+                            feature_list = extractFeatures(chunk)
+                            if feature_list != []:                          
+                                data.append(feature_list)
+                                labels.append(label)
 #                         print np.shape(data), np.shape(data[-1]), np.shape(labels)
                         
-            except OSError:
-                print "OS Error"
+            except OSError, e:
+                print "OS Error:", str(e)
     return data, labels
 
 
+def select_Data_Subset(data, labels, fraction):
+    # It works - I checked
+    trainingComplete = np.array(zip(data, labels))
+    data_len = len(data)
+    indices = np.random.randint(data_len, size=int(data_len*fraction))
+    trainingComplete_replaced = trainingComplete[indices, :]
+    trainingData = trainingComplete_replaced[:, 0].tolist()
+    trainingLabels = trainingComplete_replaced[:, 1].tolist()
+    return trainingData, trainingLabels
 
 
 
+
+
+
+def computeCV_Score(clf, data, labels, folds):
+    ###################################
+    # Function to calculate cross validation scores 
+    # Input: SVC object, data, labels, num folds
+    # Output: Array of scores averaged for each fold
+    ###################################    i = 0
+    j = 0
+    accuracy = 0.0
+    scores = []
+    clf_local = clf
+    # For each fold trained on...
+    for i in range(folds):
+        # Initialize variables
+        clf_local = clf
+        j = 0
+        accuracy = 0
+
+        try:
+            clf_local.fit(data[i], labels[i])
+            # For each validation performed (k-1 total) on a fold
+            for j in range(folds):
+                if(j!=i):
+                    predicted_Digits = clf_local.predict(data[j])
+                     
+                    for (elem1, elem2) in zip(predicted_Digits, labels[j]):
+                        if elem1 == elem2:
+                            accuracy+=1
+                        else:
+                            pass
+                j+=1
+            scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
+            i+=1
+            return np.array(scores)
+        except Exception, e:
+            print str(e)
+                
 

@@ -6,7 +6,7 @@ import os
 import parameters as prm
 from utils import *
 import cPickle as pickle
-from sklearn import svm, tree
+from sklearn import svm, tree, ensemble
 import random
 
 data_directory = prm.params["data_directory"].get()
@@ -81,9 +81,6 @@ print "Sum of labels:", sum(labels)
 #########################################################
 # CROSS VALIDATION 
 #########################################################
-print 50 * '='
-print "CROSS VALIDATION USING SVM"
-print 50 * '='
 
 ############# DATA PARTIONING ############# 
 crossValidation_Data = []
@@ -100,12 +97,36 @@ if 0:
 
 scoreBuffer = []
 
-C = np.linspace(.1, 1000. , 5)                   # array of values for parameter C
-depths = [5, 10, 50, 100]
-############# CROSS-VALIDATION ############# 
+C = np.linspace(.1, 100. , 3)                   # array of values for parameter C
+depths = [10, 25, 50, 100]
+
+############# FORESTS/TREES ############# 
+print 50 * '='
+print "CROSS VALIDATION USING SCIKIT LEARN FORESTS"
+print 50 * '='
+
+for depth in depths:
+    print "DEPTH:", depth
+    clf = ensemble.RandomForestClassifier(n_estimators=50, criterion='gini', max_depth=depth)
+    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+    scoreBuffer.append((scores).mean())
+    print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+    print 50 * '-'
+
+maxScore = np.max(scoreBuffer)
+maxScore_Index = scoreBuffer.index(maxScore)
+print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
+print 50 * '-'
+
+############# SVM ############# 
+print 50 * '='
+print "CROSS VALIDATION USING SVM"
+print 50 * '='
+
+scoreBuffer = []
 for C_Value in C:
     print "C:", np.around(C_Value, 3)
-    clf = svm.SVC(kernel='poly', C=C_Value)
+    clf = svm.SVC(kernel='rbf', C=C_Value)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
     scoreBuffer.append((scores).mean())
     print "C:", np.around(C_Value, 3), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
@@ -115,25 +136,6 @@ for C_Value in C:
 maxScore = np.max(scoreBuffer)
 maxScore_Index = scoreBuffer.index(maxScore)
 print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", np.around(maxScore, 3)
-print 50 * '-'
-
-############# BUILT-IN FUNCTION ############# 
-scoreBuffer = []
-print 50 * '='
-print "CROSS VALIDATION USING SCIKIT LEARN"
-print 50 * '='
-
-for depth in depths:
-    print "DEPTH:", depth
-    clf = tree.DecisionTreeClassifier(max_depth=depth, criterion='entropy')
-    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-    scoreBuffer.append((scores).mean())
-    print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-    print 50 * '-'
-
-maxScore = np.max(scoreBuffer)
-maxScore_Index = scoreBuffer.index(maxScore)
-print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
 print 50 * '-'
 
 

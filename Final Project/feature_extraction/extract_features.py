@@ -31,7 +31,7 @@ def extractFeatures(input_signal):
 #         std_mfcc = np.std(mfcc_list.T, 1)
 #         for i in range(len(mfcc_list)):
 #             mfcc_list[i] = (mfcc_list[i]-mean_mfcc)/std_mfcc
-
+ 
 #     print np.shape(mfcc_list[i-1]), np.shape(mean_mfcc), np.shape(std_mfcc)
     N = 2
     delta_list = delta(mfcc_list, N)
@@ -39,11 +39,11 @@ def extractFeatures(input_signal):
     
     # do not keep first coeff (energy)
     features_list=list()
-    for k in range(len(mfcc_list)):
-        features_list += [mfcc_list[k][1:5]]
+    for k in range(len(delta_list)):
+        features_list += [mfcc_list[k][0:]]
 #         features_list += [delta_list[k][1:]]
 #         features_list += [ddelta_list[k][1:]]
-#         features_list += [np.hstack((mfcc_list[k][1:], delta_list[k][1:], ddelta_list[k][1:]))]
+#         features_list += [np.hstack((mfcc_list[k][1:5], delta_list[k][1:5]))]#, ddelta_list[k][1:]))]
         
 #     print np.shape(mfcc_list), np.shape(features_list)
     

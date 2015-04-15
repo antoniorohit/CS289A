@@ -6,48 +6,74 @@ import os
 import parameters as prm
 from utils import *
 import cPickle as pickle
-from sklearn import svm
+from sklearn import svm, tree
+import random
 
 data_directory = prm.params["data_directory"].get()
-prm.params["chunk_size"].set(1)
+prm.params["chunk_size"].set(.5)
             
 try:
     print "Loading the Data... (may take a while)"
     data = pickle.load(open(data_directory+"data.p", "rb"))
     labels = pickle.load(open(data_directory+"labels.p", "rb"))
     print "Data Loaded, Good to Go!"
-except Exception as excp:
+except Exception as excp:               # data.p doesnt exist
     print "Exception:", excp
     data, labels = extract_Data(data_directory)
-    if 1:
-        print "Flattening ze Data"
-        # flatten the data (for svm)
-        data_flat = []
-        data = np.array(data)
-        for elem in data:
-            data_flat.append(elem.flatten())
-        data = data_flat
+    print "Flattening ze Data"
+    # flatten the data (for svm)
+    data_flat = []
+    data = np.array(data)
+    for elem in data:
+        data_flat.append(elem.flatten())
+    data = data_flat
+    data_male = []
+    data_female = []
+    
+    for elem in zip(data, labels):
+        if elem[1] == 1: # male
+            data_male.append(elem[0])
+        else:
+            data_female.append(elem[0])
+        
+    print "Select Data Subset... (may take a while)"
+    labels_male = np.ones(len(data_male))
+    labels_female = np.zeros(len(data_female))
+    data_male, labels_male = select_Data_Subset(data_male, labels_male, 0.1)
+    data_female, labels_female = select_Data_Subset(data_female, labels_female, 1)
+    
+    print "Shapes of Data (male, female) and sum of labels", np.shape(data_male), np.shape(data_female), sum(labels)
 
+    data = np.concatenate((data_male, data_female))
+    labels = np.concatenate((labels_male, labels_female))
+    print "Data Subset Selected!"
+
+    dataComplete = zip(data, labels)
+    
+    # SHUFFLE THE IMAGES
+    random.shuffle(dataComplete)
+    
+    data = []
+    labels = []
+    for elem in dataComplete:
+        data.append(elem[0])
+        labels.append(elem[1])
+    
     print "Saving the Data... (may take a while)"
     pickle.dump(data, open(data_directory+"data.p", "wb"))        
     pickle.dump(labels, open(data_directory+"labels.p", "wb"))        
     print "Data Saved, Good to Go!"
 
 
-print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
-print "Sum of labels:", sum(labels)
+    print "Shapes of Data (male, female) and Labels", np.shape(data_male), np.shape(data_female), np.shape(labels)
+    print "Sum of labels:", sum(labels)
 
 # Check for nan
-for elem in data:
-    for cell in elem:
-        if cell != cell:
-            print cell
+# for elem in data:
+#     for cell in elem:
+#         if cell != cell:
+#             print cell
         
-
-print "Select Data Subset... (may take a while)"
-data, labels = select_Data_Subset(data, labels, fraction=0.1)
-print "Data Subset Selected!"
-
 
 print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
 print "Sum of labels:", sum(labels)
@@ -74,14 +100,15 @@ if 0:
 
 scoreBuffer = []
 
-C = np.linspace(0.1,10,16)                   # array of values for parameter C
+C = np.linspace(.1, 1000. , 5)                   # array of values for parameter C
+depths = [5, 10, 50, 100]
 ############# CROSS-VALIDATION ############# 
 for C_Value in C:
-    print "C:", np.around(C_Value, 1)
-    clf = svm.SVC(kernel='linear', C=C_Value)
+    print "C:", np.around(C_Value, 3)
+    clf = svm.SVC(kernel='poly', C=C_Value)
     scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
     scoreBuffer.append((scores).mean())
-    print "C:", np.around(C_Value, 1), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+    print "C:", np.around(C_Value, 3), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
     print 50 * '-'
 
 
@@ -90,6 +117,24 @@ maxScore_Index = scoreBuffer.index(maxScore)
 print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", np.around(maxScore, 3)
 print 50 * '-'
 
+############# BUILT-IN FUNCTION ############# 
+scoreBuffer = []
+print 50 * '='
+print "CROSS VALIDATION USING SCIKIT LEARN"
+print 50 * '='
+
+for depth in depths:
+    print "DEPTH:", depth
+    clf = tree.DecisionTreeClassifier(max_depth=depth, criterion='entropy')
+    scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+    scoreBuffer.append((scores).mean())
+    print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+    print 50 * '-'
+
+maxScore = np.max(scoreBuffer)
+maxScore_Index = scoreBuffer.index(maxScore)
+print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
+print 50 * '-'
 
 
 print 20*"*", "The End", 20*"*"

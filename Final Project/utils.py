@@ -117,6 +117,7 @@ def computeCV_Score(clf, data, labels, folds):
     scores = []
     clf_local = clf
     # For each fold trained on...
+    print "Actual   :", len(labels[0]), sum(labels[0])             
     for i in range(folds):
         # Initialize variables
         clf_local = clf
@@ -128,18 +129,18 @@ def computeCV_Score(clf, data, labels, folds):
             # For each validation performed (k-1 total) on a fold
             for j in range(folds):
                 if(j!=i):
-                    predicted_Digits = clf_local.predict(data[j])
-                     
-                    for (elem1, elem2) in zip(predicted_Digits, labels[j]):
+                    predicted_Labels = clf_local.predict(data[j])
+                    for (elem1, elem2) in zip(predicted_Labels, labels[j]):
                         if elem1 == elem2:
                             accuracy+=1
                         else:
                             pass
                 j+=1
-            scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
+            print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
+            scores.append(100.0*accuracy/((folds-1)*len(predicted_Labels)))
             i+=1
-            return np.array(scores)
         except Exception, e:
             print str(e)
+    return np.array(scores)
                 
 

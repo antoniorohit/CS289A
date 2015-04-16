@@ -11,7 +11,7 @@ import random
 
 data_directory = prm.params["data_directory"].get()
 pickle_directory = prm.params["pickle_directory"].get()
-prm.params["chunk_size"].set(.25)
+prm.params["chunk_size"].set(1)
             
 try:
     print "Loading the Data... (may take a while)"
@@ -119,7 +119,24 @@ maxScore_Index = scoreBuffer.index(maxScore)
 print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
 print 50 * '-'
 
+# Save the best forest
+print "Saving the CLF..."
+clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depths[maxScore_Index])
+clf.fit(data, labels)
 pickle.dump(clf, open(pickle_directory+"clf.p", "wb"))        
+print "Done saving the CLF!"
+
+# HOW DOES THIS DECISION TREE DO ON THE SAME DATA IT FIT ON? (should be 100%)
+accuracy = 0
+predicted_Labels = clf.predict(data)
+for (elem1, elem2) in zip(predicted_Labels, labels):
+    if elem1 == elem2:
+        accuracy+=1
+    else:
+        pass
+print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
+print "Accuracy of CLF on training data itself:", np.around(100.0*accuracy/len(predicted_Labels),2), "%"
+
 
 ############# SVM ############# 
 kernel = 'linear'

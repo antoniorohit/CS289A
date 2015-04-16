@@ -1,7 +1,7 @@
 '''
 Created on Apr 13, 2015
 
-High-Level Code which is called to train or test the system
+High-Level Code which is called to test or train the system
 
 @author: antonio
 '''

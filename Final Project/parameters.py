@@ -86,6 +86,7 @@ params=dict()
 params["sample_rate"] = Parameter(16000, [8000, 16000, 44100])            # hz
 params["chunk_size"] = Parameter(1, [0.250, 0.500, 1.000, 2.000])              # s
 params["data_directory"] = Parameter("./Data/")
+params["pickle_directory"] = Parameter("./Pickle/")
 
 # set names
 for key in params.keys():

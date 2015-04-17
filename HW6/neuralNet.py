@@ -6,11 +6,12 @@ Created on Apr 16, 2015
 
 class Digit_NN():
     def __init__(self):
-        self.ninput = 785
-        self.noutput = 10
+        self.nin = 784
+        self.nout = 10
+        self.nhidden = 200
         
-    def fit(self):
+    def fit(self, data, labels):
         return
     
-    def predict(self):
+    def predict(self, testData):
         return

@@ -23,14 +23,15 @@ def extractFeatures(input_signal):
         print("cleaned signal is empty")
         return input_signal
     
-    mfcc_list = mfcc(input_signal, prm.params["sample_rate"].get())    
+    mfcc_list = np.array(mfcc(input_signal, prm.params["sample_rate"].get()))    
     
 #     # Cepstral Mean Normalization
 #     if 1:
 #         mean_mfcc = np.average(mfcc_list.T, 1)
 #         std_mfcc = np.std(mfcc_list.T, 1)
 #         for i in range(len(mfcc_list)):
-#             mfcc_list[i] = (mfcc_list[i]-mean_mfcc)/std_mfcc
+#             for j in range(len(mfcc_list[i])):
+#                 mfcc_list[i][j] = (mfcc_list[i][j]-mean_mfcc[j])/std_mfcc[j]
  
 #     print np.shape(mfcc_list[i-1]), np.shape(mean_mfcc), np.shape(std_mfcc)
     N = 2

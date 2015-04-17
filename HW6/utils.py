@@ -73,6 +73,12 @@ def getDataMALIK(gauss_bool, imageData, imageLabels):
     shuffledData = []
     shuffledLabels = []
 
+    imageLabels_Vector = np.zeros((len(imageLabels), 10))
+    ##### CONVERT LABELS to size(10) vectors ####
+    for i in range(len(imageLabels)):
+        imageLabels_Vector[i][imageLabels[i]] = 1
+    
+    imageLabels = imageLabels_Vector
     ############# 
     # Ink Normalization
     ############# 

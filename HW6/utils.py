@@ -32,6 +32,7 @@ def computeCV_Score(clf, data, labels, folds):
     scores = []
     clf_local = clf
     # For each fold trained on...
+    print np.shape(data), np.shape(labels)
     for i in range(folds):
         # Initialize variables
         clf_local = clf
@@ -44,10 +45,10 @@ def computeCV_Score(clf, data, labels, folds):
             if(j!=i):
                 predicted_Digits = clf_local.predict(data[j])
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
-                    if elem1 == elem2:
+                    if np.dot(elem1.T, elem2):
                         accuracy+=1
                     else:
-                        pass
+                        print elem1, elem2
                 
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
@@ -65,6 +66,13 @@ def getDataNonMalik(imageComplete):
     for elem in imageComplete:
         shuffledData.append((elem[0]).flatten())                # Use a simple array of pixels as the feature
         shuffledLabels.append((elem[1][0]))
+    
+    imageLabels_Vector = np.zeros((len(shuffledLabels), 10))
+    ##### CONVERT LABELS to size(10) vectors ####
+    for i in range(len(shuffledLabels)):
+        imageLabels_Vector[i][shuffledLabels[i]] = 1
+    shuffledLabels = imageLabels_Vector
+
     return shuffledData, shuffledLabels, imageComplete
 
 def getDataMALIK(gauss_bool, imageData, imageLabels):

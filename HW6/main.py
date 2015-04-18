@@ -8,6 +8,7 @@ Homework 6 (Neural Nets)
 ############# IMPORTS ############# 
 from utils import *
 from neuralNet import Digit_NN
+import pylab as plt
 
 DEBUG = False
 ############# FILE STUFF ############# 
@@ -37,7 +38,11 @@ imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
 
-shuffledData, shuffledLabels = getDataPickle(imageData, imageLabels)
+# shuffledData, shuffledLabels = getDataPickle(imageData, imageLabels)
+shuffledData, shuffledLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
+
+dataShape = np.shape(shuffledData)
+print dataShape
 
 ############# DATA PARTIONING ############# 
 crossValidation_Data= []
@@ -49,7 +54,10 @@ for index in range(0,k):
     crossValidation_Data.append(shuffledData[index:lengthData:stepLength])
     crossValidation_Labels.append(shuffledLabels[index:lengthData:stepLength])
 
-clf = Digit_NN()
+clf = Digit_NN(dataShape[1], n_hidden=200)
 score = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
+
 print "Neural Net Score:", score, "%"
+
+

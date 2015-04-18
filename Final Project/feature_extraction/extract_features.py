@@ -25,7 +25,7 @@ def extractFeatures(input_signal):
     
     mfcc_list = np.array(mfcc(input_signal, prm.params["sample_rate"].get()))    
     
-#     # Cepstral Mean Normalization
+#     # Cepstral Mean Normalization @TODO: WHY IS THIS NOT HELPING??
 #     if 1:
 #         mean_mfcc = np.average(mfcc_list.T, 1)
 #         std_mfcc = np.std(mfcc_list.T, 1)
@@ -49,7 +49,7 @@ def extractFeatures(input_signal):
 #     print np.shape(mfcc_list), np.shape(features_list)
     
     # dont return nan 
-    # TODO WHY DOES THIS HAPPEN?
+    # @TODO WHY DOES THIS HAPPEN?
     for row in features_list:
         for cell in row:
             if cell!=cell:

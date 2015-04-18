@@ -38,7 +38,7 @@ def train():
     scoreBuffer = []
     
     C = np.linspace(.1, 1000. , 4)                   # array of values for parameter C
-    depths = [5, 10, 25, 50]
+    depths = [5, 10, 25]
     
     ############# FORESTS/TREES ############# 
     print 50 * '='
@@ -47,7 +47,7 @@ def train():
     
     for depth in depths:
         print "DEPTH:", depth
-        clf = ensemble.RandomForestClassifier(n_estimators=50, criterion='gini', max_depth=depth)
+        clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depth)
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
@@ -60,7 +60,7 @@ def train():
     
     # Save the best forest
     print "Saving the CLF..."
-    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=depths[maxScore_Index])
+    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depths[maxScore_Index])
     clf.fit(data, labels)
     pickle.dump(clf, open(pickle_directory+"clf.p", "wb"))        
     print "Done saving the CLF!"
@@ -78,26 +78,26 @@ def train():
     
     
     ############# SVM ############# 
-    kernel = 'linear'
-    
-    print 50 * '='
-    print "CROSS VALIDATION USING", kernel, "SVM"
-    print 50 * '='
-    
-    scoreBuffer = []
-    for C_Value in C:
-        print "C:", np.around(C_Value, 3)
-        clf = svm.SVC(kernel=kernel, C=C_Value)
-        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-        scoreBuffer.append((scores).mean())
-        print "C:", np.around(C_Value, 3), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-        print 50 * '-'
-    
-    
-    maxScore = np.max(scoreBuffer)
-    maxScore_Index = scoreBuffer.index(maxScore)
-    print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", np.around(maxScore, 3)
-    print 50 * '-'
+#     kernel = 'linear'
+#     
+#     print 50 * '='
+#     print "CROSS VALIDATION USING", kernel, "SVM"
+#     print 50 * '='
+#     
+#     scoreBuffer = []
+#     for C_Value in C:
+#         print "C:", np.around(C_Value, 3)
+#         clf = svm.SVC(kernel=kernel, C=C_Value)
+#         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+#         scoreBuffer.append((scores).mean())
+#         print "C:", np.around(C_Value, 3), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+#         print 50 * '-'
+#     
+#     
+#     maxScore = np.max(scoreBuffer)
+#     maxScore_Index = scoreBuffer.index(maxScore)
+#     print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", np.around(maxScore, 3)
+#     print 50 * '-'
     
     
     print 20*"*", "Train End", 20*"*"

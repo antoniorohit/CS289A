@@ -182,8 +182,8 @@ def getData_TestProtocol(source="train"):
     
     try:
         print "Loading the Data... (may take a while)"
-        data = pickle.load(open(pickle_directory+"data_tp.p", "rb"))
-        labels = pickle.load(open(pickle_directory+"labels_tp.p", "rb"))
+        data = pickle.load(open(pickle_directory+"data_tp_"+ str(source) + ".p", "rb"))
+        labels = pickle.load(open(pickle_directory+"labels_tp_"+ str(source) + ".p", "rb"))
         print "Data Loaded, Good to Go!"
     except Exception as excp:               # data_vf.p doesnt exist
         print "Exception:", excp
@@ -244,8 +244,8 @@ def getData_TestProtocol(source="train"):
 
         
         print "Saving the Data... (may take a while)"
-        pickle.dump(data, open(pickle_directory+"data_tp.p", "wb"))        
-        pickle.dump(labels, open(pickle_directory+"labels_tp.p", "wb"))        
+        pickle.dump(data, open(pickle_directory+"data_tp_"+ str(source) + ".p", "wb"))        
+        pickle.dump(labels, open(pickle_directory+"labels_tp_"+ str(source) + ".p", "wb"))        
         print "Data Saved, Good to Go!"
 
     print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
@@ -291,4 +291,8 @@ def computeCV_Score(clf, data, labels, folds):
             print str(e)
     return np.array(scores)
                 
+def cleanPickle():
+    pickle_dir = prm.params["pickle_directory"].get()
 
+    for filename in os.listdir(pickle_dir):
+        os.remove(pickle_dir+filename)

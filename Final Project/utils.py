@@ -189,7 +189,8 @@ def getData_TestProtocol(source="train"):
         print "Exception:", excp
         for filename in os.listdir(data_dir):
             filename = filename.lower()
-            if source in filename and filename[-3:] == "wav":
+            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename:
+                print filename
         
                 #######################################
                 # GET RAW SIGNAL 
@@ -201,7 +202,6 @@ def getData_TestProtocol(source="train"):
                 #######################################
                 framedRawSignal = frame_chunks(rawSignal)
                 
-    
                 #######################################
                 # ASCERTAIN GENDER 
                 #######################################
@@ -219,6 +219,30 @@ def getData_TestProtocol(source="train"):
                         data.append(feature_list)
                         labels.append(label)
     #                         print np.shape(data), np.shape(data[-1]), np.shape(labels)
+        
+        print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
+        data_flat = []
+        data = np.array(data)
+        for elem in data:
+            data_flat.append(elem.flatten())
+        data = data_flat
+        print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
+
+
+        #######################################
+        # SHUFFLE THE IMAGES
+        #######################################
+        dataComplete = zip(data, labels)
+        
+        random.shuffle(dataComplete)
+        
+        data = []
+        labels = []
+        for elem in dataComplete:
+            data.append(elem[0])
+            labels.append(elem[1])
+
+        
         print "Saving the Data... (may take a while)"
         pickle.dump(data, open(pickle_directory+"data_tp.p", "wb"))        
         pickle.dump(labels, open(pickle_directory+"labels_tp.p", "wb"))        

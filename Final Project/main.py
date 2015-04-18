@@ -10,10 +10,10 @@ from test import test
 from utils import cleanPickle
 import parameters as prm
 import os
-    
+import numpy as np
     
 
-prm.params["chunk_size"].set(0.25)
+prm.params["chunk_size"].set(0.5)
 
 cleanPickle()
 
@@ -21,5 +21,8 @@ print 20*"#", "Training", 20*"#"
 train()
 
 print 20*"#", "Testing", 20*"#"
-test()
+accuracy = test()
 
+print "Accuracy:", np.around(accuracy,2), "%"
+
+print 20*"#", "End of Main. Thank you for Playing", 20*"#"

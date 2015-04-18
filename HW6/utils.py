@@ -45,11 +45,11 @@ def computeCV_Score(clf, data, labels, folds):
             if(j!=i):
                 predicted_Digits = clf_local.predict(data[j])
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
-                    if np.dot(elem1.T, elem2):
+                    print np.ravel(np.around(elem1.T,0),1)
+                    if sum(np.multiply(np.ravel(np.around(elem1.T,0),1), (elem2))):
                         accuracy+=1
                     else:
-                        print elem1, elem2
-                
+                        pass
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
         i+=1
@@ -75,7 +75,7 @@ def getDataNonMalik(imageComplete):
 
     return shuffledData, shuffledLabels, imageComplete
 
-def getDataMALIK(gauss_bool, imageData, imageLabels):
+def getDataMalik(gauss_bool, imageData, imageLabels):
     """Take in image data, return histogram of oriented gradients"""
     # Arrays to hold the shuffled data and labels
     shuffledData = []
@@ -104,9 +104,8 @@ def getDataMALIK(gauss_bool, imageData, imageLabels):
                                         imageLabels.shape, len(imageComplete))
         
         print "Image/Digit 10000:\n", imageComplete[20000]
-        
-    ############# SET ASIDE VALIDATION DATA (10,000) ############# 
-    # SHUFFLE THE IMAGES
+    
+    # SHUFFLE
     random.shuffle(imageComplete)
     
     n_bins=9
@@ -145,11 +144,6 @@ def getDataMALIK(gauss_bool, imageData, imageLabels):
         
         shuffledData.append(np.append(ori_4_hist, ori_7_hist))
         shuffledLabels.append((imageComplete[i][1][0]))
-                
-    print "Saving Data as Pickle Object..."
-    pickle.dump(shuffledData, open("./Results/shuffledData.p", 'wb'))
-    pickle.dump(shuffledLabels, open("./Results/shuffledLabels.p", 'wb'))
-    print "Done Saving Data!"
         
     return shuffledData, shuffledLabels, imageComplete
 
@@ -168,6 +162,11 @@ def getDataPickle(imageData, imageLabels):
         print('labels successfully opened')
     else:
         print "ERROR PICKLE FILE NOT FOUND"
-        shuffledData, shuffledLabels, imageComplete = getDataMALIK(False, imageData, imageLabels)
+        shuffledData, shuffledLabels, imageComplete = getDataMalik(False, imageData, imageLabels)
+        print "Saving Data as Pickle Object..."
+        pickle.dump(shuffledData, open("./Results/shuffledData.p", 'wb'))
+        pickle.dump(shuffledLabels, open("./Results/shuffledLabels.p", 'wb'))
+        print "Done Saving Data!"
+
         
     return shuffledData, shuffledLabels

@@ -38,26 +38,43 @@ imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
 
-# shuffledData, shuffledLabels = getDataPickle(imageData, imageLabels)
-shuffledData, shuffledLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
+# imageData, imageLabels = getDataPickle(imageData, imageLabels)
+# print imageLabels[0:11000]
+imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
 
-dataShape = np.shape(shuffledData)
+# # shufTestData, _, _ = getDataMalik(0, testData, np.ones(len(testData)))
+# shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
+
+dataShape = np.shape(imageData)
 print dataShape
 
 ############# DATA PARTIONING ############# 
 crossValidation_Data= []
 crossValidation_Labels = []
 k = 10 
-lengthData = 1000
+lengthData = 5000
 stepLength = k
 for index in range(0,k):
-    crossValidation_Data.append(shuffledData[index:lengthData:stepLength])
-    crossValidation_Labels.append(shuffledLabels[index:lengthData:stepLength])
+    crossValidation_Data.append(imageData[index:lengthData:stepLength])
+    crossValidation_Labels.append(imageLabels[index:lengthData:stepLength])
 
 clf = Digit_NN(dataShape[1], n_hidden=200)
+
 score = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
 
 print "Neural Net Score:", score, "%"
 
+############# FOR KAGGLE ############# 
+indices = np.array(range(1, len(shufTestData) + 1))
+pred_labels = []
+for elem in shufTestData:
+    predictedLabel = clf.predict(np.matrix(elem))
+    print np.around(predictedLabel)
+    actual_label = np.nonzero(predictedLabel)
+    print actual_label
+    pred_labels.append(actual_label)
+
+kaggle_format = np.vstack(((indices), pred_labels)).T
+np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
 

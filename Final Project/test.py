@@ -42,4 +42,5 @@ def test():         # primarily tests testprotocol data now
             pass
 
     print "Predicted:", len(predictedLabel), sum(predictedLabel)
-    print "Accuracy:", np.around(100.0*accuracy/len(predictedLabel),2), "%"
+    
+    return 100.0*accuracy/len(predictedLabel)

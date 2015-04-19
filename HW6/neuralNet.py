@@ -34,6 +34,7 @@ class Digit_NN(object):
     def sigmoid(self, z):
         """ Computes the sigmoid of z"""
         return (1/(1+np.exp(-z)))
+
     
     def forward(self, X, W1, W2):
         self.z2 = np.dot(X, W1)
@@ -52,7 +53,7 @@ class Digit_NN(object):
         delta2 = np.multiply(np.dot(delta3, self.W2.T)[:,self.nhidden-1], self.derivative_tanh(self.z2))
         dJdW1 = np.dot(x.T, delta2)
         self.W1 -= dJdW1*self.gamma
-    
+
     
     def fit(self, data, labels):
         labels = np.array(labels)
@@ -84,10 +85,6 @@ class Digit_NN(object):
 
             if i %10000 == 0:
                 print "i, Cost, Delta:", i, curr_cost, delta
-#                 if curr_cost < 15:
-#                     self.gamma = 1*10**-6
-#                     if curr_cost < 5:
-#                         self.gamma = 10**-7
 
             cost.append(curr_cost)
             cost.popleft()
@@ -109,17 +106,6 @@ class Digit_NN(object):
         
         return predicted        
     
-    def computeNumericalGradient(self):
-        return
-    
-    def softmax(self, labels):
-        new_labels = []
-        denominator_sm = sum(np.exp(labels))
-        for i in range(10):
-            new_labels.append(np.exp(labels[i])/denominator_sm)
-        max_value = max(new_labels)
-        max_index = new_labels.index(max_value)
-        return max_index
     
     def costFunction_sq(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
@@ -133,3 +119,18 @@ class Digit_NN(object):
         y*np.log(self.yHat)
         J = 0.5*sum(np.array(y-self.yHat)**2)
         return J
+
+
+
+    
+    def computeNumericalGradient(self):
+        return
+    
+    def softmax(self, labels):
+        new_labels = []
+        denominator_sm = sum(np.exp(labels))
+        for i in range(10):
+            new_labels.append(np.exp(labels[i])/denominator_sm)
+        max_value = max(new_labels)
+        max_index = new_labels.index(max_value)
+        return max_index

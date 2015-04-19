@@ -40,11 +40,14 @@ imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
 
-imageData, imageLabels = getDataPickle(imageData, imageLabels)
-# imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
+method = "malik"            # or "raw"
 
-# # shufTestData, _, _ = getDataMalik(0, testData, np.ones(len(testData)))
-shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
+if method == "raw":
+    imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
+    shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
+else:
+    imageData, imageLabels = getDataPickle(imageData, imageLabels, "train")
+    shufTestData, _, _ = getDataPickle(testData, np.ones(len(testData)), "test")
 
 dataShape = np.shape(imageData)
 print "Image Data Shape", dataShape
@@ -60,7 +63,10 @@ for index in range(0,k):
     crossValidation_Data.append(imageData[index:lengthData:stepLength])
     crossValidation_Labels.append(imageLabels[index:lengthData:stepLength])
 
-clf = Digit_NN(dataShape[1], n_hidden=200)
+try:
+    clf = pickle.load(open("./Results/nn_clf_" + method + ".p", "rb"))
+except:
+    clf = Digit_NN(dataShape[1], n_hidden=200)
 
 score, clf = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
@@ -72,7 +78,7 @@ clf.fit(imageData, imageLabels)
 print "Training Time for entire NN:", time.time()-start
 
 print "Saving the NN CLF..."
-pickle.dump(clf, open("./Results/" +"nn_clf.p", "wb"))        
+# pickle.dump(clf, open("./Results/" +"nn_clf_" + method + ".p", "wb"))        
 print "Done saving the NN CLF!"
 
 ############# FOR KAGGLE ############# 
@@ -84,5 +90,6 @@ for elem in shufTestData:
     pred_labels.append(clf.predict(np.matrix(elem)))
 
 kaggle_format = np.vstack(((indices), pred_labels)).T
-np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
+np.savetxt("./Results/digits.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
 
+print 20*"#", "The End !", 20*"#"

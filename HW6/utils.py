@@ -141,25 +141,25 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         
     return shuffledData, shuffledLabels, imageComplete
 
-def getDataPickle(imageData, imageLabels):
+def getDataPickle(imageData, imageLabels, data_type):
     """Loads image data stored as pickle object - if it doesnt exist, it creates it"""
     # Arrays to hold the shuffled data and labels
     shuffledData = list()
     shuffledLabels = list()
 
-    if(os.path.isfile("./Results/shuffledData.p")):
+    if(os.path.isfile("./Results/" + data_type + "Data.p")):
         print('opening data with pickle...')
-        shuffledData = pickle.load(open("./Results/shuffledData.p", 'rb'))
+        shuffledData = pickle.load(open("./Results/" + data_type + "Data.p", 'rb'))
         print('data successfully opened')
         print('opening labels with pickle..')
-        shuffledLabels = pickle.load(open("./Results/shuffledLabels.p", 'rb'))
+        shuffledLabels = pickle.load(open("./Results/" + data_type + "Labels.p", 'rb'))
         print('labels successfully opened')
     else:
         print "ERROR PICKLE FILE NOT FOUND"
         shuffledData, shuffledLabels, imageComplete = getDataMalik(False, imageData, imageLabels)
         print "Saving Data as Pickle Object..."
-        pickle.dump(shuffledData, open("./Results/shuffledData.p", 'wb'))
-        pickle.dump(shuffledLabels, open("./Results/shuffledLabels.p", 'wb'))
+        pickle.dump(shuffledData, open("./Results/" + data_type + "Data.p", 'wb'))
+        pickle.dump(shuffledLabels, open("./Results/" + data_type + "Labels.p", 'wb'))
         print "Done Saving Data!"
 
         

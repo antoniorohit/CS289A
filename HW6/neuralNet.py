@@ -28,19 +28,19 @@ class Digit_NN(object):
 
     def derivative_sig(self, z):
         """ Computes the derivative of the sigmoid of z"""
-        return np.multiply(self.sigmoid(z), (1-self.sigmoid(z)))
+        z = np.array(z)
+        return np.exp(-z)/((1+np.exp(-z))**2)
     
     def sigmoid(self, z):
         """ Computes the sigmoid of z"""
-        return (1./(1+np.exp(-z)))
+        return (1/(1+np.exp(-z)))
     
     def forward(self, X, W1, W2):
         self.z2 = np.dot(X, W1)
         self.a2 = np.tanh(self.z2)
         self.a2 = np.hstack((self.a2, np.ones((len(self.a2),1))))
         self.z3 = np.dot(self.a2, W2)
-        self.yHat = self.sigmoid(self.z3)
-        self.yHat = np.around(self.yHat, 0)
+        self.yHat = np.around(self.sigmoid(self.z3), 0)
     
     def backprop(self, x, y):
         # W2
@@ -68,8 +68,7 @@ class Digit_NN(object):
         while 1:
             if(np.abs(delta) < epsilon) or i > 120000:
                 j+=1
-                if(j>10):
-                    print "JOY"
+                if(j>50):
                     self.gamma = 10**-4
                     break   
             else:
@@ -85,14 +84,13 @@ class Digit_NN(object):
 
             if i %10000 == 0:
                 print "i, Cost, Delta:", i, curr_cost, delta
-                if curr_cost < 15:
-                    self.gamma = 1*10**-6
-                    if curr_cost < 5:
-                        self.gamma = 10**-7
+#                 if curr_cost < 15:
+#                     self.gamma = 1*10**-6
+#                     if curr_cost < 5:
+#                         self.gamma = 10**-7
 
             cost.append(curr_cost)
             cost.popleft()
-#             print "Iteration, Change:", i, delta
             i+=1
         return self.W1, self.W2
     

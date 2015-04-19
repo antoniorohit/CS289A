@@ -30,6 +30,7 @@ if DEBUG:
     print trainMatrix, testMatrix
 
 ############# GET DATA ############# 
+print 20*"#", "Getting Data", 20*"#"
 testData = np.array(testMatrix['test_images'])
 testData = np.rollaxis(testData, 2, 0)                # move the index axis to be the first 
 testData_flat = []
@@ -39,21 +40,21 @@ imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
 imageLabels = np.array(trainMatrix['train_labels'])
 
-# imageData, imageLabels = getDataPickle(imageData, imageLabels)
-# print imageLabels[0:11000]
-imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
+imageData, imageLabels = getDataPickle(imageData, imageLabels)
+# imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
 
 # # shufTestData, _, _ = getDataMalik(0, testData, np.ones(len(testData)))
 shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
 
 dataShape = np.shape(imageData)
-print dataShape
+print "Image Data Shape", dataShape
 
 ############# DATA PARTIONING ############# 
+print 20*"#", "Cross Validation", 20*"#"
 crossValidation_Data= []
 crossValidation_Labels = []
 k = 10 
-lengthData = 5000
+lengthData = 6000
 stepLength = k
 for index in range(0,k):
     crossValidation_Data.append(imageData[index:lengthData:stepLength])
@@ -61,24 +62,26 @@ for index in range(0,k):
 
 clf = Digit_NN(dataShape[1], n_hidden=200)
 
-score = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+score, clf = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
-print "Neural Net Score:", score, "%"
+print "Neural Net Score:", np.around(np.mean(score),1), "%"
 
+print 20*"#", "Training on all Data...", 20*"#"
 start = time.time()
 clf.fit(imageData, imageLabels)
-print time.time()-start
+print "Training Time for entire NN:", time.time()-start
+
+print "Saving the NN CLF..."
+pickle.dump(clf, open("./Results/" +"nn_clf.p", "wb"))        
+print "Done saving the NN CLF!"
 
 ############# FOR KAGGLE ############# 
+print 20*"#", "Predicting for Kaggle", 20*"#"
 indices = np.array(range(1, len(shufTestData) + 1))
 pred_labels = []
 print np.shape(shufTestData)
 for elem in shufTestData:
-    predictedLabel = clf.predict(np.matrix(elem))
-    print np.around(predictedLabel)
-    actual_label = np.nonzero(predictedLabel)
-    print actual_label
-    pred_labels.append(actual_label)
+    pred_labels.append(clf.predict(np.matrix(elem)))
 
 kaggle_format = np.vstack(((indices), pred_labels)).T
 np.savetxt("./Results/spam.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 

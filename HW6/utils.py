@@ -35,7 +35,7 @@ def computeCV_Score(clf, data, labels, folds):
     print np.shape(data), np.shape(labels)
     for i in range(folds):
         # Initialize variables
-        clf_local = clf
+#         clf_local = clf
         j = 0
         accuracy = 0
 
@@ -53,9 +53,9 @@ def computeCV_Score(clf, data, labels, folds):
                         pass
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
-        print "Accuracy:", scores[-1], "%"
+        print "Accuracy:", np.around(scores[-1],1), "%"
         i+=1
-    return np.array(scores)
+    return np.array(scores), clf_local
 
 def getDataNonMalik(imageComplete):
     """Return simple array of pixels (shuffled)"""
@@ -97,17 +97,9 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         aux_norm = np.linalg.norm(imageData[i])
         if aux_norm != 0:
             imageData[i] /= aux_norm
-    
-    imageComplete = zip(imageData, imageLabels)
-    
-    if 0:
-        print 50*'-'
-        print ("Shapes of image data and labels: ", imageData.shape, 
-                                        imageLabels.shape, len(imageComplete))
         
-        print "Image/Digit 10000:\n", imageComplete[20000]
-    
     # SHUFFLE
+    imageComplete = zip(imageData, imageLabels)
     random.shuffle(imageComplete)
     
     n_bins=9
@@ -145,7 +137,7 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         ori_7_hist = np.float64(ori_7_hist)/(np.linalg.norm(ori_7_hist))
         
         shuffledData.append(np.append(ori_4_hist, ori_7_hist))
-        shuffledLabels.append((imageComplete[i][1][0]))
+        shuffledLabels.append((imageComplete[i][1]))
         
     return shuffledData, shuffledLabels, imageComplete
 

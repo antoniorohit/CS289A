@@ -7,14 +7,19 @@ import numpy as np
 from collections import deque
 
 class Digit_NN(object):
-    def __init__(self, dataShape, n_hidden=200):
+    def __init__(self, dataShape, cost="square", n_hidden=200):
         self.nin = dataShape
         self.nout = 10
         self.nhidden = 200
         self.gamma = 10**-4
+        self.yHat = []
         # initialize weights
         self.W1 = 0.001*np.random.randn(dataShape+1, self.nhidden)    
         self.W2 = 0.001*np.random.randn(self.nhidden+1, self.nout)
+        if cost == "square":
+            self.costFunction = self.costFunction_sq
+        else:
+            self.costFunction = self.costFunction_entropy
 
     def derivative_tanh(self, z):
         """ Computes the derivative of the sigmoid of z"""
@@ -27,7 +32,7 @@ class Digit_NN(object):
     
     def sigmoid(self, z):
         """ Computes the sigmoid of z"""
-        return (1/(1.+np.exp(-z)))
+        return (1./(1+np.exp(-z)))
     
     def forward(self, X, W1, W2):
         self.z2 = np.dot(X, W1)
@@ -35,6 +40,7 @@ class Digit_NN(object):
         self.a2 = np.hstack((self.a2, np.ones((len(self.a2),1))))
         self.z3 = np.dot(self.a2, W2)
         self.yHat = self.sigmoid(self.z3)
+        self.yHat = np.around(self.yHat, 0)
     
     def backprop(self, x, y):
         # W2
@@ -54,13 +60,13 @@ class Digit_NN(object):
         data = np.hstack((data, np.ones((len(data),1))))
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 10**-6
-        cost = deque(10000*np.ones(50))
+        epsilon = 10**-4
+        cost = deque(10000*np.ones(1000))
         delta = 1
         i = 0
         j=0
         while 1:
-            if(np.abs(delta) < epsilon):
+            if(np.abs(delta) < epsilon) or i > 120000:
                 j+=1
                 if(j>10):
                     print "JOY"
@@ -68,21 +74,20 @@ class Digit_NN(object):
                     break   
             else:
                 j=0
-                
-            x,y = completeData[np.random.randint(data_len, size=1)]
+                                
+            x,y = completeData[np.random.randint(data_len, size=1)[0]]
             self.forward(np.matrix(x), self.W1, self.W2)
             self.backprop(np.matrix(x), y)
             curr_cost = (self.costFunction(data,labels))
-            curr_cost = np.mean(curr_cost)                    
-                    
+
+            curr_cost = np.mean(curr_cost)                            
             delta = curr_cost - np.mean(cost)
-#             if delta > 0:
-#                 self.gamma /= 2
+
             if i %10000 == 0:
-                print "Cost, Delta:", curr_cost, delta
-                if curr_cost < 23:
-                    self.gamma = 10**-6
-                    if curr_cost < 15:
+                print "i, Cost, Delta:", i, curr_cost, delta
+                if curr_cost < 15:
+                    self.gamma = 1*10**-6
+                    if curr_cost < 5:
                         self.gamma = 10**-7
 
             cost.append(curr_cost)
@@ -98,10 +103,10 @@ class Digit_NN(object):
         self.forward(np.matrix(testData), W1, W2)
         for elem in testData:
             self.forward(np.matrix(elem), W1, W2)
-            print np.around(self.yHat, 0)
-            max_value = max(self.yHat)
-            max_index = np.array(self.yHat).index(max_value)
-            print max_index
+            nn_label = self.yHat.T.tolist()
+            max_value = max(nn_label)
+            max_index = nn_label.index(max_value)
+#             print max_index
             predicted.append(max_index)
         
         return predicted        
@@ -118,8 +123,15 @@ class Digit_NN(object):
         max_index = new_labels.index(max_value)
         return max_index
     
-    def costFunction(self, x, y):
+    def costFunction_sq(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.forward(np.matrix(x), self.W1, self.W2)
+        J = 0.5*sum(np.array(y-self.yHat)**2)
+        return J
+    
+    def costFunction_entropy(self, x, y):
+        #Compute cost for given X,y, use weights already stored in class.
+        self.forward(np.matrix(x), self.W1, self.W2)
+        y*np.log(self.yHat)
         J = 0.5*sum(np.array(y-self.yHat)**2)
         return J

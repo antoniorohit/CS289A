@@ -9,6 +9,7 @@ Homework 6 (Neural Nets)
 from utils import *
 from neuralNet import Digit_NN
 import pylab as plt
+import time
 
 DEBUG = False
 ############# FILE STUFF ############# 
@@ -43,7 +44,7 @@ imageLabels = np.array(trainMatrix['train_labels'])
 imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
 
 # # shufTestData, _, _ = getDataMalik(0, testData, np.ones(len(testData)))
-# shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
+shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
 
 dataShape = np.shape(imageData)
 print dataShape
@@ -62,12 +63,16 @@ clf = Digit_NN(dataShape[1], n_hidden=200)
 
 score = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
-
 print "Neural Net Score:", score, "%"
+
+start = time.time()
+clf.fit(imageData, imageLabels)
+print time.time()-start
 
 ############# FOR KAGGLE ############# 
 indices = np.array(range(1, len(shufTestData) + 1))
 pred_labels = []
+print np.shape(shufTestData)
 for elem in shufTestData:
     predictedLabel = clf.predict(np.matrix(elem))
     print np.around(predictedLabel)

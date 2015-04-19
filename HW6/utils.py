@@ -39,19 +39,20 @@ def computeCV_Score(clf, data, labels, folds):
         j = 0
         accuracy = 0
 
-        clf_local.fit(data[i], labels[i])
+        W1, W2 = clf_local.fit(data[i], labels[i])
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
-                predicted_Digits = clf_local.predict(data[j])
+                predicted_Digits = clf_local.predict(data[j], W1, W2)
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
-                    print np.ravel(np.around(elem1.T,0),1)
-                    if sum(np.multiply(np.ravel(np.around(elem1.T,0),1), (elem2))):
+                    elem2 = elem2.tolist().index(1)
+                    if elem1 == elem2:
                         accuracy+=1
                     else:
                         pass
             j+=1
         scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
+        print scores[-1]
         i+=1
     return np.array(scores)
 

@@ -67,6 +67,9 @@ try:    # try loading the old clf if it exists
 except: # clf wasn't found - initialize new NN with ninput neurons and 200 neurons in hidden layer
     clf = Digit_NN(dataShape[1], n_hidden=200, cost="MSE")
 
+clf.gamma = 10**-8
+print clf.gamma
+
 score, clf = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
 print "NN Cross-Val Score:", np.around(np.mean(score),1), "%"
@@ -82,7 +85,7 @@ for (elem1, elem2) in zip(pred_labels, validationSet_Labels):
     else:
         pass
 
-print "Validation Set Accuracy:", 100.0*accuracy/len(pred_labels)
+print "Validation Set Accuracy:", 100.0*accuracy/len(pred_labels), "%"
 
 ############# MEGA TRAINING ############# 
 print 20*"#", "Training on all Data...", 20*"#"

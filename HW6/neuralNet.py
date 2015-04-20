@@ -87,7 +87,7 @@ class Digit_NN(object):
 
             delta = curr_cost - np.mean(cost)
 
-            if i %10000 == 0:
+            if i %1000 == 0:
                 print "i, Cost, Delta:", i, curr_cost, delta
 
             cost.append(curr_cost)
@@ -105,7 +105,7 @@ class Digit_NN(object):
             nn_label = self.yHat.T.tolist()
             max_value = max(nn_label)
             max_index = nn_label.index(max_value)
-            print max_index
+#             print max_index
             predicted.append(max_index)
         
         return predicted        

@@ -78,9 +78,13 @@ def getDataNonMalik(imageComplete):
 
 def getDataMalik(gauss_bool, imageData, imageLabels):
     """Take in image data, return histogram of oriented gradients"""
-    # Arrays to hold the shuffled data and labels
-    shuffledData = []
-    shuffledLabels = []
+    # SHUFFLE
+    imageComplete = zip(imageData, imageLabels)
+    random.shuffle(imageComplete)
+    
+    # shape of imageComplete is (60000,2) - transpose required
+    imageData = np.array(imageComplete).T[0]
+    imageLabels = np.array(imageComplete).T[1]
 
     imageLabels_Vector = np.zeros((len(imageLabels), 10))
     ##### CONVERT LABELS to size(10) vectors ####
@@ -97,24 +101,25 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         if aux_norm != 0:
             imageData[i] /= aux_norm
         
-    # SHUFFLE
     imageComplete = zip(imageData, imageLabels)
-    random.shuffle(imageComplete)
-    
+    # Arrays to hold the final shuffled data and labels
+    shuffledData = []
+    shuffledLabels = []
+
     n_bins=9
     for ind in range(len(imageComplete)):
         if ind % 300 == 0:
             print 'feature extraction :' + str(np.around(ind*100./len(imageComplete), 1))+ ' % over'
         
         if gauss_bool:
-            gaussFirst_x = filters.gaussian_filter1d(imageComplete[i][0], 1, order = 1, axis = 0)
-            gaussFirst_y = filters.gaussian_filter1d(imageComplete[i][0], 1, order = 1, axis = 1)
+            gaussFirst_x = filters.gaussian_filter1d(imageComplete[ind][0], 1, order = 1, axis = 0)
+            gaussFirst_y = filters.gaussian_filter1d(imageComplete[ind][0], 1, order = 1, axis = 1)
             ori = np.array(np.arctan2(gaussFirst_y, gaussFirst_x))
 
         else:
             grad_filter = np.array([[-1, 0, 1]])
-            gradx = signal.convolve2d(imageComplete[i][0], grad_filter, 'same')
-            grady = signal.convolve2d(imageComplete[i][0], np.transpose(grad_filter), 'same')
+            gradx = signal.convolve2d(imageComplete[ind][0], grad_filter, 'same')
+            grady = signal.convolve2d(imageComplete[ind][0], np.transpose(grad_filter), 'same')
             ori = np.array(np.arctan2(grady, gradx))
         
         ori_4_hist = list()
@@ -136,7 +141,7 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         ori_7_hist = np.float64(ori_7_hist)/(np.linalg.norm(ori_7_hist))
         
         shuffledData.append(np.append(ori_4_hist, ori_7_hist))
-        shuffledLabels.append((imageComplete[i][1]))
+        shuffledLabels.append((imageComplete[ind][1]))
         
     return shuffledData, shuffledLabels, imageComplete
 

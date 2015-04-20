@@ -1,6 +1,11 @@
 '''
 Created on Apr 16, 2015
 
+Good References:
+
+Series of Videos on NNs:
+https://www.youtube.com/watch?v=bxe2T-V8XRs
+
 @author: antonio
 '''
 import numpy as np

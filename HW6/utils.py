@@ -148,16 +148,16 @@ def getDataPickle(imageData, imageLabels, data_type):
     shuffledLabels = list()
 
     if(os.path.isfile("./Results/" + data_type + "Data.p")):
-        print('opening data with pickle...')
+        print('opening ' + data_type + ' data with pickle...')
         shuffledData = pickle.load(open("./Results/" + data_type + "Data.p", 'rb'))
-        print('data successfully opened')
-        print('opening labels with pickle..')
+        print('' + data_type + ' data successfully opened')
+        print('opening ' + data_type + ' labels with pickle..')
         shuffledLabels = pickle.load(open("./Results/" + data_type + "Labels.p", 'rb'))
-        print('labels successfully opened')
+        print('' + data_type + ' labels successfully opened')
     else:
-        print "ERROR PICKLE FILE NOT FOUND"
-        shuffledData, shuffledLabels, imageComplete = getDataMalik(False, imageData, imageLabels)
-        print "Saving Data as Pickle Object..."
+        print "Soft Error: PICKLE FILE NOT FOUND"
+        shuffledData, shuffledLabels, _ = getDataMalik(False, imageData, imageLabels)
+        print "Saving " + data_type + " Data as Pickle Object..."
         pickle.dump(shuffledData, open("./Results/" + data_type + "Data.p", 'wb'))
         pickle.dump(shuffledLabels, open("./Results/" + data_type + "Labels.p", 'wb'))
         print "Done Saving Data!"

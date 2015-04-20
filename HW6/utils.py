@@ -137,6 +137,9 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
             ori_4_hist.append(np.histogram(elem1.flatten(), n_bins, (-np.pi, np.pi))[0])
             ori_4_hist.append(np.histogram(elem2.flatten(), n_bins, (-np.pi, np.pi))[0])
         
+        ori_4_hist = ori_4_hist - np.mean(ori_4_hist)
+        ori_7_hist = ori_7_hist - np.mean(ori_7_hist)
+
         ori_4_hist = np.float64(ori_4_hist)/(np.linalg.norm(ori_4_hist))
         ori_7_hist = np.float64(ori_7_hist)/(np.linalg.norm(ori_7_hist))
         

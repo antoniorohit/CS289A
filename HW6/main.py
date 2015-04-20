@@ -31,7 +31,7 @@ imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to
 imageLabels = np.array(trainMatrix['train_labels'])
 
 ############# PROCESS DATA ############# 
-features = "malik"            # or "raw"
+features = "raw"            # or "raw"
 
 if features == "raw":
     # Non malik - raw, shuffled, and labels converted to one-of-10-high format
@@ -62,13 +62,12 @@ if lengthData < 50000:
 
 print np.shape(crossValidation_Data)
 
-try:    # try loading the old clf if it exists
-    clf = pickle.load(open("./Results/nn_clf_" + features + ".p", "rb"))
-except: # clf wasn't found - initialize new NN with ninput neurons and 200 neurons in hidden layer
-    clf = Digit_NN(dataShape[1], n_hidden=200, cost="MSE")
+# try:    # try loading the old clf if it exists
+#     clf = pickle.load(open("./Results/nn_clf_" + features + ".p", "rb"))
+# except: # clf wasn't found - initialize new NN with ninput neurons and 200 neurons in hidden layer
+clf = Digit_NN(dataShape[1], n_hidden=200, cost="MSE")
 
-clf.gamma = 10**-8
-print clf.gamma
+print "Gamma:", clf.gamma
 
 score, clf = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 

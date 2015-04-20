@@ -66,15 +66,16 @@ class Digit_NN(object):
         data = np.hstack((data, np.ones((len(data),1))))
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 10**-4
+        epsilon = 10**-6
         cost = deque(10000*np.ones(1000))
         delta = 1
         i = 0
         j=0
         while 1:
-            if(np.abs(delta) < epsilon) or i > 120000:
+            if(np.abs(delta) < epsilon) or i > 300000:
                 j+=1
                 if(j>50):
+                    print delta
                     self.gamma = 10**-4
                     break   
             else:
@@ -87,8 +88,10 @@ class Digit_NN(object):
 
             delta = curr_cost - np.mean(cost)
 
-            if i %1000 == 0:
+            if i %10000 == 0:
                 print "i, Cost, Delta:", i, curr_cost, delta
+                if curr_cost < 1:
+                    self.gamma = 10**-6
 
             cost.append(curr_cost)
             cost.popleft()
@@ -113,7 +116,6 @@ class Digit_NN(object):
     
     def costFunction_mse(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
-        self.forward(np.matrix(x), self.W1, self.W2)
         J = 0.5*sum(sum(np.array(y-self.yHat)**2))
         return J
     

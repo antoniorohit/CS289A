@@ -73,7 +73,7 @@ start = time.time()
 clf.fit(imageData, imageLabels)
 print "Training Time for entire NN:", np.around((time.time()-start)/60., 1), "minutes"
 
-try:
+try:    # @TODO can the CLF really be saved?
     print "Saving the NN CLF..."
     pickle.dump(clf, open("./Results/" +"nn_clf_" + features + ".p", "wb"))        
     print "Done saving the NN CLF!"
@@ -83,10 +83,8 @@ except Exception, e:
 ############# FOR KAGGLE ############# 
 print 20*"#", "Predicting for Kaggle", 20*"#"
 indices = np.array(range(1, len(shufTestData) + 1))
-pred_labels = []
 print np.shape(shufTestData)
-for elem in shufTestData:
-    pred_labels.append(clf.predict(np.matrix(elem), clf.W1, clf.W2))
+pred_labels = clf.predict(np.matrix(elem), clf.W1, clf.W2)
 
 kaggle_format = np.vstack(((indices), pred_labels)).T
 np.savetxt("./Results/digits.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 

@@ -12,7 +12,7 @@ import numpy as np
 from collections import deque
 
 class Digit_NN(object):
-    def __init__(self, dataShape, cost="square", n_hidden=200):
+    def __init__(self, dataShape, cost="MSE", n_hidden=200):
         self.nin = dataShape
         self.nout = 10
         self.nhidden = 200
@@ -21,8 +21,8 @@ class Digit_NN(object):
         # initialize weights
         self.W1 = 0.001*np.random.randn(dataShape+1, self.nhidden)    
         self.W2 = 0.001*np.random.randn(self.nhidden+1, self.nout)
-        if cost == "square":
-            self.costFunction = self.costFunction_sq
+        if cost == "MSE":
+            self.costFunction = self.costFunction_mse
         else:
             self.costFunction = self.costFunction_entropy
 
@@ -85,7 +85,6 @@ class Digit_NN(object):
             self.backprop(np.matrix(x), y)
             curr_cost = (self.costFunction(data,labels))
 
-            curr_cost = np.mean(curr_cost)                            
             delta = curr_cost - np.mean(cost)
 
             if i %10000 == 0:
@@ -112,17 +111,19 @@ class Digit_NN(object):
         return predicted        
     
     
-    def costFunction_sq(self, x, y):
+    def costFunction_mse(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.forward(np.matrix(x), self.W1, self.W2)
-        J = 0.5*sum(np.array(y-self.yHat)**2)
+        J = 0.5*sum(sum(np.array(y-self.yHat)**2))
         return J
     
     def costFunction_entropy(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.forward(np.matrix(x), self.W1, self.W2)
-        y*np.log(self.yHat)
-        J = 0.5*sum(np.array(y-self.yHat)**2)
+        term1 = y*np.log(self.yHat)
+        term2 = (1-y)*np.log(1-self.yHat)
+        error_matrix = term1+term2
+        J = -sum(sum(error_matrix))
         return J
 
 

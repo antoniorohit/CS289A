@@ -56,22 +56,39 @@ stepLength = k
 for index in range(0,k):
     crossValidation_Data.append(imageData[index:lengthData:stepLength])
     crossValidation_Labels.append(imageLabels[index:lengthData:stepLength])
+if lengthData < 50000:
+    validationSet_Data = imageData[50000:]
+    validationSet_Labels = imageLabels[50000:]
 
 print np.shape(crossValidation_Data)
 
 try:    # try loading the old clf if it exists
     clf = pickle.load(open("./Results/nn_clf_" + features + ".p", "rb"))
 except: # clf wasn't found - initialize new NN with ninput neurons and 200 neurons in hidden layer
-    clf = Digit_NN(dataShape[1], n_hidden=200)
+    clf = Digit_NN(dataShape[1], n_hidden=200, cost="MSE")
 
 score, clf = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
 
 print "NN Cross-Val Score:", np.around(np.mean(score),1), "%"
 
+############# VALIDATION SET ############# 
+print 20*"#", "Validation Set Accuracy", 20*"#"
+pred_labels = clf.predict(validationSet_Data, clf.W1, clf.W2)
+accuracy = 0
+for (elem1, elem2) in zip(pred_labels, validationSet_Labels):
+    elem2 = elem2.tolist().index(1)
+    if elem1 == elem2:
+        accuracy+=1
+    else:
+        pass
+
+print "Validation Set Accuracy:", 100.0*accuracy/len(pred_labels)
+
+############# MEGA TRAINING ############# 
 print 20*"#", "Training on all Data...", 20*"#"
 start = time.time()
 clf.fit(imageData, imageLabels)
-print "Training Time for entire NN:", np.around((time.time()-start)/60., 1), "minutes"
+print "Training Time for entire NN:", np.around((time.time()-start)/60., 1), "minutes"      # 13 minutes
 
 try:    # @TODO can the CLF really be saved?
     print "Saving the NN CLF..."
@@ -84,7 +101,7 @@ except Exception, e:
 print 20*"#", "Predicting for Kaggle", 20*"#"
 indices = np.array(range(1, len(shufTestData) + 1))
 print np.shape(shufTestData)
-pred_labels = clf.predict(np.matrix(elem), clf.W1, clf.W2)
+pred_labels = clf.predict(shufTestData, clf.W1, clf.W2)
 
 kaggle_format = np.vstack(((indices), pred_labels)).T
 np.savetxt("./Results/digits.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 

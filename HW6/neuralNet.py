@@ -12,7 +12,7 @@ import numpy as np
 from collections import deque
 
 class Digit_NN(object):
-    def __init__(self, dataShape, cost="MSE", n_hidden=200):
+    def __init__(self, dataShape, n_hidden=200, cost="MSE"):
         self.nin = dataShape
         self.nout = 10
         self.nhidden = 200
@@ -23,7 +23,7 @@ class Digit_NN(object):
         self.W2 = 0.001*np.random.randn(self.nhidden+1, self.nout)
         if cost == "MSE":
             self.costFunction = self.costFunction_mse
-        else:
+        else:   # entropy
             self.costFunction = self.costFunction_entropy
 
     def derivative_tanh(self, z):
@@ -105,7 +105,7 @@ class Digit_NN(object):
             nn_label = self.yHat.T.tolist()
             max_value = max(nn_label)
             max_index = nn_label.index(max_value)
-#             print max_index
+            print max_index
             predicted.append(max_index)
         
         return predicted        
@@ -120,8 +120,8 @@ class Digit_NN(object):
     def costFunction_entropy(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.forward(np.matrix(x), self.W1, self.W2)
-        term1 = y*np.log(self.yHat)
-        term2 = (1-y)*np.log(1-self.yHat)
+        term1 = np.multiply(y, np.log(self.yHat))
+        term2 = np.multiply((1-y), np.log(1-self.yHat))
         error_matrix = term1+term2
         J = -sum(sum(error_matrix))
         return J

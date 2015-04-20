@@ -44,7 +44,6 @@ def computeCV_Score(clf, data, labels, folds):
         for j in range(folds):
             if(j!=i):
                 predicted_Digits = clf_local.predict(data[j], W1, W2)
-                
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
                     elem2 = elem2.tolist().index(1)
                     if elem1 == elem2:

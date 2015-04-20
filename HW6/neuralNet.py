@@ -10,6 +10,7 @@ https://www.youtube.com/watch?v=bxe2T-V8XRs
 '''
 import numpy as np
 from collections import deque
+import time
 
 class Digit_NN(object):
     def __init__(self, dataShape, n_hidden=200, cost="MSE"):
@@ -29,23 +30,22 @@ class Digit_NN(object):
     def derivative_tanh(self, z):
         """ Computes the derivative of the sigmoid of z"""
         z = np.array(z)
-        return (1-(np.tanh(z))**2)
+        return (1-np.square(np.tanh(z)))
 
     def derivative_sig(self, z):
         """ Computes the derivative of the sigmoid of z"""
         z = np.array(z)
-        return np.exp(-z)/((1+np.exp(-z))**2)
+        return np.exp(-z)/(np.square(1+np.exp(-z)))
     
     def sigmoid(self, z):
         """ Computes the sigmoid of z"""
         return (1/(1+np.exp(-z)))
 
     
-    def forward(self, X, W1, W2):
-        self.z2 = np.dot(X, W1)
-        self.a2 = np.tanh(self.z2)
-        self.a2 = np.hstack((self.a2, np.ones((len(self.a2),1))))
-        self.z3 = np.dot(self.a2, W2)
+    def forward(self, X):
+        self.z2 = np.dot(X, self.W1)
+        self.a2 = np.hstack((np.tanh(self.z2), np.ones((np.shape(X)[0],1))))
+        self.z3 = np.dot(self.a2, self.W2)
         self.yHat = np.around(self.sigmoid(self.z3), 0)
     
     def backprop(self, x, y):
@@ -67,14 +67,16 @@ class Digit_NN(object):
         data_len = len(data)
         completeData = zip(data, labels)
         epsilon = 10**-6
-        cost = deque(10000*np.ones(1000))
+        cost = deque(10000*np.ones(10))
+        curr_cost = np.mean(cost)
         delta = 1
         i = 0
         j=0
+        startTime = 0
         while 1:
-            if(np.abs(delta) < epsilon) or i > 300000:
+            if(np.abs(delta) < epsilon) or i > 300000 or curr_cost == 0:
                 j+=1
-                if(j>50):
+                if(j>10):
                     print delta
                     self.gamma = 10**-4
                     break   
@@ -82,19 +84,20 @@ class Digit_NN(object):
                 j=0
                                 
             x,y = completeData[np.random.randint(data_len, size=1)[0]]
-            self.forward(np.matrix(x), self.W1, self.W2)
+            self.forward(np.matrix(x))
             self.backprop(np.matrix(x), y)
-            curr_cost = (self.costFunction(data,labels))
 
-            delta = curr_cost - np.mean(cost)
-
-            if i %10000 == 0:
+            if i %1000 == 0:
+                curr_cost = (self.costFunction(data,labels))    
+                delta = curr_cost - np.mean(cost)
+                cost.append(curr_cost)
+                cost.popleft()
+#                 print "Loop Time:", time.time()-startTime
                 print "i, Cost, Delta:", i, curr_cost, delta
                 if curr_cost < 1:
                     self.gamma = 10**-6
+                startTime = time.time()
 
-            cost.append(curr_cost)
-            cost.popleft()
             i+=1
         return self.W1, self.W2
     
@@ -102,11 +105,11 @@ class Digit_NN(object):
         # append bias of 1
         testData = np.hstack((testData, np.ones((len(testData),1))))
         predicted = []
-        self.forward(np.matrix(testData), W1, W2)
+        self.forward(np.matrix(testData))
         for elem in testData:
-            self.forward(np.matrix(elem), W1, W2)
+            self.forward(np.matrix(elem))
             nn_label = self.yHat.T.tolist()
-            max_value = max(nn_label)
+            max_value = np.max(nn_label)
             max_index = nn_label.index(max_value)
 #             print max_index
             predicted.append(max_index)
@@ -116,16 +119,17 @@ class Digit_NN(object):
     
     def costFunction_mse(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
-        J = 0.5*sum(sum(np.array(y-self.yHat)**2))
-        return J
+        self.forward(np.matrix(x))      # this forward pass is over the entire training set. 
+        J = 0.5*np.sum(np.sum(np.square(y-self.yHat)))
+        return J 
     
     def costFunction_entropy(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
-        self.forward(np.matrix(x), self.W1, self.W2)
+        self.forward(np.matrix(x))
         term1 = np.multiply(y, np.log(self.yHat))
         term2 = np.multiply((1-y), np.log(1-self.yHat))
         error_matrix = term1+term2
-        J = -sum(sum(error_matrix))
+        J = -np.sum(np.sum(error_matrix))
         return J
 
 

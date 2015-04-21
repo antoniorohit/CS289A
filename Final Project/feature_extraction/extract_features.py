@@ -10,6 +10,7 @@ Provides a clean interface to using the MFCC extraction functions
 from base import mfcc, delta
 import numpy as np
 import parameters as prm
+from LPCC import LPCExtractor
 
 # @timing
 def extractFeatures(input_signal):
@@ -23,8 +24,10 @@ def extractFeatures(input_signal):
         print("cleaned signal is empty")
         return input_signal
     
-    mfcc_list = np.array(mfcc(input_signal, prm.params["sample_rate"].get()))    
-    
+    mfcc_list = np.array(mfcc(input_signal, prm.params["sample_rate"].get())) 
+    extractor = LPCExtractor(prm.params["sample_rate"].get(), 32, 16, 12, 0.95)
+    lpcc = extractor.extract(input_signal)
+
 #     # Cepstral Mean Normalization @TODO: WHY IS THIS NOT HELPING??
 #     if 1:
 #         mean_mfcc = np.average(mfcc_list.T, 1)
@@ -40,11 +43,12 @@ def extractFeatures(input_signal):
     
     # do not keep first coeff (energy)
     features_list=list()
-    for k in range(len(ddelta_list)):
-        features_list += [mfcc_list[k][0:]]
+    for k in range(len(lpcc)):
+        features_list += [mfcc_list[k][0:], lpcc[k]]
 #         features_list += [delta_list[k][1:]]
+#         features_list += [lpcc[k][0:15]]
 #         features_list += [ddelta_list[k][1:]]
-#         features_list += [np.hstack((mfcc_list[k][0:], delta_list[k][0:]))]#, ddelta_list[k][0:]))]
+#         features_list += [np.hstack((mfcc_list[k][0:12], delta_list[k][1:12]))]#, ddelta_list[k][0:]))]
         
 #     print np.shape(mfcc_list), np.shape(features_list)
     

@@ -13,7 +13,7 @@ import os
 import numpy as np
     
 
-prm.params["chunk_size"].set(0.25)
+prm.params["chunk_size"].set(1)
 
 cleanPickle()
 

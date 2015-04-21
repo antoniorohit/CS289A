@@ -17,7 +17,7 @@ class Digit_NN(object):
         self.nin = dataShape
         self.nout = 10
         self.nhidden = 200
-        self.gamma = 10**-5
+        self.gamma = 10**-4
         self.yHat = []
         # initialize weights
         self.W1 = 0.001*np.random.randn(dataShape+1, self.nhidden)    
@@ -90,14 +90,14 @@ class Digit_NN(object):
                     j+=1
                     if(j>5 or curr_cost == 0):
                         print "Cost and Delta:", cost, delta
-                        self.gamma = 10**-5
+                        self.gamma = 10**-4
                         break   
                 else:
                     j=0
 
                 print "i, Cost, Delta:", i, np.around(curr_cost), delta
                 if i > 50000:
-                    self.gamma = 10.0/i
+                    self.gamma = 100.0/i
                         
 #                 startTime = time.time()
 

@@ -28,7 +28,7 @@ imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to
 imageLabels = np.array(trainMatrix['train_labels'])
 
 ############# PROCESS DATA ############# 
-features = "raw"            # or "raw"
+features = "malik"            # or "raw"
 
 if features == "raw":
     # Non malik - raw, shuffled, and labels converted to one-of-10-high format
@@ -49,7 +49,7 @@ print 20*"#", "Cross Validation", 20*"#"
 crossValidation_Data= []
 crossValidation_Labels = []
 k = 10 
-lengthData = 20000          # do CV with a subset of the entire dataset so it takes less time (eg 5-10k samples)
+lengthData = 10000          # do CV with a subset of the entire dataset so it takes less time (eg 5-10k samples)
 stepLength = k
 for index in range(0,k):
     crossValidation_Data.append(imageData[index:lengthData:stepLength])

@@ -66,7 +66,7 @@ class Digit_NN(object):
         data = np.hstack((data, np.ones((len(data),1))))
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 10**0
+        epsilon = 10**-2
         cost = deque((self.costFunction(data,labels))*np.ones(10))
         curr_cost = np.mean(cost)
         delta = 1
@@ -88,17 +88,16 @@ class Digit_NN(object):
                 delta = np.mean(cost) - old_cost
                 if(np.abs(delta) <= epsilon) or i > 1200000 or curr_cost <= epsilon:
                     j+=1
-                    if(j>=5 or curr_cost == 0):
+                    if(j>5 or curr_cost == 0):
                         print "Cost and Delta:", cost, delta
                         self.gamma = 10**-5
                         break   
                 else:
                     j=0
 
-                if i % 10000 == 0:
-                    print "i, Cost, Delta:", i, np.around(curr_cost), delta
-                    if i > 500000:
-                        self.gamma = 10**-6
+                print "i, Cost, Delta:", i, np.around(curr_cost), delta
+                if i > 50000:
+                    self.gamma = 10.0/i
                         
 #                 startTime = time.time()
 

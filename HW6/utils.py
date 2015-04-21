@@ -120,6 +120,7 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
             grad_filter = np.array([[-1, 0, 1]])
             gradx = signal.convolve2d(imageComplete[ind][0], grad_filter, 'same')
             grady = signal.convolve2d(imageComplete[ind][0], np.transpose(grad_filter), 'same')
+            mag = np.sqrt(gradx**2+grady**2)
             ori = np.array(np.arctan2(grady, gradx))
         
         ori_4_hist = list()
@@ -136,14 +137,9 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         for elem1, elem2 in zip(ori_7_1, ori_7_2):
             ori_7_hist.append(np.histogram(elem1.flatten(), n_bins, (-np.pi, np.pi))[0])
             ori_7_hist.append(np.histogram(elem2.flatten(), n_bins, (-np.pi, np.pi))[0])
-        
-        ori_4_hist = ori_4_hist
-        ori_7_hist = ori_7_hist
-
-        ori_4_hist = np.float64(ori_4_hist)
-        ori_7_hist = np.float64(ori_7_hist)
-        
+                
         features = np.append(ori_4_hist, ori_7_hist)
+        features = np.append(features, mag)
         features = (features - np.mean(features))/np.linalg.norm(features)
         
         shuffledData.append(features)

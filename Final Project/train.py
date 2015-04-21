@@ -37,53 +37,48 @@ def train():
     
     scoreBuffer = []
     
-    C = np.linspace(.1, 1000. , 4)                   # array of values for parameter C
+    C = np.linspace(.01, 1000. , 4)                   # array of values for parameter C
     depths = [5, 10, 25]
     
     ############# FORESTS/TREES ############# 
-    print 50 * '='
-    print "CROSS VALIDATION USING SCIKIT-LEARN FORESTS"
-    print 50 * '='
-    
-    for depth in depths:
-        print "DEPTH:", depth
-        clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depth)
-        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
-        scoreBuffer.append((scores).mean())
-        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-        print 50 * '-'
-    
-    maxScore = np.max(scoreBuffer)
-    maxScore_Index = scoreBuffer.index(maxScore)
-    print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
-    print 50 * '-'
-    
-    # Save the best forest
-    print "Saving the CLF..."
-    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depths[maxScore_Index])
-    clf.fit(data, labels)
-    pickle.dump(clf, open(pickle_directory+"clf.p", "wb"))        
-    print "Done saving the CLF!"
-    
-    # HOW DOES THIS DECISION TREE DO ON THE SAME DATA IT FIT ON? (should be 100%)
-    accuracy = 0
-    predicted_Labels = clf.predict(data)
-    for (elem1, elem2) in zip(predicted_Labels, labels):
-        if elem1 == elem2:
-            accuracy+=1
-        else:
-            pass
-    print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
-    print "Accuracy of CLF on training data itself:", np.around(100.0*accuracy/len(predicted_Labels),2), "%"
-    
-    
+#     print 50 * '='
+#     print "CROSS VALIDATION USING SCIKIT-LEARN FORESTS"
+#     print 50 * '='
+#     
+#     for depth in depths:
+#         print "DEPTH:", depth
+#         clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depth)
+#         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+#         scoreBuffer.append((scores).mean())
+#         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+#         print 50 * '-'
+#     
+#     maxScore = np.max(scoreBuffer)
+#     maxScore_Index = scoreBuffer.index(maxScore)
+#     print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
+#     print 50 * '-'
+#     
+
+#     
+#     # HOW DOES THIS DECISION TREE DO ON THE SAME DATA IT FIT ON? (should be 100%)
+#     accuracy = 0
+#     predicted_Labels = clf.predict(data)
+#     for (elem1, elem2) in zip(predicted_Labels, labels):
+#         if elem1 == elem2:
+#             accuracy+=1
+#         else:
+#             pass
+#     print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
+#     print "Accuracy of CLF on training data itself:", np.around(100.0*accuracy/len(predicted_Labels),2), "%"
+#     
+#     
     ############# SVM ############# 
 #     kernel = 'linear'
-#     
+#      
 #     print 50 * '='
 #     print "CROSS VALIDATION USING", kernel, "SVM"
 #     print 50 * '='
-#     
+#      
 #     scoreBuffer = []
 #     for C_Value in C:
 #         print "C:", np.around(C_Value, 3)
@@ -92,13 +87,47 @@ def train():
 #         scoreBuffer.append((scores).mean())
 #         print "C:", np.around(C_Value, 3), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
 #         print 50 * '-'
-#     
-#     
+#      
+#      
 #     maxScore = np.max(scoreBuffer)
 #     maxScore_Index = scoreBuffer.index(maxScore)
 #     print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", np.around(maxScore, 3)
 #     print 50 * '-'
+#     
+#     
+#     print 20*"*", "Train End", 20*"*"
+
+    ############# KNN ############# 
+    print 50 * '='
+    print "CROSS VALIDATION USING KNN"
+    print 50 * '='
+      
+    scoreBuffer = []    
+    num_neighbors = [5, 20, 50, 100]
+    from sklearn.neighbors import KNeighborsClassifier
+    for num in num_neighbors:
+        print "Num:", (num)
+        clf = KNeighborsClassifier(n_neighbors=num)
+        scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
+        scoreBuffer.append((scores).mean())
+        print "Num:", (num), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50 * '-'
+     
+     
+    maxScore = np.max(scoreBuffer)
+    maxScore_Index = scoreBuffer.index(maxScore)
+    print "Best Num Value:", num_neighbors[maxScore_Index], "Accuracy for that Num:", np.around(maxScore, 3)
+    print 50 * '-'
     
     
     print 20*"*", "Train End", 20*"*"
 
+    # Save the best CLF
+    print "Saving the CLF..."
+#     clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depths[maxScore_Index])
+#     clf = svm.SVC(kernel=kernel, C=C[maxScore_Index])
+    clf = KNeighborsClassifier(n_neighbors=num_neighbors[maxScore_Index])
+
+    clf.fit(data, labels)
+    pickle.dump(clf, open(pickle_directory+"clf.p", "wb"))        
+    print "Done saving the CLF!"

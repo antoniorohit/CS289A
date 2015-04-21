@@ -114,7 +114,7 @@ print "Validation Set Accuracy:", 100.0*accuracy/len(pred_labels), "%"
 print 20*"#", "Predicting for Kaggle", 20*"#"
 indices = np.array(range(1, len(shufTestData) + 1))
 print np.shape(shufTestData)
-pred_labels = clf.predict(shufTestData, clf.W1, clf.W2)
+pred_labels = clf.predict(shufTestData)
 
 kaggle_format = np.vstack(((indices), pred_labels)).T
 np.savetxt("./Results/digits.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 

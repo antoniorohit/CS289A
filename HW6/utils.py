@@ -39,11 +39,11 @@ def computeCV_Score(clf, data, labels, folds):
         j = 0
         accuracy = 0
 
-        W1, W2 = clf_local.fit(data[i], labels[i])
+        clf_local.fit(data[i], labels[i])
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):
             if(j!=i):
-                predicted_Digits = clf_local.predict(data[j], W1, W2)
+                predicted_Digits = clf_local.predict(data[j])
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
                     elem2 = elem2.tolist().index(1)
                     if elem1 == elem2:
@@ -60,7 +60,7 @@ def getDataNonMalik(imageComplete):
     """Return simple array of pixels (shuffled)"""
         # SHUFFLE THE IMAGES
     random.shuffle(imageComplete)
-    
+        
     # Arrays to hold the shuffled data and labels
     shuffledData = []
     shuffledLabels = []
@@ -134,8 +134,8 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
         ori_7_1 = (blockshaped(ori, 7, 7))
         ori_7_2 = (blockshaped(ori[3:-4, 3:-4], 7, 7))
         for elem1, elem2 in zip(ori_7_1, ori_7_2):
-            ori_4_hist.append(np.histogram(elem1.flatten(), n_bins, (-np.pi, np.pi))[0])
-            ori_4_hist.append(np.histogram(elem2.flatten(), n_bins, (-np.pi, np.pi))[0])
+            ori_7_hist.append(np.histogram(elem1.flatten(), n_bins, (-np.pi, np.pi))[0])
+            ori_7_hist.append(np.histogram(elem2.flatten(), n_bins, (-np.pi, np.pi))[0])
         
         ori_4_hist = ori_4_hist - np.mean(ori_4_hist)
         ori_7_hist = ori_7_hist - np.mean(ori_7_hist)

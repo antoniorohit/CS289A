@@ -22,9 +22,6 @@ testMatrix = io.loadmat(testFileMNIST)                   # Dictionary
 print 20*"#", "Getting Data", 20*"#"
 testData = np.array(testMatrix['test_images'])
 testData = np.rollaxis(testData, 2, 0)                # move the index axis to be the first 
-testData_flat = []
-for elem in testData:
-    testData_flat.append(elem.flatten())
 
 imageData = np.array(trainMatrix['train_images'])
 imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to be the first 
@@ -36,7 +33,7 @@ features = "malik"            # or "raw"
 if features == "raw":
     # Non malik - raw, shuffled, and labels converted to one-of-10-high format
     imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
-    shufTestData, _, _ = getDataNonMalik(zip(testData, [np.ones(len(testData))]))
+    shufTestData, _, _ = getDataNonMalik(zip(testData, np.ones((len(testData),1))))
 else:
     # Malik - HOG, shuffled, and labels converted to one-of-10-high format
     imageData, imageLabels = getDataPickle(imageData, imageLabels, "train")
@@ -45,13 +42,14 @@ else:
 # Shape of data determines number of input layers
 dataShape = np.shape(imageData)
 print "Image Data Shape", dataShape
+print "Test Data Shape", np.shape(shufTestData)
 
 ############# DATA PARTIONING ############# 
 print 20*"#", "Cross Validation", 20*"#"
 crossValidation_Data= []
 crossValidation_Labels = []
 k = 10 
-lengthData = 5000          # do CV with a subset of the entire dataset so it takes less time (eg 5-10k samples)
+lengthData = 10000          # do CV with a subset of the entire dataset so it takes less time (eg 5-10k samples)
 stepLength = k
 for index in range(0,k):
     crossValidation_Data.append(imageData[index:lengthData:stepLength])
@@ -60,7 +58,7 @@ if lengthData < 50000:
     validationSet_Data = imageData[50000:]
     validationSet_Labels = imageLabels[50000:]
 
-print np.shape(crossValidation_Data)
+print "CV Data Shape:", np.shape(crossValidation_Data)
 
 # try:    # try loading the old clf if it exists
 #     clf = pickle.load(open("./Results/nn_clf_" + features + ".p", "rb"))
@@ -75,7 +73,7 @@ print "NN Cross-Val Score:", np.around(np.mean(score),1), "%"
 
 ############# VALIDATION SET ############# 
 print 20*"#", "Validation Set Accuracy", 20*"#"
-pred_labels = clf.predict(validationSet_Data, clf.W1, clf.W2)
+pred_labels = clf.predict(validationSet_Data)
 accuracy = 0
 for (elem1, elem2) in zip(pred_labels, validationSet_Labels):
     elem2 = elem2.tolist().index(1)
@@ -99,6 +97,19 @@ try:    # @TODO can the CLF really be saved?
 except Exception, e:
     print str(e)
     
+############# VALIDATION SET (AGAIN) ############# 
+print 20*"#", "Validation Set Accuracy", 20*"#"
+pred_labels = clf.predict(validationSet_Data)
+accuracy = 0
+for (elem1, elem2) in zip(pred_labels, validationSet_Labels):
+    elem2 = elem2.tolist().index(1)
+    if elem1 == elem2:
+        accuracy+=1
+    else:
+        pass
+
+print "Validation Set Accuracy:", 100.0*accuracy/len(pred_labels), "%"
+
 ############# FOR KAGGLE ############# 
 print 20*"#", "Predicting for Kaggle", 20*"#"
 indices = np.array(range(1, len(shufTestData) + 1))

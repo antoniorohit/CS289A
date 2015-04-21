@@ -67,17 +67,17 @@ class Digit_NN(object):
         data_len = len(data)
         completeData = zip(data, labels)
         epsilon = 10**-6
-        cost = deque(10000*np.ones(10))
+        cost = deque(np.zeros(10))
         curr_cost = np.mean(cost)
         delta = 1
         i = 0
         j=0
         startTime = 0
         while 1:
-            if(np.abs(delta) < epsilon) or i > 300000 or curr_cost == 0:
+            if(np.abs(delta) < epsilon) or i > 1200000 or curr_cost < epsilon:
                 j+=1
                 if(j>10):
-                    print delta
+                    print "Cost and Delta:", cost, delta
                     self.gamma = 10**-4
                     break   
             else:
@@ -88,20 +88,26 @@ class Digit_NN(object):
             self.backprop(np.matrix(x), y)
 
             if i %1000 == 0:
+#                 print "Loop Time:", time.time()-startTime
                 curr_cost = (self.costFunction(data,labels))    
                 delta = curr_cost - np.mean(cost)
                 cost.append(curr_cost)
                 cost.popleft()
-#                 print "Loop Time:", time.time()-startTime
-                print "i, Cost, Delta:", i, curr_cost, delta
-                if curr_cost < 1:
-                    self.gamma = 10**-6
-                startTime = time.time()
+                if i % 10000 == 0:
+                    print "i, Cost, Delta:", i, np.around(curr_cost), delta
+                    if i > 50000:
+                        self.gamma = 10**-5
+                        if i > 100000:
+                            self.gamma = 10**-6
+                            if i > 150000:
+                                self.gamma = 10**-7
+                        
+#                 startTime = time.time()
 
             i+=1
         return self.W1, self.W2
     
-    def predict(self, testData, W1, W2):
+    def predict(self, testData):
         # append bias of 1
         testData = np.hstack((testData, np.ones((len(testData),1))))
         predicted = []
@@ -111,7 +117,7 @@ class Digit_NN(object):
             nn_label = self.yHat.T.tolist()
             max_value = np.max(nn_label)
             max_index = nn_label.index(max_value)
-#             print max_index
+            print max_index
             predicted.append(max_index)
         
         return predicted        
@@ -126,8 +132,9 @@ class Digit_NN(object):
     def costFunction_entropy(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.forward(np.matrix(x))
-        term1 = np.multiply(y, np.log(self.yHat))
-        term2 = np.multiply((1-y), np.log(1-self.yHat))
+        stability_term = 10**-8
+        term1 = np.multiply(y, np.log(self.yHat+10**-8))
+        term2 = np.multiply((1-y), np.log(1-self.yHat + 10**-8))
         error_matrix = term1+term2
         J = -np.sum(np.sum(error_matrix))
         return J

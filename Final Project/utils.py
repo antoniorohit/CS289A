@@ -193,6 +193,9 @@ def getData_TestProtocol(source="train"):
 #                 if source == "train":
 #                     if "clean" not in filename:
 #                         continue
+                if source == "test":
+                    if "clean" not in filename:
+                        continue
                 print filename
         
                 #######################################
@@ -291,7 +294,8 @@ def computeCV_Score(clf, data, labels, folds):
             scores.append(100.0*accuracy/((folds-1)*len(predicted_Labels)))
             i+=1
         except Exception, e:
-            print str(e)
+            pass
+#             print str(e)
     return np.array(scores)
                 
 def cleanPickle():

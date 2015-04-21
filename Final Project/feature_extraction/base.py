@@ -5,7 +5,7 @@ import numpy
 from scipy.fftpack import dct
 import math
     
-def mfcc(signal,samplerate=16000,winlen=0.032,winstep=0.016,numcep=15,
+def mfcc(signal,samplerate=16000,winlen=0.032,winstep=0.016,numcep=23,
           nfilt=55,nfft=512,lowfreq=0,highfreq=6000,preemph=0.95,ceplifter=22,appendEnergy=True):
     """Compute MFCC features from an audio signal.
 

@@ -66,7 +66,7 @@ class Digit_NN(object):
         data = np.hstack((data, np.ones((len(data),1))))
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 10**-6
+        epsilon = 10**-3
         cost = deque(np.zeros(10))
         curr_cost = np.mean(cost)
         delta = 1
@@ -74,33 +74,34 @@ class Digit_NN(object):
         j=0
         startTime = 0
         while 1:
-            if(np.abs(delta) < epsilon) or i > 1200000 or curr_cost < epsilon:
-                j+=1
-                if(j>10):
-                    print "Cost and Delta:", cost, delta
-                    self.gamma = 10**-4
-                    break   
-            else:
-                j=0
                                 
             x,y = completeData[np.random.randint(data_len, size=1)[0]]
             self.forward(np.matrix(x))
             self.backprop(np.matrix(x), y)
 
-            if i %1000 == 0:
+            if i %10000 == 0:
 #                 print "Loop Time:", time.time()-startTime
                 curr_cost = (self.costFunction(data,labels))    
                 delta = curr_cost - np.mean(cost)
                 cost.append(curr_cost)
                 cost.popleft()
+                if(np.abs(delta) < epsilon) or i > 1200000 or curr_cost < epsilon:
+                    j+=1
+                    if(j>10):
+                        print "Cost and Delta:", cost, delta
+                        self.gamma = 10**-4
+                        break   
+                else:
+                    j=0
+
                 if i % 10000 == 0:
                     print "i, Cost, Delta:", i, np.around(curr_cost), delta
                     if i > 50000:
                         self.gamma = 10**-5
-                        if i > 100000:
+                        if i > 150000:
                             self.gamma = 10**-6
-                            if i > 150000:
-                                self.gamma = 10**-7
+                            if i > 200000:
+                                self.gamma = 10**-4
                         
 #                 startTime = time.time()
 
@@ -117,7 +118,7 @@ class Digit_NN(object):
             nn_label = self.yHat.T.tolist()
             max_value = np.max(nn_label)
             max_index = nn_label.index(max_value)
-            print max_index
+#             print max_index
             predicted.append(max_index)
         
         return predicted        

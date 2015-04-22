@@ -56,11 +56,13 @@ def computeCV_Score(clf, data, labels, folds):
         i += 1
     return np.array(scores), clf_local
 
-def getDataNonMalik(imageComplete):
+def getDataNonMalik(imageComplete, data_type):
     """Return simple array of pixels (shuffled)"""
-        # SHUFFLE THE IMAGES
-    random.shuffle(imageComplete)
-        
+    if data_type == "train":
+        # SHUFFLE
+        random.shuffle(imageComplete)
+    else:
+        print "NOT SHUFFLING"
     # Arrays to hold the shuffled data and labels
     shuffledData = []
     shuffledLabels = []
@@ -81,11 +83,14 @@ def getDataNonMalik(imageComplete):
 
     return shuffledData, shuffledLabels, imageComplete
 
-def getDataMalik(gauss_bool, imageData, imageLabels):
+def getDataMalik(gauss_bool, imageData, imageLabels, data_type):
     """Take in image data, return histogram of oriented gradients"""
-    # SHUFFLE
     imageComplete = zip(imageData, imageLabels)
-    random.shuffle(imageComplete)
+    if data_type == "train":
+        # SHUFFLE
+        random.shuffle(imageComplete)
+    else:
+        print "NOT SHUFFLING"
     
     # shape of imageComplete is (60000,2) - transpose required
     imageData = np.array(imageComplete).T[0]
@@ -144,7 +149,7 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
             ori_7_hist.append(np.histogram(elem2.flatten(), n_bins, (-np.pi, np.pi))[0])
                 
         features = np.append(ori_4_hist, ori_7_hist)
-        features = np.append(features, mag)
+#         features = np.append(features, mag)
         features = (features - np.mean(features)) / np.linalg.norm(features)
         
         shuffledData.append(features)
@@ -167,7 +172,7 @@ def getDataPickle(imageData, imageLabels, data_type):
         print('' + data_type + ' labels successfully opened')
     else:
         print "Soft Error: PICKLE FILE NOT FOUND"
-        shuffledData, shuffledLabels, _ = getDataMalik(False, imageData, imageLabels)
+        shuffledData, shuffledLabels, _ = getDataMalik(False, imageData, imageLabels, data_type)
         print "Saving " + data_type + " Data as Pickle Object..."
         pickle.dump(shuffledData, open("./Results/" + data_type + "Data.p", 'wb'))
         pickle.dump(shuffledLabels, open("./Results/" + data_type + "Labels.p", 'wb'))

@@ -54,7 +54,11 @@ class Digit_NN(object):
         x = np.hstack((x, np.ones((np.size(x, 0), 1))))
         # W2
         # a2: 1x(nhidden+1), delta3: 1xnout
-        delta3 = np.multiply(-(y - self.yHat), self.derivative_sig(self.z3))
+        if self.costFunction == self.costFunction_mse:
+            costFunc_prime = -(y - self.yHat)
+        else:
+            pass
+        delta3 = np.multiply(costFunc_prime, self.derivative_sig(self.z3))
         dJdW2 = np.dot(self.a2.T, delta3)
         self.W2 -= dJdW2 * self.gamma
         
@@ -73,13 +77,14 @@ class Digit_NN(object):
         data = np.array(data)
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 2*10 ** -4
+        epsilon = 10 ** -4
         cost = deque((self.costFunction(data, labels)) * np.ones(10))
         curr_cost = np.mean(cost)
         delta = 1
         i = 0
         j = 0
         startTime = 0
+        orig_gamma = self.gamma
         while 1:
             x, y = completeData[np.random.randint(data_len, size=1)[0]]
 
@@ -104,14 +109,14 @@ class Digit_NN(object):
                     j += 1
                     if(j > 5 or curr_cost == 0):
                         print "Cost and Delta:", cost, delta
-                        self.gamma = 0.001
+                        self.gamma = orig_gamma
                         break   
                 else:
                     j = 0
 
                 print "i, Cost, Delta:", i, np.around(curr_cost, 3), np.around(delta, 6)
                 if i > 200000:
-                    self.gamma = 0.1 / np.sqrt(i)
+                    self.gamma = 100*orig_gamma / np.sqrt(i)
                         
 #                 startTime = time.time()
 

@@ -28,12 +28,12 @@ imageData = np.rollaxis(imageData, 2, 0)  # move the index axis to be the first
 imageLabels = np.array(trainMatrix['train_labels'])
 
 ############# PROCESS DATA ############# 
-features = "raw"  # or "raw"
+features = "malik"  # or "raw"
 
 if features == "raw":
     # Non malik - raw, shuffled, and labels converted to one-of-10-high format
-    imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels))
-    shufTestData, _, _ = getDataNonMalik(zip(testData, np.ones((len(testData), 1))))
+    imageData, imageLabels, _ = getDataNonMalik(zip(imageData, imageLabels), "train")
+    shufTestData, _, _ = getDataNonMalik(zip(testData, np.ones((len(testData), 1))), "test")
 else:
     # Malik - HOG, shuffled, and labels converted to one-of-10-high format
     imageData, imageLabels = getDataPickle(imageData, imageLabels, "train")
@@ -65,6 +65,11 @@ print "CV Data Shape:", np.shape(crossValidation_Data)
 # except: # clf wasn't found - initialize new NN with ninput neurons and 200 neurons in hidden layer
 clf = Digit_NN(dataShape[1], n_hidden=200, cost="MSE")
 
+if features == "malik":
+    clf.gamma = 10 ** -1
+else:
+    clf.gamma = 10 ** -3
+    
 print "Gamma:", clf.gamma
 
 score, clf = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
@@ -117,6 +122,6 @@ print np.shape(shufTestData)
 pred_labels = clf.predict(shufTestData)
 
 kaggle_format = np.vstack(((indices), pred_labels)).T
-np.savetxt("./Results/digits.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
+np.savetxt("./Results/digits_" + str(features) + ".csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
 
 print 20 * "#", "The End !", 20 * "#"

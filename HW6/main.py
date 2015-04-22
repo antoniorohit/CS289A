@@ -28,7 +28,7 @@ imageData = np.rollaxis(imageData, 2, 0)                # move the index axis to
 imageLabels = np.array(trainMatrix['train_labels'])
 
 ############# PROCESS DATA ############# 
-features = "malik"            # or "raw"
+features = "raw"            # or "raw"
 
 if features == "raw":
     # Non malik - raw, shuffled, and labels converted to one-of-10-high format

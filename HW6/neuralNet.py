@@ -17,10 +17,10 @@ class Digit_NN(object):
         self.nin = dataShape
         self.nout = 10
         self.nhidden = 200
-        self.gamma = 10**-4
+        self.gamma = 10**-3
         self.yHat = []
         # initialize weights
-        self.W1 = 0.001*np.random.randn(dataShape+1, self.nhidden)    
+        self.W1 = 0.001*np.random.randn(dataShape + 1, self.nhidden)    
         self.W2 = 0.001*np.random.randn(self.nhidden+1, self.nout)
         if cost == "MSE":
             self.costFunction = self.costFunction_mse
@@ -46,7 +46,7 @@ class Digit_NN(object):
         self.z2 = np.dot(X, self.W1)
         self.a2 = np.hstack((np.tanh(self.z2), np.ones((np.shape(X)[0],1))))
         self.z3 = np.dot(self.a2, self.W2)
-        self.yHat = np.around(self.sigmoid(self.z3), 0)
+        self.yHat = self.sigmoid(self.z3)
     
     def backprop(self, x, y):
         # W2
@@ -58,6 +58,8 @@ class Digit_NN(object):
         delta2 = np.multiply(np.dot(delta3, self.W2.T)[:,self.nhidden-1], self.derivative_tanh(self.z2))
         dJdW1 = np.dot(x.T, delta2)
         self.W1 -= dJdW1*self.gamma
+        
+        return dJdW1, dJdW2
 
     
     def fit(self, data, labels):
@@ -66,7 +68,7 @@ class Digit_NN(object):
         data = np.hstack((data, np.ones((len(data),1))))
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 10**-2
+        epsilon = 10**0
         cost = deque((self.costFunction(data,labels))*np.ones(10))
         curr_cost = np.mean(cost)
         delta = 1
@@ -74,10 +76,20 @@ class Digit_NN(object):
         j=0
         startTime = 0
         while 1:
-                                
             x,y = completeData[np.random.randint(data_len, size=1)[0]]
             self.forward(np.matrix(x))
-            self.backprop(np.matrix(x), y)
+            dJdW1, dJdW2 = self.backprop(np.matrix(x), y)
+            numgrad = self.computeNumericalGradient(self, x, y)
+            print "DJ shapes:", np.shape(dJdW1.ravel().T), np.shape(dJdW2.ravel().T)
+            grad = np.concatenate((np.array(dJdW1.ravel().T.tolist()), np.array(dJdW2.ravel().T.tolist())))
+            
+            print "Shapes", np.shape(grad), np.shape(numgrad)
+            
+            numer = np.linalg.norm(grad-numgrad)
+            denom = np.linalg.norm(grad+numgrad)
+            print numer
+            print denom
+            print "The factor!!", numer/denom
 
             if i %10000 == 0:
 #                 print "Loop Time:", time.time()-startTime
@@ -90,14 +102,14 @@ class Digit_NN(object):
                     j+=1
                     if(j>5 or curr_cost == 0):
                         print "Cost and Delta:", cost, delta
-                        self.gamma = 10**-4
+                        self.gamma = 0.001
                         break   
                 else:
                     j=0
 
                 print "i, Cost, Delta:", i, np.around(curr_cost), delta
-                if i > 50000:
-                    self.gamma = 100.0/i
+                if i > 10000:
+                    self.gamma = .1/np.sqrt(i)
                         
 #                 startTime = time.time()
 
@@ -111,7 +123,7 @@ class Digit_NN(object):
         self.forward(np.matrix(testData))
         for elem in testData:
             self.forward(np.matrix(elem))
-            nn_label = self.yHat.T.tolist()
+            nn_label = np.around(self.yHat,0).T.tolist()
             max_value = np.max(nn_label)
             max_index = nn_label.index(max_value)
 #             print max_index
@@ -123,7 +135,7 @@ class Digit_NN(object):
     def costFunction_mse(self, x, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.forward(np.matrix(x))      # this forward pass is over the entire training set. 
-        J = 0.5*np.sum(np.sum(np.square(y-self.yHat)))
+        J = 0.5*np.mean(np.sum(np.square(y-self.yHat)))
         return J 
     
     def costFunction_entropy(self, x, y):
@@ -136,11 +148,40 @@ class Digit_NN(object):
         J = -np.sum(np.sum(error_matrix))
         return J
 
+    def setParams(self, params):
+        #Set W1 and W2 using single paramater vector.
+        W1_start = 0
+        W1_end = self.nhidden * (self.nin + 1)
+        self.W1 = np.reshape(params[W1_start:W1_end], (self.nin + 1 , self.nhidden))
+        W2_end = W1_end + (self.nhidden + 1)*self.nout
+        self.W2 = np.reshape(params[W1_end:W2_end], (self.nhidden + 1, self.nout))
 
 
-    
-    def computeNumericalGradient(self):
-        return
+    def computeNumericalGradient(self, N, X, y):
+        paramsInitial = np.concatenate((N.W1.ravel(), N.W2.ravel()))
+        numgrad = np.zeros(paramsInitial.shape)
+        perturb = np.zeros(paramsInitial.shape)
+        e = 1e-6
+
+        for p in range(len(paramsInitial)):
+            #Set perturbation vector
+            perturb[p] = e
+            N.setParams(paramsInitial + perturb)
+            loss2 = N.costFunction(X, y)
+            
+            N.setParams(paramsInitial - perturb)
+            loss1 = N.costFunction(X, y)
+
+            #Compute Numerical Gradient
+            numgrad[p] = (loss2 - loss1) / (2*e)
+
+            #Return the value we changed to zero:
+            perturb[p] = 0
+            
+        #Return Params to original value:
+        N.setParams(paramsInitial)
+
+        return numgrad 
     
     def softmax(self, labels):
         new_labels = []

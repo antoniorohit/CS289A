@@ -73,6 +73,11 @@ def getDataNonMalik(imageComplete):
     for i in range(len(shuffledLabels)):
         imageLabels_Vector[i][shuffledLabels[i]] = 1
     shuffledLabels = imageLabels_Vector
+    
+    shuffledData = (shuffledData-np.mean(shuffledData))/np.std(shuffledData)
+    
+    print "Data Mean:", np.mean(shuffledData)
+    print "Data Std:", np.std(shuffledData)
 
     return shuffledData, shuffledLabels, imageComplete
 

@@ -31,27 +31,27 @@ class Digit_NN(object):
     def derivative_tanh(self, z):
         """ Computes the derivative of the sigmoid of z"""
         z = np.array(z)
-        return (1 - np.square(np.tanh(z)))
+        return (1. - np.square(np.tanh(z)))
 
     def derivative_sig(self, z):
         """ Computes the derivative of the sigmoid of z"""
         z = np.array(z)
-        return np.exp(-z) / (np.square(1 + np.exp(-z)))
+        return np.exp(-z) / (np.square(1. + np.exp(-z)))
     
     def sigmoid(self, z):
         """ Computes the sigmoid of z"""
-        return (1 / (1 + np.exp(-z)))
+        return (1. / (1 + np.exp(-z)))
 
     
     def forward(self, X):
-        X = np.hstack((X, np.ones((len(X), 1))))
+        X = np.hstack((X, np.ones((np.size(X, 0), 1))))
         self.z2 = np.dot(X, self.W1)
         self.a2 = np.hstack((np.tanh(self.z2), np.ones((np.shape(X)[0], 1))))
         self.z3 = np.dot(self.a2, self.W2)
         self.yHat = self.sigmoid(self.z3)
     
     def backprop(self, x, y):
-        x = np.hstack((x, np.ones((len(x), 1))))
+        x = np.hstack((x, np.ones((np.size(x, 0), 1))))
         # W2
         # a2: 1x(nhidden+1), delta3: 1xnout
         delta3 = np.multiply(-(y - self.yHat), self.derivative_sig(self.z3))
@@ -83,15 +83,15 @@ class Digit_NN(object):
         while 1:
             x, y = completeData[np.random.randint(data_len, size=1)[0]]
 
-            numgrad = self.computeNumericalGradient(self, x, y)
+#             numgrad = self.computeNumericalGradient(self, x, y)
             self.forward(np.matrix(x))
             dJdW1, dJdW2 = self.backprop(np.matrix(x), y)
-            grad = np.concatenate((dJdW1.ravel().T.tolist(), dJdW2.ravel().T.tolist())).ravel()
-            numer = np.linalg.norm(grad - numgrad)
-            denom = np.linalg.norm(grad + numgrad)
-            print numer
-            print denom
-            print "The factor!!", numer / denom
+#             grad = np.concatenate((dJdW1.ravel().T.tolist(), dJdW2.ravel().T.tolist())).ravel()
+#             numer = np.linalg.norm(grad - numgrad)
+#             denom = np.linalg.norm(grad + numgrad)
+#             print numer
+#             print denom
+#             print "The factor!!", numer / denom
 
             if i % 10000 == 0:
 #                 print "Loop Time:", time.time()-startTime

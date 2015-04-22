@@ -20,8 +20,8 @@ def blockshaped(arr, nrows, ncols):
     each subblock preserving the "physical" layout of arr.
     """
     h, w = arr.shape
-    return (arr.reshape(h//nrows, nrows, -1, ncols)
-               .swapaxes(1,2)
+    return (arr.reshape(h // nrows, nrows, -1, ncols)
+               .swapaxes(1, 2)
                .reshape(-1, nrows, ncols))
 
 def computeCV_Score(clf, data, labels, folds):
@@ -42,18 +42,18 @@ def computeCV_Score(clf, data, labels, folds):
         clf_local.fit(data[i], labels[i])
         # For each validation performed (k-1 total) on a fold
         for j in range(folds):
-            if(j!=i):
+            if(j != i):
                 predicted_Digits = clf_local.predict(data[j])
                 for (elem1, elem2) in zip(predicted_Digits, labels[j]):
                     elem2 = elem2.tolist().index(1)
                     if elem1 == elem2:
-                        accuracy+=1
+                        accuracy += 1
                     else:
                         pass
-            j+=1
-        scores.append(100.0*accuracy/((folds-1)*len(predicted_Digits)))
-        print "Accuracy:", np.around(scores[-1],1), "%"
-        i+=1
+            j += 1
+        scores.append(100.0 * accuracy / ((folds - 1) * len(predicted_Digits)))
+        print "Accuracy:", np.around(scores[-1], 1), "%"
+        i += 1
     return np.array(scores), clf_local
 
 def getDataNonMalik(imageComplete):
@@ -65,7 +65,7 @@ def getDataNonMalik(imageComplete):
     shuffledData = []
     shuffledLabels = []
     for elem in imageComplete:
-        shuffledData.append((elem[0]).flatten())                # Use a simple array of pixels as the feature
+        shuffledData.append((elem[0]).flatten())  # Use a simple array of pixels as the feature
         shuffledLabels.append((elem[1][0]))
     
     imageLabels_Vector = np.zeros((len(shuffledLabels), 10))
@@ -96,7 +96,7 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
     # Ink Normalization
     ############# 
     for i in range(len(imageData)):
-        imageData[i]-=np.mean(imageData[i])
+        imageData[i] -= np.mean(imageData[i])
         aux_norm = np.linalg.norm(imageData[i])
         if aux_norm != 0:
             imageData[i] /= aux_norm
@@ -106,21 +106,21 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
     shuffledData = []
     shuffledLabels = []
 
-    n_bins=9
+    n_bins = 9
     for ind in range(len(imageComplete)):
         if ind % 300 == 0:
-            print 'feature extraction :' + str(np.around(ind*100./len(imageComplete), 1))+ ' % over'
+            print 'feature extraction :' + str(np.around(ind * 100. / len(imageComplete), 1)) + ' % over'
         
         if gauss_bool:
-            gaussFirst_x = filters.gaussian_filter1d(imageComplete[ind][0], 1, order = 1, axis = 0)
-            gaussFirst_y = filters.gaussian_filter1d(imageComplete[ind][0], 1, order = 1, axis = 1)
+            gaussFirst_x = filters.gaussian_filter1d(imageComplete[ind][0], 1, order=1, axis=0)
+            gaussFirst_y = filters.gaussian_filter1d(imageComplete[ind][0], 1, order=1, axis=1)
             ori = np.array(np.arctan2(gaussFirst_y, gaussFirst_x))
 
         else:
             grad_filter = np.array([[-1, 0, 1]])
             gradx = signal.convolve2d(imageComplete[ind][0], grad_filter, 'same')
             grady = signal.convolve2d(imageComplete[ind][0], np.transpose(grad_filter), 'same')
-            mag = np.sqrt(gradx**2+grady**2)
+            mag = np.sqrt(gradx ** 2 + grady ** 2)
             ori = np.array(np.arctan2(grady, gradx))
         
         ori_4_hist = list()
@@ -140,7 +140,7 @@ def getDataMalik(gauss_bool, imageData, imageLabels):
                 
         features = np.append(ori_4_hist, ori_7_hist)
         features = np.append(features, mag)
-        features = (features - np.mean(features))/np.linalg.norm(features)
+        features = (features - np.mean(features)) / np.linalg.norm(features)
         
         shuffledData.append(features)
         shuffledLabels.append((imageComplete[ind][1]))

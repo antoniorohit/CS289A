@@ -22,7 +22,7 @@ class Parameter:
         self.name = str()
         
         # actions initialized to argument
-        self.actions=actions
+        self.actions = actions
     
     def default(self):
         ''' get default value.
@@ -49,7 +49,7 @@ class Parameter:
         :return: current value'''
         
         # if parameter current value is already set to new_value tell user and return current value
-        if new_value==self.current_value:
+        if new_value == self.current_value:
             print(self.name + " parameter set to " + str(new_value) + " (default value)")
             return self.current_value
         
@@ -67,7 +67,7 @@ class Parameter:
         :return: result of the action associated with the current value"""
         
         # if no actions has been defined tell so user and do nothing
-        if len(self.actions.keys())==0:
+        if len(self.actions.keys()) == 0:
             print(self.name + " parameter has not been associated with any action, launch impossible")
             return
         
@@ -80,14 +80,14 @@ class Parameter:
 global params
     
 # initialize dictionary
-params=dict()
+params = dict()
 
 # fill dictionary with values
-params["sample_rate"] = Parameter(16000, [8000, 16000, 44100])            # hz
-params["chunk_size"] = Parameter(1, [0.250, 0.500, 1.000, 2.000])              # s
+params["sample_rate"] = Parameter(16000, [8000, 16000, 44100])  # hz
+params["chunk_size"] = Parameter(1, [0.250, 0.500, 1.000, 2.000])  # s
 params["voxforge_directory"] = Parameter("./Data/")
 params["pickle_directory"] = Parameter("./Pickle/")
 
 # set names
 for key in params.keys():
-    params[key].name=key   
+    params[key].name = key   

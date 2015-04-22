@@ -14,14 +14,14 @@ from sklearn import svm, tree, ensemble
 from extract_features import extractFeatures
 import os 
 
-def test():         # primarily tests testprotocol data now
-    male_file = "./Data/_r2h-20100822-kmh/wav/b0284.wav"                # Male
-    female_file = "./Data/aileen-20080831-dfq/wav/a0395.wav"            # Female
+def test():  # primarily tests testprotocol data now
+    male_file = "./Data/_r2h-20100822-kmh/wav/b0284.wav"  # Male
+    female_file = "./Data/aileen-20080831-dfq/wav/a0395.wav"  # Female
     
     pickle_directory = prm.params["pickle_directory"].get()
     
     print "Loading CLF...."
-    clf = pickle.load(open(pickle_directory+"clf.p", "rb"))
+    clf = pickle.load(open(pickle_directory + "clf.p", "rb"))
     print "Done loading CLF...."
     data, labels = getData_TestProtocol(source="test")
     
@@ -29,18 +29,18 @@ def test():         # primarily tests testprotocol data now
     for chunk in data:
         predictedLabel.append(clf.predict(chunk))
         
-    if sum(predictedLabel)*1./len(predictedLabel) < 0.95:
-        print "Female", sum(predictedLabel)*1./len(predictedLabel)
+    if sum(predictedLabel) * 1. / len(predictedLabel) < 0.95:
+        print "Female", sum(predictedLabel) * 1. / len(predictedLabel)
     else:
-        print "Male", sum(predictedLabel)*1./len(predictedLabel)
+        print "Male", sum(predictedLabel) * 1. / len(predictedLabel)
         
     accuracy = 0
     for (elem1, elem2) in zip(predictedLabel, labels):
         if elem1 == elem2:
-            accuracy+=1
+            accuracy += 1
         else:
             pass
 
     print "Predicted:", len(predictedLabel), sum(predictedLabel)
     
-    return 100.0*accuracy/len(predictedLabel)
+    return 100.0 * accuracy / len(predictedLabel)

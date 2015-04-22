@@ -20,7 +20,7 @@ def extractFeatures(input_signal):
     :return: features list"""
     
     # compute mfcc list
-    if len(input_signal)==0:
+    if len(input_signal) == 0:
         print("cleaned signal is empty")
         return input_signal
     
@@ -42,10 +42,10 @@ def extractFeatures(input_signal):
     ddelta_list = delta(delta_list, N)
     
     # do not keep first coeff (energy)
-    features_list=list()
+    features_list = list()
     for k in range(len(lpcc)):
-#         features_list += [np.hstack((mfcc_list[k][0:22], lpcc[k][0:22]))]
-        features_list += [mfcc_list[k][1:]]
+        features_list += [np.hstack((mfcc_list[k][0:22], lpcc[k][0:22]))]
+#         features_list += [mfcc_list[k][1:]]
 #         features_list += [lpcc[k][0:15]]
 #         features_list += [np.hstack((mfcc_list[k][0:12], delta_list[k][1:12]))]#, ddelta_list[k][0:]))]
         
@@ -55,7 +55,7 @@ def extractFeatures(input_signal):
     # @TODO WHY DOES THIS HAPPEN?
     for row in features_list:
         for cell in row:
-            if cell!=cell:
+            if cell != cell:
                 print cell
                 return []
     

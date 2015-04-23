@@ -52,7 +52,7 @@ def computeCV_Score(clf, data, labels, folds):
                         pass
             j += 1
         scores.append(100.0 * accuracy / ((folds - 1) * len(predicted_Digits)))
-        print "Accuracy:", np.around(scores[-1], 1), "%"
+        print "Iteration(" + str(i) + ") Accuracy:", np.around(scores[-1], 1), "%"
         i += 1
     return np.array(scores), clf_local
 

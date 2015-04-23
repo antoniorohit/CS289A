@@ -20,14 +20,15 @@ class Digit_NN(object):
         self.gamma = 10 ** -3
         self.yHat = []
         # initialize weights
-        self.W1 = 0.001 * np.random.randn(dataShape + 1, self.nhidden)    
-        self.W2 = 0.001 * np.random.randn(self.nhidden + 1, self.nout)
+        self.W1 = 0.0001 * np.random.randn(dataShape + 1, self.nhidden)    
+        self.W2 = 0.0001 * np.random.randn(self.nhidden + 1, self.nout)
         if cost == "MSE":
             self.costFunction = self.costFunction_mse
+            self.epsilon = 10 ** -6
         else:  # entropy
-            print "WARNING _ ENTROPY NOT IMPLEMENTED "
             self.costFunction = self.costFunction_entropy
-
+            self.epsilon = 10 ** -1
+            
     def derivative_tanh(self, z):
         """ Computes the derivative of the sigmoid of z"""
         z = np.array(z)
@@ -56,9 +57,11 @@ class Digit_NN(object):
         # a2: 1x(nhidden+1), delta3: 1xnout
         if self.costFunction == self.costFunction_mse:
             costFunc_prime = -(y - self.yHat)
+            delta3 = np.multiply(costFunc_prime, self.derivative_sig(self.z3))
         else:
-            pass
-        delta3 = np.multiply(costFunc_prime, self.derivative_sig(self.z3))
+            # @TODO
+            delta3 = -(y - self.yHat)
+
         dJdW2 = np.dot(self.a2.T, delta3)
         self.W2 -= dJdW2 * self.gamma
         
@@ -77,13 +80,14 @@ class Digit_NN(object):
         data = np.array(data)
         data_len = len(data)
         completeData = zip(data, labels)
-        epsilon = 10 ** -4
         cost = deque((self.costFunction(data, labels)) * np.ones(10))
         curr_cost = np.mean(cost)
         delta = 1
         i = 0
         j = 0
         startTime = 0
+        accuracy = 0
+
         orig_gamma = self.gamma
         while 1:
             x, y = completeData[np.random.randint(data_len, size=1)[0]]
@@ -98,23 +102,32 @@ class Digit_NN(object):
 #             print denom
 #             print "The factor!!", numer / denom
 
-            if i % 10000 == 0:
+            if i % 1000 == 0:
 #                 print "Loop Time:", time.time()-startTime
                 curr_cost = (self.costFunction(data, labels))    
                 old_cost = np.mean(cost)
                 cost.append(curr_cost)
                 cost.popleft()
                 delta = np.mean(cost) - old_cost
-                if(np.abs(delta) <= epsilon) or i > 1200000 or curr_cost <= epsilon:
+                if(np.abs(delta) <= self.epsilon) or i > 1000000 or curr_cost <= self.epsilon or accuracy > 99.9:
                     j += 1
-                    if(j > 5 or curr_cost == 0):
+                    if(j >= 5 or curr_cost == 0):
                         print "Cost and Delta:", cost, delta
                         self.gamma = orig_gamma
                         break   
                 else:
                     j = 0
-
-                print "i, Cost, Delta:", i, np.around(curr_cost, 3), np.around(delta, 6)
+                    
+                accuracy = 0
+                pred_labels = self.predict(data)
+                for elem1, elem2 in zip(pred_labels, labels):
+                    elem2 = elem2.tolist().index(1)
+                    if elem1 == elem2:
+                        accuracy += 1
+                        
+                accuracy = 100.0*accuracy/len(pred_labels)
+                # "i, Cost, Delta, Accuracy:" 
+                print i, np.around(curr_cost, 3), np.around(delta, 6), accuracy
                 if i > 200000:
                     self.gamma = 100*orig_gamma / np.sqrt(i)
                         

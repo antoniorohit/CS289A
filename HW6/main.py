@@ -11,8 +11,8 @@ from neuralNet import Digit_NN
 import pylab as plt
 import time
 
-features = "raw"  # or "raw"
-cost = "MSE"
+features = "raw"  # or "malik" -> for HOG features
+cost = "MSE"        # or "entropy"
 
 ############# FILE STUFF ############# 
 testFileMNIST = "./digit-dataset/test.mat"

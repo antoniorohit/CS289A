@@ -1,0 +1,14 @@
+--------------------
+Gamma:0.001
+Cost:MSE
+Features:raw
+--------------------
+NN Cross-Val Score Array:[ 78.6  83.6  85.9  87.3  88.8  89.6  90.4  91.3  92.7  93.6]%
+NN Cross-Val Score Mean:88.2%
+--------------------
+Validation Set Accuracy:88.74%
+--------------------
+Training Time for entire NN:165.4minutes
+--------------------
+Validation Set Accuracy:93.67%
+--------------------

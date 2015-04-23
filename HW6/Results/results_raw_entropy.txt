@@ -1,0 +1,14 @@
+--------------------
+Gamma:0.001
+Cost:entropy
+Features:raw
+--------------------
+NN Cross-Val Score Array:[ 80.4  83.6  86.5  88.1  89.7  89.4  91.5  92.2  92.8  93.2]%
+NN Cross-Val Score Mean:88.8%
+--------------------
+Validation Set Accuracy:88.55%
+--------------------
+Training Time for entire NN:197.1minutes
+--------------------
+Validation Set Accuracy:97.13%
+--------------------

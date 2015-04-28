@@ -115,20 +115,20 @@ def train():
 #     clf = KNeighborsClassifier(n_neighbors=num_neighbors[maxScore_Index])
 
     clf.fit(data, labels)
-    pickle.dump(clf, open(pickle_directory + "clf.p", "wb"))        
+    pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + ".p", "wb"))        
 #     print "Done saving the CLF!"
     
     # HOW DOES THIS DECISION TREE DO ON THE SAME DATA IT FIT ON? (should be 100% ?)
-    accuracy = 0
-    predicted_Labels = clf.predict(data)
-    index = 0
-    for (elem1, elem2) in zip(predicted_Labels, labels):
-        if elem1 == elem2:
-            accuracy += 1
-        else:
-#             print 'Decision Tree Mis-classification: predicted, actual', elem1, elem2
-            write_wave((1, 2, 44100), np.int16(rawData[index]), './Errors/cleaned_audio_' + str(index) + '.wav')
-        index += 1
-#     print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
-    print "Accuracy of CLF on training data itself:", np.around(100.0 * accuracy / len(predicted_Labels), 2), "%"
+#     accuracy = 0
+#     predicted_Labels = clf.predict(data)
+#     index = 0
+#     for (elem1, elem2) in zip(predicted_Labels, labels):
+#         if elem1 == elem2:
+#             accuracy += 1
+#         else:
+# #             print 'Decision Tree Mis-classification: predicted, actual', elem1, elem2
+#             write_wave((1, 2, 44100), np.int16(rawData[index]), './Errors/cleaned_audio_' + str(index) + '.wav')
+#         index += 1
+# #     print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
+#     print "Accuracy of CLF on training data itself:", np.around(100.0 * accuracy / len(predicted_Labels), 2), "%"
 

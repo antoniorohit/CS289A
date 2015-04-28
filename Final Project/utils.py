@@ -18,16 +18,16 @@ import cPickle as pickle
 import random
 from simple import remove_silence
 
-def get_RawSignal(file_name):
+def get_RawSignal(filename):
     '''Opens filename, and returns (params, rawSignal)'''
-    wf = wave.open(file_name, 'rb')
+    wf = wave.open(filename, 'rb')
     n = wf.getnframes()
     string = wf.readframes(n)
     params = [wf.getnchannels(), wf.getsampwidth(),
                wf.getframerate(), wf.getnframes(),
                wf.getcomptype(), wf.getcompname()]
     rawSignal = np.fromstring(string, np.int16)
-#     print params
+#     print filename, params
     return params, rawSignal
 
 def frame_chunks(rawSignal):
@@ -35,7 +35,7 @@ def frame_chunks(rawSignal):
     chunk_size = prm.params["chunk_size"].get() * prm.params["sample_rate"].get()
     framedRawSignal = []
     index = 0
-    while index < (len(rawSignal) - chunk_size):
+    while index <= (len(rawSignal) - chunk_size):
         framedRawSignal.append(rawSignal[index:index + chunk_size])
         index += chunk_size  # non-overlapping
     
@@ -194,7 +194,7 @@ def getData_TestProtocol(source="train"):
 #         print "Exception:", excp
         for filename in os.listdir(data_dir):
             filename = filename.lower()
-            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and "mac" not in filename:
+            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and str(prm.params["device"].get()) not in filename:
 #                 if source == "train":
 #                     if "clean" not in filename:
 #                         continue
@@ -316,7 +316,8 @@ def cleanPickle():
     pickle_dir = prm.params["pickle_directory"].get()
 
     for filename in os.listdir(pickle_dir):
-        os.remove(pickle_dir + filename)
+        if "clf" not in filename:
+            os.remove(pickle_dir + filename)
     
     for filename in os.listdir("./Errors/"):
         os.remove("./Errors/" + filename)

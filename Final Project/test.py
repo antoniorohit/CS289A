@@ -20,7 +20,7 @@ def test():  # primarily tests testprotocol data now
     pickle_directory = prm.params["pickle_directory"].get()
     
 #     print "Loading CLF...."
-    clf = pickle.load(open(pickle_directory + "clf.p", "rb"))
+    clf = pickle.load(open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + ".p", "rb"))
 #     print "Done loading CLF...."
     data, labels, rawData = getData_TestProtocol(source="test")
     
@@ -35,12 +35,18 @@ def test():  # primarily tests testprotocol data now
 #             print "Male", sum(predictedLabel) * 1. / len(predictedLabel)
         
     accuracy = 0
+    index = 0
     for (elem1, elem2) in zip(predictedLabel, labels):
         if elem1 == elem2:
             accuracy += 1
         else:
-            pass
+            if prm.params["device"].get() == "mac":
+                write_wave((2, 2, 44100), np.int16(rawData[index]), './Errors/cleaned_audio_' + str(index) + '.wav')
+            else:
+                write_wave((1, 2, 44100), np.int16(rawData[index]), './Errors/cleaned_audio_' + str(index) + '.wav')
+                
+        index+=1
 
-    print "Predicted:", len(predictedLabel), sum(predictedLabel)
+#     print "Predicted:", len(predictedLabel), sum(predictedLabel)
     
     return 100.0 * accuracy / len(predictedLabel)

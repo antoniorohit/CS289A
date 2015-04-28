@@ -58,10 +58,8 @@ for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     data = stream.read(chunk)
     frames.append(np.fromstring(data, "int16"))
     features = np.array(extractFeatures(frame_chunks(frames[-1])[0])).flatten()
-    print i, clf.predict(features.flatten())
-    # check for silence here by comparing the level with 0 (or some threshold) for 
-    # the contents of data.
-    # then write data or not to a file
+    print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"
+
 
 print "* done"
 
@@ -69,10 +67,9 @@ stream.stop_stream()
 stream.close()
 p.terminate()
 
-# frames = np.fromstring(frames, "int16")
 print "Num frames:", len(frames)
 frames = np.ravel(frames)
-print type(frames[0]), np.shape(frames)
+print np.shape(frames)
 
 
 fs, data = remove_silence(44100, (frames))
@@ -81,10 +78,9 @@ print "Shape of framedSignal", np.shape(framedSignal)
 
 for chunk in framedSignal:
     features = np.array(extractFeatures(chunk)).flatten()
-    print "Shape of features", np.shape(features)
     predictedLabel.append(clf.predict(features.flatten()))
     
-print sum(predictedLabel)*1.0/len(predictedLabel)
+print "Percentage Male:", float(sum(predictedLabel)*1.0/len(predictedLabel))*100, "%"
 
 
 wf = wave.open('pyaudiotest.wav', 'wb')

@@ -5,7 +5,7 @@ import numpy
 from scipy.fftpack import dct
 import math
     
-def mfcc(signal, samplerate=16000, winlen=0.032, winstep=0.016, numcep=23,
+def mfcc(signal, samplerate=16000, winlen=0.032, winstep=0.016, numcep=30,
           nfilt=55, nfft=512, lowfreq=0, highfreq=6000, preemph=0.95, ceplifter=22, appendEnergy=True):
     """Compute MFCC features from an audio signal.
 
@@ -24,10 +24,10 @@ def mfcc(signal, samplerate=16000, winlen=0.032, winstep=0.016, numcep=23,
     :returns: A numpy array of size (NUMFRAMES by numcep) containing features. Each row holds 1 feature vector.
     """            
     feat, energy = fbank(signal, samplerate, winlen, winstep, nfilt, nfft, lowfreq, highfreq, preemph)
-    feat = numpy.log(feat)
+    feat = numpy.log(feat+10**-15)
     feat = dct(feat, type=2, axis=1, norm='ortho')[:, :numcep]
     feat = lifter(feat, ceplifter)
-    if appendEnergy: feat[:, 0] = numpy.log(energy)  # replace first cepstral coefficient with log of frame energy
+    if appendEnergy: feat[:, 0] = numpy.log(energy+10**-15)  # replace first cepstral coefficient with log of frame energy
     return feat
 
 def fbank(signal, samplerate=16000, winlen=0.025, winstep=0.01,

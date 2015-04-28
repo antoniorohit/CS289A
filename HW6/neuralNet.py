@@ -24,7 +24,7 @@ class Digit_NN(object):
         self.W2 = 0.0001 * np.random.randn(self.nhidden + 1, self.nout)
         if cost == "MSE":
             self.costFunction = self.costFunction_mse
-            self.epsilon = 10 ** -6
+            self.epsilon = 10 ** -5
         else:  # entropy
             self.costFunction = self.costFunction_entropy
             self.epsilon = 10 ** -1

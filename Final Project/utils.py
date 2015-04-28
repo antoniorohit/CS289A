@@ -27,6 +27,7 @@ def get_RawSignal(file_name):
                wf.getframerate(), wf.getnframes(),
                wf.getcomptype(), wf.getcompname()]
     rawSignal = np.fromstring(string, np.int16)
+#     print params
     return params, rawSignal
 
 def frame_chunks(rawSignal):
@@ -65,9 +66,8 @@ def extract_Gender_Label(directory):
     elif("male" in readme):
         label = 1
     else:
-        print "ERROR!!"
+        print "Neither Male nor Female in Readme Txt!!"
         print readme
-        exit
     return label
 
 def extract_Data(data_directory):
@@ -112,9 +112,9 @@ def getTrainData_Pickle(method="voxforge"):
     if method == "voxforge":
         data, labels = getData_Voxforge()
     else:  # test_protocol
-        data, labels = getData_TestProtocol("train")
+        data, labels, rawData = getData_TestProtocol("train")
     
-    return data, labels
+    return data, labels, rawData
 
 def getData_Voxforge():
     pickle_directory = prm.params["pickle_directory"].get()
@@ -183,24 +183,25 @@ def getData_TestProtocol(source="train"):
     
     data = []
     labels = []
+    rawData = []
     
     try:
-        print "Loading the Data... (may take a while)"
+#         print "Loading the Data... (may take a while)"
         data = pickle.load(open(pickle_directory + "data_tp_" + str(source) + ".p", "rb"))
         labels = pickle.load(open(pickle_directory + "labels_tp_" + str(source) + ".p", "rb"))
-        print "Data Loaded, Good to Go!"
+#         print "Data Loaded, Good to Go!"
     except Exception as excp:  # data_vf.p doesnt exist
-        print "Exception:", excp
+#         print "Exception:", excp
         for filename in os.listdir(data_dir):
             filename = filename.lower()
-            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and "android" not in filename:
+            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and "mac" not in filename:
 #                 if source == "train":
 #                     if "clean" not in filename:
 #                         continue
-#                 if source == "test":
-#                     if "clean" not in filename:
-#                         continue
-                print filename
+                if source == "test":
+                    if "clean" not in filename:
+                        continue
+#                 print filename
         
                 #######################################
                 # GET RAW SIGNAL 
@@ -234,40 +235,43 @@ def getData_TestProtocol(source="train"):
                     if feature_list != []:                          
                         data.append(feature_list)
                         labels.append(label)
+                        rawData.append(chunk)
     #                         print np.shape(data), np.shape(data[-1]), np.shape(labels)
         
-        print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
+        print "Shapes of Data, Labels, RawData", np.shape(data), np.shape(labels), np.shape(rawData)
         data_flat = []
         data = np.array(data)
         for elem in data:
             data_flat.append(elem.flatten())
         data = data_flat
-        print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
+#         print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
 
 
         #######################################
         # SHUFFLE THE IMAGES
         #######################################
-        dataComplete = zip(data, labels)
+        dataComplete = zip(data, labels, rawData)
         
         random.shuffle(dataComplete)
         
         data = []
         labels = []
+        rawData = []
         for elem in dataComplete:
             data.append(elem[0])
             labels.append(elem[1])
+            rawData.append(elem[2])
 
         
-        print "Saving the Data... (may take a while)"
+#         print "Saving the Data... (may take a while)"
         pickle.dump(data, open(pickle_directory + "data_tp_" + str(source) + ".p", "wb"))        
         pickle.dump(labels, open(pickle_directory + "labels_tp_" + str(source) + ".p", "wb"))        
-        print "Data Saved, Good to Go!"
+#         print "Data Saved, Good to Go!"
 
-    print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
-    print "Sum of labels:", sum(labels)
+#     print "Shapes of Data and Labels", np.shape(data), np.shape(labels), np.shape(rawData)
+#     print "Sum of labels:", sum(labels)
 
-    return data, labels
+    return data, labels, rawData
 
 
 def computeCV_Score(clf, data, labels, folds):
@@ -281,7 +285,7 @@ def computeCV_Score(clf, data, labels, folds):
     scores = []
     clf_local = clf
     # For each fold trained on...
-    print "Actual   :", len(labels[0]), sum(labels[0])             
+#     print "Actual   :", len(labels[0]), sum(labels[0])             
     for i in range(folds):
         # Initialize variables
         clf_local = clf
@@ -300,7 +304,7 @@ def computeCV_Score(clf, data, labels, folds):
                         else:
                             pass
                 j += 1
-            print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
+#             print "Predicted:", len(predicted_Labels), sum(predicted_Labels)
             scores.append(100.0 * accuracy / ((folds - 1) * len(predicted_Labels)))
             i += 1
         except Exception, e:
@@ -313,3 +317,6 @@ def cleanPickle():
 
     for filename in os.listdir(pickle_dir):
         os.remove(pickle_dir + filename)
+    
+    for filename in os.listdir("./Errors/"):
+        os.remove("./Errors/" + filename)

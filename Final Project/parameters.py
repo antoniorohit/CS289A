@@ -83,7 +83,7 @@ global params
 params = dict()
 
 # fill dictionary with values
-params["sample_rate"] = Parameter(16000, [8000, 16000, 44100])  # hz
+params["sample_rate"] = Parameter(44100, [8000, 16000, 44100])  # hz
 params["chunk_size"] = Parameter(1, [0.250, 0.500, 1.000, 2.000])  # s
 params["voxforge_directory"] = Parameter("./Data/")
 params["pickle_directory"] = Parameter("./Pickle/")

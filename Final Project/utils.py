@@ -194,7 +194,7 @@ def getData_TestProtocol(source="train"):
 #         print "Exception:", excp
         for filename in os.listdir(data_dir):
             filename = filename.lower()
-            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and str(prm.params["device"].get()) not in filename:
+            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and str(prm.params["device"].get()) in filename:
 #                 if source == "train":
 #                     if "clean" not in filename:
 #                         continue

@@ -30,7 +30,7 @@ for device in prm.params["device"].all():
         print 20 * "#", "Testing", 20 * "#"
         accuracy = test()
         
-print "Accuracy:", np.around(accuracy, 2), "%"
+        print "Accuracy:", np.around(accuracy, 2), "%"
     
 
 print 20 * "*", "End of Main. Thank you for Playing", 20 * "*"

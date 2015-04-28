@@ -46,16 +46,16 @@ def train():
     print 50 * '='
      
     for depth in depths:
-        print "DEPTH:", depth
+#         print "DEPTH:", depth
         clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depth)
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
-        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-        print 50 * '-'
+#         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+#         print 50 * '-'
      
     maxScore = np.max(scoreBuffer)
     maxScore_Index = scoreBuffer.index(maxScore)
-    print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 3)
+    print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 1), "%"
     print 50 * '-'     
      
     ############# SVM ############# 

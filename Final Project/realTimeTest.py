@@ -20,9 +20,9 @@ import cPickle as pickle
 
 chunk = 11025
 FORMAT = pyaudio.paInt16
-CHANNELS = 1
+CHANNELS = 2
 RATE = 44100
-RECORD_SECONDS = 10.
+RECORD_SECONDS = 20.
 
 import os
      
@@ -55,9 +55,10 @@ frames = []
 print "* recording"
 
 for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
-    print i
     data = stream.read(chunk)
     frames.append(np.fromstring(data, "int16"))
+    features = np.array(extractFeatures(frame_chunks(frames[-1])[0])).flatten()
+    print i, clf.predict(features.flatten())
     # check for silence here by comparing the level with 0 (or some threshold) for 
     # the contents of data.
     # then write data or not to a file
@@ -74,7 +75,6 @@ frames = np.ravel(frames)
 print type(frames[0]), np.shape(frames)
 
 
-
 fs, data = remove_silence(44100, (frames))
 framedSignal = np.array(frame_chunks(data))
 print "Shape of framedSignal", np.shape(framedSignal)
@@ -84,7 +84,7 @@ for chunk in framedSignal:
     print "Shape of features", np.shape(features)
     predictedLabel.append(clf.predict(features.flatten()))
     
-print predictedLabel
+print sum(predictedLabel)*1.0/len(predictedLabel)
 
 
 wf = wave.open('pyaudiotest.wav', 'wb')

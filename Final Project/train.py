@@ -9,11 +9,15 @@ import cPickle as pickle
 from sklearn import svm, tree, ensemble
 import random
 
-def train():
+def train(source="test_protocol"):
     voxforge_directory = prm.params["voxforge_directory"].get()
     pickle_directory = prm.params["pickle_directory"].get()
     
-    data, labels, rawData = getTrainData_Pickle("test_protocol")
+    if source == "test_protocol":
+        data, labels, rawData = getTrainData_Pickle("test_protocol")
+    else:
+        data, labels, rawData = getTrainData_Pickle("voxforge")
+
     
 #     print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
 #     print "Sum of labels:", sum(labels)

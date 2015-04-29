@@ -2,7 +2,8 @@
 Created on Apr 13, 2015
 
 Provides a clean interface to using the MFCC extraction functions
-
+See: https://github.com/ppwwyyxx/speaker-recognition/blob/master/doc/06-Final-Report.pdf
+for some of the motivation on the numbers chosen
 @author: antonio
 '''
 # coding utf-8
@@ -24,17 +25,18 @@ def extractFeatures(input_signal):
         print("cleaned signal is empty")
         return input_signal
     
-    mfcc_list = np.array(mfcc(input_signal, prm.params["sample_rate"].get())) 
-    extractor = LPCExtractor(prm.params["sample_rate"].get(), 32, 16, 23, 0.95)
-    lpcc = extractor.extract(input_signal)
+    mfcc_list = np.array(mfcc(input_signal, samplerate=prm.params["sample_rate"].get(), winlen=0.032, winstep=0.016, numcep=30,
+          nfilt=55, nfft=2048, lowfreq=0, highfreq=6000, preemph=0.95, ceplifter=22, appendEnergy=True )) 
+#     extractor = LPCExtractor(prm.params["sample_rate"].get(), 32, 16, 30, 0.95)
+#     lpcc = extractor.extract(input_signal)
 
 #     # Cepstral Mean Normalization @TODO: WHY IS THIS NOT HELPING??
-#     if 1:
-#         mean_mfcc = np.average(mfcc_list.T, 1)
-#         std_mfcc = np.std(mfcc_list.T, 1)
-#         for i in range(len(mfcc_list)):
-#             for j in range(len(mfcc_list[i])):
-#                 mfcc_list[i][j] = (mfcc_list[i][j]-mean_mfcc[j])/std_mfcc[j]
+    if 0:
+        mean_mfcc = np.mean(mfcc_list.T, 1)
+        std_mfcc = np.std(mfcc_list.T, 1)
+        for i in range(len(mfcc_list)):
+            for j in range(len(mfcc_list[i])):
+                mfcc_list[i][j] = (mfcc_list[i][j]-mean_mfcc[j])/std_mfcc[j]
  
 #     print np.shape(mfcc_list[i-1]), np.shape(mean_mfcc), np.shape(std_mfcc)
     N = 2
@@ -43,11 +45,11 @@ def extractFeatures(input_signal):
     
     # do not keep first coeff (energy)
     features_list = list()
-    for k in range(len(mfcc_list)):
-#         features_list += [np.hstack((mfcc_list[k][0:22], lpcc[k][0:22]))]
-        features_list += [mfcc_list[k][0:]]
-#         features_list += [lpcc[k][0:22]]
-#         features_list += [np.hstack((mfcc_list[k][0:12], delta_list[k][0:12]))]#, ddelta_list[k][0:]))]
+    for k in range(len(ddelta_list)):
+#         features_list += [np.hstack((mfcc_list[k][0:], lpcc[k][0:]))]
+#         features_list += [mfcc_list[k][0:]]
+#         features_list += [lpcc[k][0:]]
+        features_list += [np.hstack((mfcc_list[k][0:], delta_list[k][0:], ddelta_list[k][0:]))]
         
 #     print np.shape(mfcc_list), np.shape(features_list)
     

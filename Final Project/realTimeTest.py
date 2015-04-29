@@ -20,7 +20,7 @@ import cPickle as pickle
 
 chunk = 11025
 FORMAT = pyaudio.paInt16
-CHANNELS = 2
+CHANNELS = 1
 RATE = 44100
 RECORD_SECONDS = 20.
 
@@ -57,9 +57,14 @@ print "* recording"
 for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     data = stream.read(chunk)
     frames.append(np.fromstring(data, "int16"))
-    features = np.array(extractFeatures(frame_chunks(frames[-1])[0])).flatten()
-    print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"
-
+    _, data = remove_silence(44100, frames[-1])
+#     print len(frames[-1]), len(data)
+    if len(data) > 0.25*len(frames[-1]):
+        data = frame_chunks(data)[0]
+        features = np.array(extractFeatures(data)).flatten()
+        print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"
+    else:
+        print i, "Silence"
 
 print "* done"
 

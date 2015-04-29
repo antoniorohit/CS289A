@@ -39,10 +39,10 @@ def frame_chunks(rawSignal):
         framedRawSignal.append(rawSignal[index:index + chunk_size])
         index += chunk_size  # non-overlapping
     
-    # Zero padding for last sample (unnecessary?)    (remove)
-#     if index != len(rawSignal):
-#         framedRawSignal.append(rawSignal[index:])
-#         framedRawSignal[-1] = np.append(framedRawSignal[-1], np.zeros(chunk_size - len(framedRawSignal[-1])))
+    # Zero padding for last sample (unnecessary?)    (remove?)
+    if index != len(rawSignal):
+        framedRawSignal.append(rawSignal[index:])
+        framedRawSignal[-1] = np.append(framedRawSignal[-1], np.zeros(chunk_size - len(framedRawSignal[-1])))
 
     return framedRawSignal
 
@@ -73,6 +73,7 @@ def extract_Gender_Label(directory):
 def extract_Data(data_directory):
     labels = []
     data = []
+    rawData = []
     for folder in os.listdir(data_directory):
         if "." not in folder and "an4" not in folder and "anonymous" not in folder:
             print folder
@@ -82,18 +83,21 @@ def extract_Data(data_directory):
                 for file_name in os.listdir(directory + folder):
                     if file_name[-3:] == "wav":
                         label = extract_Gender_Label(directory)
-                        _, rawSignal = get_RawSignal(directory + folder + file_name)
-                        framedRawSignal = (frame_chunks(rawSignal))
+                        params, rawSignal = get_RawSignal(directory + folder + file_name)
+                        prm.params["sample_rate"].set(params[2])
+                        fs, cleanSignal = remove_silence(params[2], rawSignal)
+                        framedRawSignal = (frame_chunks(cleanSignal))
                         for chunk in framedRawSignal:
                             feature_list = extractFeatures(chunk)
                             if feature_list != []:                          
                                 data.append(feature_list)
                                 labels.append(label)
+                                rawData.append(chunk)
 #                         print np.shape(data), np.shape(data[-1]), np.shape(labels)
                         
             except OSError, e:
                 print "OS Error:", str(e)
-    return data, labels
+    return data, labels, rawData
 
 
 def select_Data_Subset(data, labels, fraction):
@@ -110,7 +114,7 @@ def select_Data_Subset(data, labels, fraction):
 
 def getTrainData_Pickle(method="voxforge"):
     if method == "voxforge":
-        data, labels = getData_Voxforge()
+        data, labels, rawData = getData_Voxforge()
     else:  # test_protocol
         data, labels, rawData = getData_TestProtocol("train")
     
@@ -127,7 +131,7 @@ def getData_Voxforge():
         print "Data Loaded, Good to Go!"
     except Exception as excp:  # data_vf.p doesnt exist
         print "Exception:", excp
-        data, labels = extract_Data(voxforge_directory)
+        data, labels, rawData = extract_Data(voxforge_directory)
         print "Flattening ze Data"
         # flatten the data (for svm)
         data_flat = []
@@ -175,7 +179,7 @@ def getData_Voxforge():
         print "Shapes of Data (male, female) and Labels", np.shape(data_male), np.shape(data_female), np.shape(labels)
         print "Sum of labels:", sum(labels)
         
-        return data, labels
+        return data, labels, rawData
 
 def getData_TestProtocol(source="train"):
     data_dir = "/Users/antonio/git/caltranscense/models/data/test_protocol/"
@@ -198,15 +202,16 @@ def getData_TestProtocol(source="train"):
 #                 if source == "train":
 #                     if "clean" not in filename:
 #                         continue
-                if source == "test":
-                    if "clean" not in filename:
-                        continue
+#                 if source == "test":
+#                     if "clean" not in filename:
+#                         continue
 #                 print filename
         
                 #######################################
                 # GET RAW SIGNAL 
                 #######################################
                 params, rawSignal = get_RawSignal(data_dir + filename)
+                prm.params["sample_rate"].set(params[2])
                             
                 #######################################
                 # CLEAN SAMPLES 

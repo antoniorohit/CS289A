@@ -25,7 +25,7 @@ for device in prm.params["device"].all():
         cleanPickle()       # cleans pickle and error directory (except for clfs)
         
         print 20 * "#", "Training", 20 * "#"
-        train()
+        train("test_protocol")       # test_protocol or voxforge
         
         print 20 * "#", "Testing", 20 * "#"
         accuracy = test()

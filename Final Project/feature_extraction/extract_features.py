@@ -7,11 +7,13 @@ for some of the motivation on the numbers chosen
 @author: antonio
 '''
 # coding utf-8
-
+import sys
+sys.path.append("./pitch_estimation/")
 from base import mfcc, delta
 import numpy as np
 import parameters as prm
 from LPCC import LPCExtractor
+from brewed import extract_pitch
 
 # @timing
 def extractFeatures(input_signal):
@@ -29,7 +31,10 @@ def extractFeatures(input_signal):
           nfilt=55, nfft=2048, lowfreq=0, highfreq=6000, preemph=0.95, ceplifter=22, appendEnergy=True )) 
 #     extractor = LPCExtractor(prm.params["sample_rate"].get(), 32, 16, 30, 0.95)
 #     lpcc = extractor.extract(input_signal)
-
+    
+    pitch = extract_pitch(input_signal)
+#     print pitch
+    
 #     # Cepstral Mean Normalization @TODO: WHY IS THIS NOT HELPING??
     if 0:
         mean_mfcc = np.mean(mfcc_list.T, 1)
@@ -45,11 +50,11 @@ def extractFeatures(input_signal):
     
     # do not keep first coeff (energy)
     features_list = list()
-    for k in range(len(ddelta_list)):
+    for k in range(len(mfcc_list)):
 #         features_list += [np.hstack((mfcc_list[k][0:], lpcc[k][0:]))]
-#         features_list += [mfcc_list[k][0:]]
+        features_list += [mfcc_list[k][0:]]
 #         features_list += [lpcc[k][0:]]
-        features_list += [np.hstack((mfcc_list[k][0:], delta_list[k][0:], ddelta_list[k][0:]))]
+#         features_list += [np.hstack((mfcc_list[k][0:], delta_list[k][0:], ddelta_list[k][0:]))]
         
 #     print np.shape(mfcc_list), np.shape(features_list)
     
@@ -60,5 +65,18 @@ def extractFeatures(input_signal):
             if cell != cell:
                 print "Cell is nan (see feature extraction):", str(cell)
                 return []
+    
+    features_list = []
+    features_list = list(np.ravel(features_list))
+    features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
+#     features_list.append(pitch)         # do we need to append this multiple times to ensure that the forest selects it?
     
     return features_list

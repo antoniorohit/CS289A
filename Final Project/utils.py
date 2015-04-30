@@ -17,16 +17,26 @@ from extract_features import extractFeatures
 import cPickle as pickle
 import random
 from simple import remove_silence
+import scipy.io.wavfile
+
+def stereo_to_mono(hex1, hex2):
+    """average two hex string samples"""
+    return hex((ord(hex1) + ord(hex2))/2)
 
 def get_RawSignal(filename):
     '''Opens filename, and returns (params, rawSignal)'''
     wf = wave.open(filename, 'rb')
-    n = wf.getnframes()
-    string = wf.readframes(n)
+    _, rawSignal = scipy.io.wavfile.read(filename)
+
     params = [wf.getnchannels(), wf.getsampwidth(),
                wf.getframerate(), wf.getnframes(),
                wf.getcomptype(), wf.getcompname()]
-    rawSignal = np.fromstring(string, np.int16)
+    
+    # convert from stereo to mono
+    if params[0] == 2:
+        monoChannel = np.int16(rawSignal.mean(axis=1))
+        rawSignal = monoChannel#np.fromstring(monoChannel, np.int16)
+
 #     print filename, params
     return params, rawSignal
 

@@ -40,7 +40,7 @@ if 0:
 
 predictedLabel = []
 
-clf = pickle.load(open("./Pickle/clf_" + str(prm.params["chunk_size"].get()) + ".p", "rb"))
+clf = pickle.load(open("./Pickle/clf_" + str(1.0) + ".p", "rb"))
     
 
 stream = p.open(format=FORMAT,
@@ -50,21 +50,23 @@ stream = p.open(format=FORMAT,
                 output=False,
                 frames_per_buffer=chunk)
 
-frames = []
-
 print "* recording"
 
+frames = []
 for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     data = stream.read(chunk)
     frames.append(np.fromstring(data, "int16"))
-    _, data = remove_silence(44100, frames[-1])
-#     print len(frames[-1]), len(data)
-    if len(data) > 0.25*len(frames[-1]):
-        data = frame_chunks(data)[0]
-        features = np.array(extractFeatures(data)).flatten()
-        print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"
-    else:
-        print i, "Silence"
+    if((i+1)%4 == 0):
+        data = np.array(frames[-4:]).ravel()
+        print np.shape(data)
+        _, data = remove_silence(44100, data)
+        print len(data)
+        if len(data) > 0.25*44100:
+            data = frame_chunks(data)[0]
+            features = np.array(extractFeatures(data)).flatten()
+            print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"
+        else:
+            print i, "Silence"
 
 print "* done"
 

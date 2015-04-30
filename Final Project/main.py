@@ -11,7 +11,6 @@ from utils import cleanPickle
 import parameters as prm
 import os
 import numpy as np
-    
 
 for device in prm.params["device"].all():
     print 60 * "*"        

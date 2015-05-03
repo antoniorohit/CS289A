@@ -18,17 +18,11 @@ import time
 import numpy as np
 from scipy import io
 
-features = "raw"  # or "malik" -> for HOG features
-cost = "MSE"        # or "entropy"
-
 ############# FILE STUFF ############# 
 trainFileMNIST = "./mnist_data/images.mat"
     
 trainMatrix = io.loadmat(trainFileMNIST)  # Dictionary
 
-print trainMatrix
-
-output_file = open("./Results/results_" + str(features) + "_" + cost + ".txt", "wb")
 ############# GET DATA ############# 
 print 20 * "#", "Getting Data", 20 * "#"
 imageData = np.array(trainMatrix['images'])

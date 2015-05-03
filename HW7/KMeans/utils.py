@@ -20,4 +20,4 @@ def visualize(image_list, cluster):
         plt.figure()
         plt.imsave("./Results/Centroid_" + str(i) + "_for_" + str(cluster) + "_clusters", image, cmap='gray')
         i+=1
-    plt.close()
+    plt.close('all')

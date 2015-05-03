@@ -13,9 +13,10 @@ import os
 import scipy.ndimage.filters as filters
 import pylab as plt
  
-def visualize(image_list):
+def visualize(image_list, cluster):
+    i = 0
     for image in image_list:
         image = np.reshape(image, (28,28))
         plt.figure()
-        plt.imshow(image, cmap='gray')
-    plt.show()
+        plt.imsave("./Results/Centroid_" + str(i) + "for_" + str(cluster) + "_clusters", image)
+        i+=1

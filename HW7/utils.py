@@ -18,5 +18,6 @@ def visualize(image_list, cluster):
     for image in image_list:
         image = np.reshape(image, (28,28))
         plt.figure()
-        plt.imsave("./Results/Centroid_" + str(i) + "for_" + str(cluster) + "_clusters", image)
+        plt.imsave("./Results/Centroid_" + str(i) + "_for_" + str(cluster) + "_clusters", image, cmap='gray')
         i+=1
+    plt.close()

@@ -7,7 +7,7 @@ import numpy as np
 from blaze.expr.table import Label
 
 class KMeans(object):
-    def __init__(self,n_clusters=5, init='k-means++', n_init=10, max_iter=5, tol=0.0001):
+    def __init__(self,n_clusters=5, init='k-means++', n_init=10, max_iter=10, tol=0.0001):
         self.n_clusters = n_clusters
         self.cluster_centers_ = []
         self.max_iter = max_iter
@@ -33,8 +33,7 @@ class KMeans(object):
             # recompute means
             for j in range(self.n_clusters):
                 self.cluster_centers_[j] = np.mean([x[0] for x in zip(X, self.labels) if x[1] == j], 0)
-                print np.shape(([x[0] for x in zip(X, self.labels) if x[1] == j]))
-                print np.shape(np.mean([x[0] for x in zip(X, self.labels) if x[1] == j], 0))
+                print "Shape of Points in Centroids:", np.shape(([x[0] for x in zip(X, self.labels) if x[1] == j]))
         
         
     def predict(self, X):

@@ -50,5 +50,5 @@ for cluster in num_clusters:
     print 20 * "#", "Num Clusters:", cluster, 20 * "#"
     KM = KMeans(cluster)
     KM.fit(imageDataFlat)
-    print KM.cluster_centers_
+    visualize(KM.cluster_centers_)
     

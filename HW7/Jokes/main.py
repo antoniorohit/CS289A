@@ -32,16 +32,17 @@ for line in tf.readlines():
 
 print np.shape(testData), np.shape(validationData)
 
-# AVerage score
+############# SIMPLE SYS ############# 
+# Average score
 av_score = []
 for i in range(np.shape(jokeData)[1]):
     av_score.append(np.mean([x[i] for x in jokeData if not np.isnan(x[i])]))
     
-print av_score
-
 accuracy = 0
 for elem in validationData:
     if elem[2]*av_score[elem[1]-1] > 0 or (elem[2]==0 and av_score[elem[1]-1] < 0):
         accuracy+=1
 
 print "Simple Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
+
+############# PERSONAL PREF ############# 

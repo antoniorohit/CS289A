@@ -11,10 +11,8 @@ Homework 6 (Neural Nets)
 @author: antonio
 '''
 ############# IMPORTS ############# 
-from utils import *
+from utils import visualize
 from KMeans import KMeans
-import pylab as plt
-import time
 import numpy as np
 from scipy import io
 

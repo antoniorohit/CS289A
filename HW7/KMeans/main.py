@@ -46,3 +46,4 @@ for cluster in num_clusters:
     KM.fit(imageDataFlat)
     visualize(KM.cluster_centers_, cluster)
     
+    

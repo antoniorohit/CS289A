@@ -41,7 +41,7 @@ print av_score
 
 accuracy = 0
 for elem in validationData:
-    if elem[2]==1 and av_score[elem[1]-1] > 0:
+    if elem[2]*av_score[elem[1]-1] > 0 or (elem[2]==0 and av_score[elem[1]-1] < 0):
         accuracy+=1
 
 print "Simple Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"

@@ -35,6 +35,7 @@ for line in tf.readlines():
 print "Validation, Test Data Shape:", np.shape(validationData), np.shape(testData)
 
 ############# SIMPLE SYS ############# 
+print 20 * "#", "Simple System", 20 * "#"
 # Average score
 av_score = []
 accuracy = 0
@@ -48,6 +49,7 @@ for elem in validationData:
 print "Simple Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
 
 ############# PERSONAL PREF #############
+print 20 * "#", "Personal Pref", 20 * "#"
 jokeDataNew = jokeData
 # replace nan by 0
 for i in range(len(jokeData)):
@@ -61,7 +63,7 @@ for k in [10, 100, ]:
     av_score = []
     accuracy = 0
     for i in range(100):
-        average_score = (np.mean([jokeData[ind] for ind in neighbours[i]], 0))
+        average_score = (np.mean([jokeDataNew[ind] for ind in neighbours[i]], 0))
         av_score.append(average_score)
         
     for elem in validationData:
@@ -71,7 +73,8 @@ for k in [10, 100, ]:
     print "Pref Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
         
 ############# LATENT FACTOR ANALYSIS #############
-for d in [2, 5, 10, 20]:
+print 20 * "#", "PCA", 20 * "#"
+for d in [2, 5, 10]:
     print "Value of d:", d
     u, v = PCA(jokeDataNew, d)
     reduced = np.dot(u,v)
@@ -87,3 +90,15 @@ for d in [2, 5, 10, 20]:
     
     print "PCA Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
 
+############# KAGGLE #############
+pred = []
+for elem in testData:
+    pred.append(reduced[elem[0]-1][elem[1]-1] > 0)
+
+indices = np.array(range(1, len(pred) + 1))
+print np.shape(indices), np.shape(pred)
+kaggle_format = np.vstack((indices, pred)).T
+print np.shape(kaggle_format)
+np.savetxt("./Results/jokes.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
+
+print 20 * "#", "The End !", 20 * "#"

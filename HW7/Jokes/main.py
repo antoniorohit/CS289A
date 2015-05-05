@@ -74,7 +74,7 @@ for k in [10, 100, 1000]:
         
 ############# LATENT FACTOR ANALYSIS #############
 print 20 * "#", "PCA", 20 * "#"
-for d in [2, 5, 10]:
+for d in [2, 5, 10, 20]:
     print "Value of d:", d
     u, v = PCA(jokeDataNew, d)
     reduced = np.dot(u,v)

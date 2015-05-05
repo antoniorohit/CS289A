@@ -7,6 +7,7 @@ Created on May 3, 2015
 import numpy as np
 from scipy import io
 from knn import KNN
+from pca import PCA
 
 ############# FILE STUFF ############# 
 trainFile = "./joke_data/joke_train.mat"
@@ -47,14 +48,15 @@ for elem in validationData:
 print "Simple Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
 
 ############# PERSONAL PREF #############
+jokeDataNew = jokeData
 # replace nan by 0
 for i in range(len(jokeData)):
-    jokeData[i] = [0 if np.isnan(x) else x for x in jokeData[i] ]
+    jokeDataNew[i] = [0 if np.isnan(x) else x for x in jokeData[i] ]
     
-for k in [10, 100, 1000, 10000]:
+for k in [10, 100, ]:
     print "K Value:", k
     knn = KNN(k)
-    knn.fit(jokeData)
+    knn.fit(jokeDataNew)
     neighbours = knn.neighbours
     av_score = []
     accuracy = 0
@@ -67,4 +69,9 @@ for k in [10, 100, 1000, 10000]:
     
     print "Pref Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
         
-     
+############# LATENT FACTOR ANALYSIS #############
+for d in [2, 5, 10, 20]:
+    print "Value of d:", d
+    u, v = PCA(jokeDataNew, d)
+    MSE = np.sum(np.square(np.dot(u,v)-jokeDataNew))
+    print np.shape(u), np.shape(v), np.around(MSE)

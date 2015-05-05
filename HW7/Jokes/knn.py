@@ -16,8 +16,7 @@ class KNN(object):
         for i in range(100):
             distanceBuf = []
             for j in range(dataLen):
-                if i!=j:
-                    distanceBuf.append(np.sum(np.square(X[i]-X[j])))
+                distanceBuf.append(np.sum(np.square(X[i]-X[j])))
             sortedDistanceBuf = sorted(distanceBuf)
             self.neighbours[i]=[distanceBuf.index(x) for x in sortedDistanceBuf[:self.k]]
             

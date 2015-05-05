@@ -55,7 +55,7 @@ jokeDataNew = jokeData
 for i in range(len(jokeData)):
     jokeDataNew[i] = [0 if np.isnan(x) else x for x in jokeData[i] ]
     
-for k in [10, 100, ]:
+for k in [10, 100, 1000]:
     print "K Value:", k
     knn = KNN(k)
     knn.fit(jokeDataNew)
@@ -96,9 +96,7 @@ for elem in testData:
     pred.append(reduced[elem[0]-1][elem[1]-1] > 0)
 
 indices = np.array(range(1, len(pred) + 1))
-print np.shape(indices), np.shape(pred)
 kaggle_format = np.vstack((indices, pred)).T
-print np.shape(kaggle_format)
 np.savetxt("./Results/jokes.csv", kaggle_format, delimiter=",", fmt='%d,%d', header='Id,Category', comments='') 
 
 print 20 * "#", "The End !", 20 * "#"

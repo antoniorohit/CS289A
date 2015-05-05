@@ -61,10 +61,11 @@ for k in [10, 100, ]:
     av_score = []
     accuracy = 0
     for i in range(100):
-        av_score.append(np.mean([jokeData[ind] for ind in neighbours[i]]))
+        average_score = (np.mean([jokeData[ind] for ind in neighbours[i]], 0))
+        av_score.append(average_score)
         
     for elem in validationData:
-        if elem[2]*av_score[elem[1]-1] > 0 or (elem[2]==0 and av_score[elem[1]-1] <= 0):
+        if (elem[2]*av_score[elem[0]-1][elem[1]-1] > 0) or (elem[2]==0 and av_score[elem[0]-1][elem[1]-1] < 0):
             accuracy+=1
     
     print "Pref Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
@@ -73,5 +74,16 @@ for k in [10, 100, ]:
 for d in [2, 5, 10, 20]:
     print "Value of d:", d
     u, v = PCA(jokeDataNew, d)
-    MSE = np.sum(np.square(np.dot(u,v)-jokeDataNew))
-    print np.shape(u), np.shape(v), np.around(MSE)
+    reduced = np.dot(u,v)
+    MSE = np.sum(np.square(reduced-jokeDataNew))
+    print "MSE:", np.around(MSE)
+    
+    accuracy = 0
+    print np.shape(reduced)
+    reduced = reduced.tolist()
+    for elem in validationData:
+        if (elem[2]*reduced[elem[0]-1][elem[1]-1] > 0) or (elem[2]==0 and reduced[elem[0]-1][elem[1]-1] < 0):
+            accuracy+=1
+    
+    print "PCA Accuracy:", np.around(100.0*accuracy/len(validationData)), "%"
+

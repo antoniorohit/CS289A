@@ -114,12 +114,12 @@ def train(source="test_protocol"):
 
     # Save the best CLF
 #     print "Saving the CLF..."
-    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depths[maxScore_Index])
+#     clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depths[maxScore_Index])
 #     clf = svm.SVC(kernel=kernel, C=C[maxScore_Index])
 #     clf = KNeighborsClassifier(n_neighbors=num_neighbors[maxScore_Index])
 
-    clf.fit(data, labels)
-    pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + ".p", "wb"))        
+#     clf.fit(data, labels)
+#     pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + ".p", "wb"))        
 #     print "Done saving the CLF!"
     
     # HOW DOES THIS DECISION TREE DO ON THE SAME DATA IT FIT ON? (should be 100% ?)

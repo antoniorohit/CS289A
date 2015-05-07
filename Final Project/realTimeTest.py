@@ -25,7 +25,10 @@ RATE = 44100
 RECORD_SECONDS = 20.
 
 import os
-     
+from build import build
+
+prm.params["chunk_size"].set(1)
+build()
 
 p = pyaudio.PyAudio()
 
@@ -58,9 +61,7 @@ for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     frames.append(np.fromstring(data, "int16"))
     if((i+1)%4 == 0):
         data = np.array(frames[-4:]).ravel()
-        print np.shape(data)
         _, data = remove_silence(44100, data)
-        print len(data)
         if len(data) > 0.25*44100:
             data = frame_chunks(data)[0]
             features = np.array(extractFeatures(data)).flatten()

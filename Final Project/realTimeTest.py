@@ -27,8 +27,11 @@ RECORD_SECONDS = 20.
 import os
 from build import build
 
-prm.params["chunk_size"].set(1)
-build()
+chunk_size = 1.
+source = "voxforge"
+
+prm.params["chunk_size"].set(chunk_size)
+build(source)
 
 p = pyaudio.PyAudio()
 
@@ -43,7 +46,7 @@ if 0:
 
 predictedLabel = []
 
-clf = pickle.load(open("./Pickle/clf_" + str(1.0) + ".p", "rb"))
+clf = pickle.load(open("./Pickle/clf_" + str(chunk_size) + "_" + source + ".p", "rb"))
     
 
 stream = p.open(format=FORMAT,
@@ -56,13 +59,15 @@ stream = p.open(format=FORMAT,
 print "* recording"
 
 frames = []
+num_frames = chunk_size*44100./11025
+
 for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     data = stream.read(chunk)
     frames.append(np.fromstring(data, "int16"))
-    if((i+1)%4 == 0):
-        data = np.array(frames[-4:]).ravel()
+    if((i+1)%num_frames == 0):
+        data = np.array(frames[-num_frames:]).ravel()
         _, data = remove_silence(44100, data)
-        if len(data) > 0.25*44100:
+        if len(data) > 0.25*num_frames*11025:
             data = frame_chunks(data)[0]
             features = np.array(extractFeatures(data)).flatten()
             print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"

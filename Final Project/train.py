@@ -61,7 +61,7 @@ def train(source="test_protocol"):
     maxScore_Index = scoreBuffer.index(maxScore)
     print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 1), "%"
     print 50 * '-'     
-     
+    
     ############# SVM ############# 
 #     kernel = 'linear'
 #        

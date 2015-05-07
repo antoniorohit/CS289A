@@ -24,6 +24,6 @@ def build(source="test_protocol"):
 #     clf = KNeighborsClassifier(n_neighbors=num_neighbors[maxScore_Index])
 
     clf.fit(data, labels)
-    pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + ".p", "wb"))        
+    pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + source +".p", "wb"))        
     print("Build Data Done")
 

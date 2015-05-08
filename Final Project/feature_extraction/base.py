@@ -183,7 +183,7 @@ def framesig(sig, frame_len, frame_step, winfunc=lambda x:numpy.ones((1, x))):
     indices = numpy.tile(numpy.arange(0, frame_len), (numframes, 1)) + numpy.tile(numpy.arange(0, numframes * frame_step, frame_step), (frame_len, 1)).T
     indices = numpy.array(indices, dtype=numpy.int32)
     frames = padsignal[indices]
-    win = numpy.tile(winfunc(frame_len), (numframes, 1))
+    win = numpy.tile(numpy.hamming(frame_len), (numframes, 1))
     return frames * win
     
 def deframesig(frames, siglen, frame_len, frame_step, winfunc=lambda x:numpy.ones((1, x))):

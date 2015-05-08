@@ -174,11 +174,7 @@ def getData_Voxforge():
         # SHUFFLE THE IMAGES
         random.shuffle(dataComplete)
         
-        data = []
-        labels = []
-        for elem in dataComplete:
-            data.append(elem[0])
-            labels.append(elem[1])
+        data, labels = zip(*dataComplete)
         
         print "Saving the Data... (may take a while)"
         pickle.dump(data, open(pickle_directory + "data_vf.p", "wb"))        
@@ -269,14 +265,7 @@ def getData_TestProtocol(source="train"):
         
         random.shuffle(dataComplete)
         
-        data = []
-        labels = []
-        rawData = []
-        for elem in dataComplete:
-            data.append(elem[0])
-            labels.append(elem[1])
-            rawData.append(elem[2])
-
+        data, labels, rawData = zip(*dataComplete)
         
 #         print "Saving the Data... (may take a while)"
         pickle.dump(data, open(pickle_directory + "data_tp_" + str(source) + ".p", "wb"))        
@@ -331,8 +320,7 @@ def cleanPickle():
     pickle_dir = prm.params["pickle_directory"].get()
 
     for filename in os.listdir(pickle_dir):
-        if "clf" not in filename:
-            os.remove(pickle_dir + filename)
+        os.remove(pickle_dir + filename)
     
     for filename in os.listdir("./Errors/"):
         os.remove("./Errors/" + filename)

@@ -7,7 +7,8 @@ import os
 import parameters as prm
 from utils import *
 import cPickle as pickle
-from sklearn import svm, tree, ensemble
+from sklearn import svm, ensemble
+from sklearn.neighbors import KNeighborsClassifier
 import random
 
 
@@ -19,11 +20,15 @@ def build(source="test_protocol"):
     else:
         data, labels, rawData = getTrainData_Pickle("voxforge")
     
-    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=10)
-#     clf = svm.SVC(kernel=kernel, C=1)
-#     clf = KNeighborsClassifier(n_neighbors=10)
+    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=10)
+#     clf = svm.SVC(kernel='linear', C=1)
+#     clf = KNeighborsClassifier(n_neighbors=20)
 
+    print("Fitting Data...")
     clf.fit(data, labels)
+    
+    print("Saving CLF...")
     pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + source +".p", "wb"))        
+    
     print("Build Data Done")
 

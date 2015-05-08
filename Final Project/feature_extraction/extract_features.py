@@ -66,6 +66,7 @@ def extractFeatures(input_signal):
                 print "Cell is nan (see feature extraction):", str(cell)
                 return []
     
+    full_features_list = []
     full_features_list = list(np.ravel(features_list))
     full_features_list.extend([pitch]*30)         # do we need to append this multiple times to ensure that the forest selects it?
     

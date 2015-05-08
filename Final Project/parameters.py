@@ -83,7 +83,7 @@ global params
 params = dict()
 
 # fill dictionary with values
-params["device"] = Parameter("android", ["mac","android"])
+params["device"] = Parameter("android", ["android","mac"])
 params["sample_rate"] = Parameter(44100, [8000, 16000, 44100])  # hz
 params["chunk_size"] = Parameter(1.0, [0.25, 1.0])  # s
 params["voxforge_directory"] = Parameter("./Data/")

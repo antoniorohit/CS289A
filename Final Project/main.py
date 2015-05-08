@@ -13,15 +13,15 @@ import os
 import numpy as np
 from build import build
 
-source = "voxforge"
+source = "test_protocol"
 
 results = []
 
-for device in prm.params["device"].all():
+for device in ["_"]:
     print 60 * "*"        
     prm.params["device"].set(device)
     print 60 * "*"    
-    for chunkSize in prm.params["chunk_size"].all():
+    for chunkSize in [0.25, 0.5, 1, 2]:
         print 60 * "*"        
         prm.params["chunk_size"].set(chunkSize)
         print 60 * "*"    

@@ -9,16 +9,12 @@ import cPickle as pickle
 from sklearn import svm, tree, ensemble
 import random
 
-def train(source="test_protocol"):
-    pickle_directory = prm.params["pickle_directory"].get()
-    
+def train(source="test_protocol"):    
     print "Loading the Data... (may take a while)"
     if source == "test_protocol":
-        data = pickle.load(open(pickle_directory + "data_tp_train.p", "rb"))
-        labels = pickle.load(open(pickle_directory + "labels_tp_train.p", "rb"))
+        data, labels, rawData = getTrainData_Pickle("test_protocol")
     else:
-        data = pickle.load(open(pickle_directory + "data_vf.p", "rb"))
-        labels = pickle.load(open(pickle_directory + "labels_vf.p", "rb"))
+        data, labels, rawData = getTrainData_Pickle("voxforge")
     print "Data Loaded, Good to Go!"
 
     #########################################################
@@ -40,34 +36,34 @@ def train(source="test_protocol"):
     
     scoreBuffer = []
     
-    C = np.linspace(.01, 1000. , 4)  # array of values for parameter C
-    depths = [10]
+    C = np.linspace(.01, 10. , 4)  # array of values for parameter C
+    depths = [10, 20, 25, 50]
     
     ############# FORESTS/TREES ############# 
     print 50 * '='
     print "CROSS VALIDATION USING SCIKIT-LEARN FORESTS"
     print 50 * '='
-     
+      
     for depth in depths:
 #         print "DEPTH:", depth
-        clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depth)
+        clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=depth)
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
-#         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
-#         print 50 * '-'
-     
+        print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
+        print 50 * '-'
+      
     maxScore = np.max(scoreBuffer)
     maxScore_Index = scoreBuffer.index(maxScore)
     print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 1), "%"
     print 50 * '-'     
-        
+#         
     ############# SVM ############# 
 #     kernel = 'linear'
-#        
+#          
 #     print 50 * '='
 #     print "CROSS VALIDATION USING", kernel, "SVM"
 #     print 50 * '='
-#        
+#          
 #     scoreBuffer = []
 #     for C_Value in C:
 #         print "C:", np.around(C_Value, 3)
@@ -76,23 +72,23 @@ def train(source="test_protocol"):
 #         scoreBuffer.append((scores).mean())
 #         print "C:", np.around(C_Value, 3), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
 #         print 50 * '-'
-#        
-#        
+#          
+#          
 #     maxScore = np.max(scoreBuffer)
 #     maxScore_Index = scoreBuffer.index(maxScore)
 #     print "Best C Value:", C[maxScore_Index], "Accuracy for that C:", np.around(maxScore, 3)
 #     print 50 * '-'
-#       
-#       
+#        
+#        
 #     print 20*"*", "Train End", 20*"*"
 
     ############# KNN ############# 
 #     print 50 * '='
 #     print "CROSS VALIDATION USING KNN"
 #     print 50 * '='
-#         
+#          
 #     scoreBuffer = []    
-#     num_neighbors = [5, 20, 50, 100]
+#     num_neighbors = [5, 10, 15, 20, 25]
 #     from sklearn.neighbors import KNeighborsClassifier
 #     for num in num_neighbors:
 #         print "Num:", (num)
@@ -101,13 +97,13 @@ def train(source="test_protocol"):
 #         scoreBuffer.append((scores).mean())
 #         print "Num:", (num), "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)
 #         print 50 * '-'
-#        
-#        
+#         
+#         
 #     maxScore = np.max(scoreBuffer)
 #     maxScore_Index = scoreBuffer.index(maxScore)
 #     print "Best Num Value:", num_neighbors[maxScore_Index], "Accuracy for that Num:", np.around(maxScore, 3)
 #     print 50 * '-'
-#       
+       
 #       
 #     print 20*"*", "Train End", 20*"*"
 

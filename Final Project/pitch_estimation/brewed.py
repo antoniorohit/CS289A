@@ -14,7 +14,7 @@ def extract_pitch(rawSignal):
     fftData = abs(np.fft.rfft(rawSignal)) ** 2
     # find the maximum
     lofreq = 50    # hz
-    hifreq = 230    #hz
+    hifreq = 210    #hz
     which = fftData[lofreq/scale:hifreq/scale].argmax() + lofreq/scale
     # use quadratic interpolation around the max
     if which != len(fftData) - 1:

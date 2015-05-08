@@ -17,11 +17,11 @@ source = "test_protocol"
 
 results = []
 
-for device in ["_"]:
+for device in prm.params["device"].all():
     print 60 * "*"        
     prm.params["device"].set(device)
     print 60 * "*"    
-    for chunkSize in [0.25, 0.5, 1, 2]:
+    for chunkSize in [1.]:
         print 60 * "*"        
         prm.params["chunk_size"].set(chunkSize)
         print 60 * "*"    

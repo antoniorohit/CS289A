@@ -20,7 +20,7 @@ def build(source="test_protocol"):
     else:
         data, labels, rawData = getTrainData_Pickle("voxforge")
     
-    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=10)
+    clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=10)
 #     clf = svm.SVC(kernel='linear', C=1)
 #     clf = KNeighborsClassifier(n_neighbors=20)
 

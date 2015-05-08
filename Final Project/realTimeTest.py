@@ -3,6 +3,7 @@ Created on Apr 21, 2015
 
 @author: antonio
 '''
+import os
 import pyaudio
 import sys
 import parameters as prm
@@ -10,10 +11,10 @@ import parameters as prm
 sys.path.append("./VAD")
 sys.path.append("./feature_extraction")
 
-
 import wave 
 from _imaging import path
 from simple import remove_silence
+from aed import aeDetect
 from extract_features import extractFeatures
 from utils import *
 import cPickle as pickle
@@ -24,14 +25,13 @@ CHANNELS = 1
 RATE = 44100
 RECORD_SECONDS = 20.
 
-import os
 from build import build
 
 chunk_size = 1.
-source = "voxforge"
+source = "test_protocol"
 
 prm.params["chunk_size"].set(chunk_size)
-build(source)
+# build(source)
 
 p = pyaudio.PyAudio()
 
@@ -59,18 +59,19 @@ stream = p.open(format=FORMAT,
 print "* recording"
 
 frames = []
-num_frames = chunk_size*44100./11025
+num_frames = int(chunk_size*44100./11025)
 
 for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     data = stream.read(chunk)
     frames.append(np.fromstring(data, "int16"))
     if((i+1)%num_frames == 0):
         data = np.array(frames[-num_frames:]).ravel()
-        _, data = remove_silence(44100, data)
-        if len(data) > 0.25*num_frames*11025:
+#         _, data = remove_silence(44100, data)
+        data = aeDetect(data)
+        if len(data) > 0:
             data = frame_chunks(data)[0]
             features = np.array(extractFeatures(data)).flatten()
-            print i, "Female" if clf.predict(features.flatten()) == 0 else "Male"
+            print i, ("Female", features[-1]) if clf.predict(features.flatten()) == 0 else ("Male", features[-1])
         else:
             print i, "Silence"
 
@@ -85,7 +86,8 @@ frames = np.ravel(frames)
 print np.shape(frames)
 
 
-fs, data = remove_silence(44100, (frames))
+# fs, data = remove_silence(44100, (frames))
+data = aeDetect(frames)
 framedSignal = np.array(frame_chunks(data))
 print "Shape of framedSignal", np.shape(framedSignal)
 

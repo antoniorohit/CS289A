@@ -11,6 +11,11 @@ from utils import cleanPickle
 import parameters as prm
 import os
 import numpy as np
+from build import build
+
+source = "voxforge"
+
+results = []
 
 for device in prm.params["device"].all():
     print 60 * "*"        
@@ -21,15 +26,22 @@ for device in prm.params["device"].all():
         prm.params["chunk_size"].set(chunkSize)
         print 60 * "*"    
         
-        cleanPickle()       # cleans pickle and error directory (except for clfs)
+        cleanPickle()       # cleans pickle and error directory (except for vf)
         
-        print 20 * "#", "Training", 20 * "#"
-        train("test_protocol")       # test_protocol or voxforge
+        print 20 * "#", "Building", 20 * "#"
+        build(source)
+        
+#         print 20 * "#", "Training", 20 * "#"
+#         train(source)       # test_protocol or voxforge
         
         print 20 * "#", "Testing", 20 * "#"
-        accuracy = test()
+        accuracy = np.around(test(source), 2)
         
-        print "Accuracy:", np.around(accuracy, 2), "%"
-    
+        print "Accuracy:", (accuracy), "%"
+        
+        results.append([device, chunkSize, np.around(accuracy,2)])
+        
+print results
 
 print 20 * "*", "End of Main. Thank you for Playing", 20 * "*"
+

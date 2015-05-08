@@ -85,7 +85,7 @@ params = dict()
 # fill dictionary with values
 params["device"] = Parameter("android", ["mac","android"])
 params["sample_rate"] = Parameter(44100, [8000, 16000, 44100])  # hz
-params["chunk_size"] = Parameter(1.0, [1.0])  # s
+params["chunk_size"] = Parameter(1.0, [0.25, 1.0])  # s
 params["voxforge_directory"] = Parameter("./Data/")
 params["pickle_directory"] = Parameter("./Pickle/")
 

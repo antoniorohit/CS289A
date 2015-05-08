@@ -17,11 +17,9 @@ from extract_features import extractFeatures
 import cPickle as pickle
 import random
 from simple import remove_silence
+from aed import aeDetect
 import scipy.io.wavfile
 
-def stereo_to_mono(hex1, hex2):
-    """average two hex string samples"""
-    return hex((ord(hex1) + ord(hex2))/2)
 
 def get_RawSignal(filename):
     '''Opens filename, and returns (params, rawSignal)'''
@@ -35,7 +33,7 @@ def get_RawSignal(filename):
     # convert from stereo to mono
     if params[0] == 2:
         monoChannel = np.int16(rawSignal.mean(axis=1))
-        rawSignal = monoChannel#np.fromstring(monoChannel, np.int16)
+        rawSignal = monoChannel
 
 #     print filename, params
     return params, rawSignal
@@ -95,7 +93,8 @@ def extract_Data(data_directory):
                         label = extract_Gender_Label(directory)
                         params, rawSignal = get_RawSignal(directory + folder + file_name)
                         prm.params["sample_rate"].set(params[2])
-                        fs, cleanSignal = remove_silence(params[2], rawSignal)
+#                         fs, cleanSignal = remove_silence(params[2], rawSignal)
+                        cleanSignal = aeDetect(rawSignal)
                         framedRawSignal = (frame_chunks(cleanSignal))
                         for chunk in framedRawSignal:
                             feature_list = extractFeatures(chunk)
@@ -189,7 +188,7 @@ def getData_Voxforge():
         print "Shapes of Data (male, female) and Labels", np.shape(data_male), np.shape(data_female), np.shape(labels)
         print "Sum of labels:", sum(labels)
         
-        return data, labels, rawData
+    return data, labels, data
 
 def getData_TestProtocol(source="train"):
     data_dir = "/Users/antonio/git/caltranscense/models/data/test_protocol/"
@@ -226,7 +225,8 @@ def getData_TestProtocol(source="train"):
                 #######################################
                 # CLEAN SAMPLES 
                 #######################################
-                fs, cleanSignal = remove_silence(params[2], rawSignal)
+#                 fs, cleanSignal = remove_silence(params[2], rawSignal)
+                cleanSignal = aeDetect(rawSignal)
                 
                 #######################################
                 # FRAME SAMPLES 

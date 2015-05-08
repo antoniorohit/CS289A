@@ -20,8 +20,8 @@ def build(source="test_protocol"):
         data, labels, rawData = getTrainData_Pickle("voxforge")
     
     clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=10)
-#     clf = svm.SVC(kernel=kernel, C=C[maxScore_Index])
-#     clf = KNeighborsClassifier(n_neighbors=num_neighbors[maxScore_Index])
+#     clf = svm.SVC(kernel=kernel, C=1)
+#     clf = KNeighborsClassifier(n_neighbors=10)
 
     clf.fit(data, labels)
     pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + source +".p", "wb"))        

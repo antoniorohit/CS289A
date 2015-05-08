@@ -10,18 +10,17 @@ from sklearn import svm, tree, ensemble
 import random
 
 def train(source="test_protocol"):
-    voxforge_directory = prm.params["voxforge_directory"].get()
     pickle_directory = prm.params["pickle_directory"].get()
     
+    print "Loading the Data... (may take a while)"
     if source == "test_protocol":
-        data, labels, rawData = getTrainData_Pickle("test_protocol")
+        data = pickle.load(open(pickle_directory + "data_tp_train.p", "rb"))
+        labels = pickle.load(open(pickle_directory + "labels_tp_train.p", "rb"))
     else:
-        data, labels, rawData = getTrainData_Pickle("voxforge")
+        data = pickle.load(open(pickle_directory + "data_vf.p", "rb"))
+        labels = pickle.load(open(pickle_directory + "labels_vf.p", "rb"))
+    print "Data Loaded, Good to Go!"
 
-    
-#     print "Shapes of Data and Labels", np.shape(data), np.shape(labels)
-#     print "Sum of labels:", sum(labels)
-    
     #########################################################
     # CROSS VALIDATION 
     #########################################################
@@ -61,7 +60,7 @@ def train(source="test_protocol"):
     maxScore_Index = scoreBuffer.index(maxScore)
     print "Best Depth Value:", depths[maxScore_Index], "Accuracy for that Depth:", np.around(maxScore, 1), "%"
     print 50 * '-'     
-    
+        
     ############# SVM ############# 
 #     kernel = 'linear'
 #        

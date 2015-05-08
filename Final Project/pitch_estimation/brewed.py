@@ -14,7 +14,7 @@ def extract_pitch(rawSignal):
     fftData = abs(np.fft.rfft(rawSignal)) ** 2
     # find the maximum
     lofreq = 50    # hz
-    hifreq = 210    #hz
+    hifreq = 230    #hz
     which = fftData[lofreq/scale:hifreq/scale].argmax() + lofreq/scale
     # use quadratic interpolation around the max
     if which != len(fftData) - 1:
@@ -36,10 +36,11 @@ if __name__ == "__main__":
     from simple import remove_silence
     from aed import aeDetect
     # open up a wave
-    wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/android_helene_train_clean_21.wav", 'rb')
-#     wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/android_leonard_train_clean_36.wav", 'rb')
+#     wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/android_helene_train_clean_21.wav", 'rb')
+    wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/android_leonard_train_clean_36.wav", 'rb')
 #     wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/Android_mathilde_test_BGN_42.wav", 'rb')
 #     wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/Android_antonio_test_clean_120.wav", 'rb')
+#     wf = wave.open("/Users/antonio/git/caltranscense/models/data/test_protocol/Android_Train_Audio_Full.wav", 'rb')
 
     swidth = wf.getsampwidth()
     print swidth

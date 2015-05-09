@@ -10,35 +10,29 @@ The project uses a Random Forest classifier and MFCC+pitch features. A simplisti
 
 **Dataset**
 
-Before being able to run the classifier, you need to download the datasets. The Test_Protocol dataset is found here:
-https://www.dropbox.com/sh/yfwi4kmt2jppt85/AABIVLAmDFjBcOLhiZmP-7cBa?dl=0
+Before being able to run the classifier, you need to download the datasets. The Test_Protocol dataset is found [here](https://www.dropbox.com/sh/yfwi4kmt2jppt85/AABIVLAmDFjBcOLhiZmP-7cBa?dl=0) and these files should be placed in a ./Data/Test_Protocol/ folder in the directory structure. 
 
-and these files should be placed in a ./Data/Test_Protocol/ folder in the directory structure. 
-
-The dataset of voxforge files from:
-http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Audio/Main/16kHz_16bit/
-
-should be placed in the ./Data/Voxforge/ folder.
+The dataset of voxforge files from the [16kHz dataset](http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Audio/Main/16kHz_16bit/) should be placed in the ./Data/Voxforge/ folder.
 
 **Important Files**
-- main.py
+- [main.py](./main.py)
 
 Running main allows you to build your data, train the classifier, and test it out. 
 The build function builds a classifier based on the parameters you choose based on cross-validation (see build.py and train.py). The train function contains code that cross-validates your classifier based on depth. The test function uses the test set to evaluate accuracy of the classifier.
 
-- realTimeTest.py
+- [realTimeTest.py](./realTimeTest.py)
 
 After a classifier is built by running main.py, you can evaluate its real-time performance by running realTimeTest and speaking into your microphone. This file prints to the console whether the speaker is male, female or if silence is detected.
 
-- ./pitch_extraction/simple_pitch.py
+- [./pitch_extraction/simple_pitch.py](./pitch_estimation/simple_pitch.py)
 
 This file if run directly, reads in a wav file specified by you, and plays it back chunk by chunk, estimating the pitch for each chunk, and also specifying gender based on this pitch
 
-- ./feature_extaction/extract_features.py
+- [./feature_extaction/extract_features.py](./feature_extaction/extract_features.py)
 
 This file provides an easy way to tweak features fed into the classifier
 
-- ./VAD/aed.py 
+- [./VAD/aed.py](./VAD/aed.py)
 
 Adaptive energy detection method for signal cleaning
 

@@ -43,7 +43,7 @@ def train():
       
     for depth in depths:
 #         print "DEPTH:", depth
-        clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=depth)
+        clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=depth)
         scores = computeCV_Score(clf, crossValidation_Data, crossValidation_Labels, k)
         scoreBuffer.append((scores).mean())
         print "Depth:", depth, "Accuracy: %0.2f%% (+/- %0.2f)" % ((scores).mean(), np.array(scores).std() / 2)

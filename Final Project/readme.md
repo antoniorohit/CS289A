@@ -36,6 +36,10 @@ The dataset of voxforge files from the [16kHz dataset](http://www.repository.vox
 
   Adaptive energy detection method for signal cleaning
 
+- [./parameters.py](./parameters.py)
+
+  This file provides global access to parameters used across files: like chunk_size, device, sample_rate, directory paths, etc. It provides an easy get/set interface, and keeps the overall code much cleaner.  
+
 - [./utils.py](./utils.py)
 
   Contains all the utility functions - like reading a wav file, splitting the test_protocol files, creating gender labels, building the data, etc

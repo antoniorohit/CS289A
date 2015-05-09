@@ -13,7 +13,7 @@ from base import mfcc, delta
 import numpy as np
 import parameters as prm
 from LPCC import LPCExtractor
-from brewed import extract_pitch
+from simple_pitch import extract_pitch
 
 # @timing
 def extractFeatures(input_signal):

@@ -4,7 +4,7 @@
 
 This project documents a real-time gender classifier based on voice, developed as the final project for CS289A Introduction to Machine Learning (Spring 2015) at UC Berkeley.
 
-The project uses a Random Forest classifier and MFCC+pitch features. A simplistic adaptive energy detection method is used to remove silence. It achieves >90% accuracy on a custom dataset, and has been tested on the voxforge dataset with good results as well. For more details on the implementation and tests, please read the report *Real Time Gender Identifier Based on Voice.pdf* 
+The project uses a Random Forest classifier and MFCC+pitch features. A simplistic adaptive energy detection method is used to remove silence. It achieves >90% accuracy on a custom dataset, and has been tested on the voxforge dataset with good results as well. For more details on the implementation and tests, please read the report [Real Time Gender Identifier Based on Voice.pdf]("./Real Time Gender Identifier Based on Voice.pdf")
 
 **How to use the code**
 
@@ -24,11 +24,11 @@ The build function builds a classifier based on the parameters you choose based 
 
 After a classifier is built by running main.py, you can evaluate its real-time performance by running realTimeTest and speaking into your microphone. This file prints to the console whether the speaker is male, female or if silence is detected.
 
-- [./pitch_extraction/simple_pitch.py](./pitch_estimation/simple_pitch.py)
+- [./pitch_estimation/simple_pitch.py](./pitch_estimation/simple_pitch.py)
 
 This file if run directly, reads in a wav file specified by you, and plays it back chunk by chunk, estimating the pitch for each chunk, and also specifying gender based on this pitch
 
-- [./feature_extaction/extract_features.py](./feature_extaction/extract_features.py)
+- [./feature_extraction/extract_features.py](./feature_extraction/extract_features.py)
 
 This file provides an easy way to tweak features fed into the classifier
 

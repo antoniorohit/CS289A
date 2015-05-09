@@ -4,7 +4,7 @@
 
 This project documents a real-time gender classifier based on voice, developed as the final project for CS289A Introduction to Machine Learning (Spring 2015) at UC Berkeley.
 
-The project uses a Random Forest classifier and MFCC+pitch features. A simplistic adaptive energy detection method is used to remove silence. It achieves >90% accuracy on a custom dataset, and has been tested on the voxforge dataset with good results as well. For more details on the implementation and tests, please read the report [Real Time Gender Identifier Based on Voice.pdf](./Real Time Gender Identifier Based on Voice.pdf)
+The project uses a Random Forest classifier and MFCC+pitch features. A simplistic adaptive energy detection method is used to remove silence. It achieves >90% accuracy on a custom dataset, and has been tested on the voxforge dataset with good results as well. For more details on the implementation and tests, please read the report: [**Real Time Gender Identifier Based on Voice.pdf**](./Real Time Gender Identifier Based on Voice.pdf)
 
 **How to use the code**
 
@@ -36,6 +36,10 @@ The dataset of voxforge files from the [16kHz dataset](http://www.repository.vox
 
   Adaptive energy detection method for signal cleaning
 
+- [./parameters.py](./parameters.py)
+
+  This file provides global access to parameters used across files: like chunk_size, device, sample_rate, directory paths, etc. It provides an easy get/set interface, and keeps the overall code much cleaner.  
+
 - [./utils.py](./utils.py)
 
   Contains all the utility functions - like reading a wav file, splitting the test_protocol files, creating gender labels, building the data, etc
@@ -44,3 +48,9 @@ The dataset of voxforge files from the [16kHz dataset](http://www.repository.vox
 
   Misclassified chunks are placed into this folder
 
+**Acknowledgements**
+- [Leonard Berrada](https://github.com/leonardbj) whom I owe a lot of my intuition and coding style for this project.
+- [James Lyons](http://practicalcryptography.com/miscellaneous/machine-learning/guide-mel-frequency-cepstral-coefficients-mfccs/) and his MFCC tutorial/code
+- Stack Overflow users like [Justin Peel](http://stackoverflow.com/questions/2648151/python-frequency-detection)
+- [Andrew Ho](https://github.com/andrew950468) with whom I collaborated on this project
+- [Transcense](http://www.transcense.com/) for the initial challenge of real-time speaker ID

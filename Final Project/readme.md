@@ -17,26 +17,30 @@ The dataset of voxforge files from the [16kHz dataset](http://www.repository.vox
 **Important Files**
 - [main.py](./main.py)
 
-Running main allows you to build your data, train the classifier, and test it out. 
-The build function builds a classifier based on the parameters you choose based on cross-validation (see build.py and train.py). The train function contains code that cross-validates your classifier based on depth. The test function uses the test set to evaluate accuracy of the classifier.
+  Running main allows you to build your data, train the classifier, and test it out. 
+  The build function builds a classifier based on the parameters you choose based on cross-validation (see build.py and train.py). The train function contains code that cross-validates your classifier based on depth. The test function uses the test set to evaluate accuracy of the classifier.
 
 - [realTimeTest.py](./realTimeTest.py)
 
-After a classifier is built by running main.py, you can evaluate its real-time performance by running realTimeTest and speaking into your microphone. This file prints to the console whether the speaker is male, female or if silence is detected.
+  After a classifier is built by running main.py, you can evaluate its real-time performance by running realTimeTest and speaking into your microphone. This file prints to the console whether the speaker is male, female or if silence is detected.
 
 - [./pitch_estimation/simple_pitch.py](./pitch_estimation/simple_pitch.py)
 
-This file if run directly, reads in a wav file specified by you, and plays it back chunk by chunk, estimating the pitch for each chunk, and also specifying gender based on this pitch
+  This file if run directly, reads in a wav file specified by you, and plays it back chunk by chunk, estimating the pitch for each chunk, and also specifying gender based on this pitch
 
 - [./feature_extraction/extract_features.py](./feature_extraction/extract_features.py)
 
-This file provides an easy way to tweak features fed into the classifier
+  This file provides an easy way to tweak features fed into the classifier
 
 - [./VAD/aed.py](./VAD/aed.py)
 
-Adaptive energy detection method for signal cleaning
+  Adaptive energy detection method for signal cleaning
+
+- [./utils.py](./utils.py)
+
+  Contains all the utility functions - like reading a wav file, splitting the test_protocol files, creating gender labels, building the data, etc
 
 - ./Errors/
 
-Misclassified chunks are placed into this folder
+  Misclassified chunks are placed into this folder
 

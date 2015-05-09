@@ -65,6 +65,69 @@ def write_wave(params, cleaned_signal, output_fname='cleaned_audio.wav', output_
 
 
 
+def splitAudio(origAudio_file, speaker_label_file, condition_label_file):
+    '''Splits the Audio file into separate wav files based on speaker and
+condition labels
+INPUTS: origAudio_file: Filename of wav file to be split
+        speaker_label_file: txt file with speaker labels (Audacity export)
+        condition_label_file: txt file with condition labels (Audacity export)
+RETRUNS: Nothing, but saves the split files and saves them in AUDACITY_DIR        
+        '''
+    origAudio = wave.open(origAudio_file,'r')
+    frameRate = origAudio.getframerate()
+    nChannels = origAudio.getnchannels()
+    sampWidth = origAudio.getsampwidth()
+    nframes = origAudio.getparams()[3]
+
+    data_dir = prm.params["test_protocol_directory"].get()
+
+    f1 = open(speaker_label_file, 'rb')
+    f2 = open(condition_label_file, 'rb')
+    cond_labels = f2.read().strip().replace('\n', '\t').split('\t')
+    sp_labels = f1.read().strip().replace('\n', '\t').split('\t')
+
+    i = 0
+    cond_dict = {'BGV':[], 'BGN':[], 'clean':[],'echo':[],}
+    while i < len(cond_labels)-2:
+        start = float(cond_labels[i])
+        end = float(cond_labels[i+1])
+        cond_dict[cond_labels[i+2]].append([start, end])
+        i+=3
+    
+    i = 0
+    
+    if 'Train' in origAudio_file:
+        type = 'train'
+    else:
+        type = 'test'
+        
+    
+    if 'mac' in origAudio_file:
+        device = 'Mac_'
+    else:
+        device = 'Android_'
+    
+    while i < len(sp_labels)-2:
+        start = float(sp_labels[i])
+        end = float(sp_labels[i+1])
+        for elem in cond_dict:
+            for pair in cond_dict[elem]:
+                if end < pair[1]+1 and start > pair[0]-1:
+                    condition = elem
+        filename = device+sp_labels[i+2].lower()+'_'+type+'_'+str(condition)+'_'+str(i)+'.wav'
+        
+        origAudio.setpos(int(start*frameRate))
+        chunkData = origAudio.readframes(int((end-start)*frameRate))
+        
+        chunkAudio = wave.open(data_dir+filename,'w')
+        chunkAudio.setnchannels(nChannels)
+        chunkAudio.setsampwidth(sampWidth)
+        chunkAudio.setframerate(frameRate)
+        chunkAudio.writeframes(chunkData)
+        chunkAudio.close()
+        i+=3
+    
+    f1.close()
 
 def extract_Gender_Label(directory):
     folder = directory + "/etc/"
@@ -187,8 +250,19 @@ def getData_Voxforge():
     return data, labels, data
 
 def getData_TestProtocol(source="train"):
-    data_dir = "/Users/antonio/git/caltranscense/models/data/test_protocol/"
+#     data_dir = "/Users/antonio/git/caltranscense/models/data/test_protocol/"
+    data_dir = prm.params["test_protocol_directory"].get()
     pickle_directory = prm.params["pickle_directory"].get()
+    device = prm.params["device"].get()
+    
+    sourceNew = "T" + source[1:]
+    origAudio_file = data_dir + device + '_' + sourceNew + '_Audio_Full.wav'
+    speaker_label_file = data_dir + device + \
+        '_' + sourceNew + '_Speaker_Label.txt'
+    condition_label_file = data_dir + device + \
+        '_' + sourceNew + '_Condition_Label.txt'
+
+    splitAudio(origAudio_file, speaker_label_file, condition_label_file)
     
     data = []
     labels = []
@@ -203,7 +277,7 @@ def getData_TestProtocol(source="train"):
 #         print "Exception:", excp
         for filename in os.listdir(data_dir):
             filename = filename.lower()
-            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and str(prm.params["device"].get()) in filename:
+            if source in filename and filename[-3:] == "wav" and "," not in filename and "audio" not in filename and device in filename:
 #                 if source == "train":
 #                     if "clean" not in filename:
 #                         continue

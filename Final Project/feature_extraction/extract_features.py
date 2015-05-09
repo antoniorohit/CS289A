@@ -29,19 +29,19 @@ def extractFeatures(input_signal):
     
     mfcc_list = np.array(mfcc(input_signal, samplerate=prm.params["sample_rate"].get(), winlen=0.032, winstep=0.016, numcep=30,
           nfilt=55, nfft=2048, lowfreq=0, highfreq=6000, preemph=0.95, ceplifter=22, appendEnergy=True )) 
-#     extractor = LPCExtractor(prm.params["sample_rate"].get(), 32, 16, 30, 0.95)
-#     lpcc = extractor.extract(input_signal)
+    extractor = LPCExtractor(prm.params["sample_rate"].get(), 32, 16, 30, 0.95)
+    lpcc = extractor.extract(input_signal)
     
     pitch = extract_pitch(input_signal)
 #     print pitch
     
 #     # Cepstral Mean Normalization @TODO: WHY IS THIS NOT HELPING??
-    if 0:
-        mean_mfcc = np.mean(mfcc_list.T, 1)
-        std_mfcc = np.std(mfcc_list.T, 1)
-        for i in range(len(mfcc_list)):
-            for j in range(len(mfcc_list[i])):
-                mfcc_list[i][j] = (mfcc_list[i][j]-mean_mfcc[j])/std_mfcc[j]
+#     if 1:
+#         mean_mfcc = np.mean(mfcc_list.T, 1)
+#         std_mfcc = np.std(mfcc_list.T, 1)
+#         for i in range(len(mfcc_list)):
+#             for j in range(len(mfcc_list[i])):
+#                 mfcc_list[i][j] = (mfcc_list[i][j]-mean_mfcc[j])/std_mfcc[j]
  
 #     print np.shape(mfcc_list[i-1]), np.shape(mean_mfcc), np.shape(std_mfcc)
     N = 2
@@ -68,6 +68,6 @@ def extractFeatures(input_signal):
     
     full_features_list = []
     full_features_list = list(np.ravel(features_list))
-    full_features_list.extend([pitch]*30)         # do we need to append this multiple times to ensure that the forest selects it?
+#     full_features_list.extend([pitch]*30)         # do we need to append this multiple times to ensure that the forest selects it?
     
     return full_features_list

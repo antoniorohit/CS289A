@@ -4,7 +4,6 @@ import pyaudio
 import wave
 import numpy as np
 import parameters as prm
-chunk = 44100
 
 def extract_pitch(rawSignal):
     swidth = 2
@@ -22,10 +21,8 @@ def extract_pitch(rawSignal):
         x1 = (y2 - y0) * .5 / (2 * y1 - y2 - y0)
         # find the frequency and output it
         thefreq = (which + x1) * RATE / chunk
-#         print "The freq is %f Hz." % (thefreq)
     else:
         thefreq = which * RATE / chunk
-#         print "The freq is %f Hz." % (thefreq)
     
     return thefreq       
 

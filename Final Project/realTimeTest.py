@@ -19,7 +19,7 @@ from extract_features import extractFeatures
 from utils import *
 import cPickle as pickle
 
-chunk = 11025
+chunk = 10000
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
@@ -59,7 +59,7 @@ stream = p.open(format=FORMAT,
 print "* recording"
 
 frames = []
-num_frames = int(chunk_size*44100./11025)
+num_frames = int(chunk_size*44100./chunk)
 
 for i in range(0, int(44100. / chunk * RECORD_SECONDS)):
     data = stream.read(chunk)

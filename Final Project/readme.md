@@ -48,3 +48,9 @@ The dataset of voxforge files from the [16kHz dataset](http://www.repository.vox
 
   Misclassified chunks are placed into this folder
 
+**Acknowledgements**
+- [Leonard Berrada](https://github.com/leonardbj) whom I owe a lot of my intuition and coding style for this project.
+- [James Lyons](http://practicalcryptography.com/miscellaneous/machine-learning/guide-mel-frequency-cepstral-coefficients-mfccs/) and his MFCC tutorial/code
+- Stack Overflow users like [Justin Peel](http://stackoverflow.com/questions/2648151/python-frequency-detection)
+- [Andrew Ho](https://github.com/andrew950468) with whom I collaborated on this project
+- [Transcense](http://www.transcense.com/) for the initial challenge of real-time speaker ID

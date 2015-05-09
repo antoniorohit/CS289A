@@ -15,6 +15,8 @@ from build import build
 
 prm.params["data_source"].set("test_protocol")      # test_protocol or voxforge
 
+cross_validate = True
+
 results = []
 
 for device in prm.params["device"].all():
@@ -26,13 +28,14 @@ for device in prm.params["device"].all():
         prm.params["chunk_size"].set(chunkSize)
         print 60 * "*"    
         
-        cleanPickle()       # cleans pickle and error directory (except for vf)
-        
+        cleanPickle()       # cleans pickle and error directory
+
+        if cross_validate:        
+            print 20 * "#", "Training", 20 * "#"
+            train()       
+
         print 20 * "#", "Building", 20 * "#"
         build()
-        
-#         print 20 * "#", "Training", 20 * "#"
-#         train()       
         
         print 20 * "#", "Testing", 20 * "#"
         accuracy = np.around(test(), 2)

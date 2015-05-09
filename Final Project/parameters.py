@@ -89,6 +89,7 @@ params["chunk_size"] = Parameter(1.0, [0.25, 1.0])  # s
 params["voxforge_directory"] = Parameter("./Data/Voxforge/")
 params["test_protocol_directory"] = Parameter("./Data/Test_Protocol/")
 params["pickle_directory"] = Parameter("./Pickle/")
+params["data_source"] = Parameter("test_protocol")
 
 # set names
 for key in params.keys():

@@ -13,11 +13,12 @@ import cPickle as pickle
 from extract_features import extractFeatures
 import os 
 
-def test(source="test_protocol"):  # primarily tests testprotocol data now    
+def test():  # only tests test_protocol data now    
     pickle_directory = prm.params["pickle_directory"].get()
+    data_source= prm.params["data_source"].get()
     
     print "Loading CLF...."
-    clf = pickle.load(open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + source + ".p", "rb"))
+    clf = pickle.load(open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + data_source + ".p", "rb"))
     print "Done loading CLF...."
     data, labels, rawData = getData_TestProtocol(source="test")
     

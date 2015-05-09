@@ -28,10 +28,9 @@ RECORD_SECONDS = 20.
 from build import build
 
 chunk_size = 1.
-source = "test_protocol"
 
 prm.params["chunk_size"].set(chunk_size)
-# build(source)
+# build()
 
 p = pyaudio.PyAudio()
 

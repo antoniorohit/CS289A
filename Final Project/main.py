@@ -13,7 +13,7 @@ import os
 import numpy as np
 from build import build
 
-source = "test_protocol"
+prm.params["data_source"].set("test_protocol")      # test_protocol or voxforge
 
 results = []
 
@@ -29,13 +29,13 @@ for device in prm.params["device"].all():
         cleanPickle()       # cleans pickle and error directory (except for vf)
         
         print 20 * "#", "Building", 20 * "#"
-        build(source)
+        build()
         
 #         print 20 * "#", "Training", 20 * "#"
-#         train(source)       # test_protocol or voxforge
+#         train()       
         
         print 20 * "#", "Testing", 20 * "#"
-        accuracy = np.around(test(source), 2)
+        accuracy = np.around(test(), 2)
         
         print "Accuracy:", (accuracy), "%"
         

@@ -9,12 +9,9 @@ import cPickle as pickle
 from sklearn import svm, tree, ensemble
 import random
 
-def train(source="test_protocol"):    
+def train():    
     print "Loading the Data... (may take a while)"
-    if source == "test_protocol":
-        data, labels, rawData = getTrainData_Pickle("test_protocol")
-    else:
-        data, labels, rawData = getTrainData_Pickle("voxforge")
+    data, labels, rawData = getTrainData_Pickle(prm.params["data_source"].get())
     print "Data Loaded, Good to Go!"
 
     #########################################################

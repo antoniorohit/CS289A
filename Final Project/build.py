@@ -12,13 +12,11 @@ from sklearn.neighbors import KNeighborsClassifier
 import random
 
 
-def build(source="test_protocol"):
+def build():
+    data_source = prm.params["data_source"].get()
     pickle_directory = prm.params["pickle_directory"].get()
     print("Building CLF...")
-    if source == "test_protocol":
-        data, labels, rawData = getTrainData_Pickle("test_protocol")
-    else:
-        data, labels, rawData = getTrainData_Pickle("voxforge")
+    data, labels, rawData = getTrainData_Pickle(data_source)
     
     clf = ensemble.RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=10)
 #     clf = svm.SVC(kernel='linear', C=1)
@@ -28,7 +26,7 @@ def build(source="test_protocol"):
     clf.fit(data, labels)
     
     print("Saving CLF...")
-    pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + source +".p", "wb"))        
+    pickle.dump(clf, open(pickle_directory + "clf_" + str(prm.params["chunk_size"].get()) + "_" + data_source +".p", "wb"))        
     
     print("Build Data Done")
 
